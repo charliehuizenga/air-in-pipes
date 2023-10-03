@@ -2,21 +2,22 @@
 "use client";
 import { Disclosure } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 type NavigationItem = {
   name: string;
   href: string;
-  current: boolean;
 };
 
 const navigation: NavigationItem[] = [
-  { name: "Principal", href: "#", current: true },
-  { name: "Profile Data", href: "#", current: false },
-  { name: "Tophography Data", href: "#", current: false },
-  { name: "Graph", href: "#", current: false },
-  { name: "Tube Data", href: "#", current: false },
-  { name: "Valve Details", href: "#", current: false },
-  { name: "Report", href: "#", current: false },
+  { name: "Principal", href: "/" },
+  { name: "Profile Data", href: "/profile-data" },
+  { name: "Tophography Data", href: "/tophography-data" },
+  { name: "Graph", href: "/graph" },
+  { name: "Tube Data", href: "/tube-data" },
+  { name: "Valve Details", href: "/valve-details" },
+  { name: "Report", href: "/report" },
 ];
 
 function classNames(...classes: (string | undefined)[]): string {
@@ -24,6 +25,10 @@ function classNames(...classes: (string | undefined)[]): string {
 }
 
 export default function NavBar({}) {
+  // the current path name
+  const pathname = usePathname();
+  const isActiveRoute = (href: string) => pathname === href;
+
   return (
     <Disclosure as="nav" className="bg-gray-800 font-inter">
       {({ open }) => (
@@ -52,19 +57,21 @@ export default function NavBar({}) {
               <div className="flex items-center space-x-4">
                 <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
                   {navigation.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
                       href={item.href}
                       className={classNames(
-                        item.current
+                        isActiveRoute(item.href)
                           ? " bg-gray-900 text-white"
                           : " text-gray-300 hover:bg-gray-700 hover:text-white",
                         "rounded-md px-2 py-2 text-sm font-medium"
                       )}
-                      aria-current={item.current ? "page" : undefined}
+                      aria-current={
+                        isActiveRoute(item.href) ? "page" : undefined
+                      }
                     >
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </div>
                 <div className="flex-shrink-0">
@@ -87,12 +94,12 @@ export default function NavBar({}) {
                   as="a"
                   href={item.href}
                   className={classNames(
-                    item.current
+                    isActiveRoute(item.href)
                       ? "font-semibold bg-beige text-darkest-blue"
                       : " font-semibold text-beige text-opacity-80 hover:bg-darkest-blue hover:text-beige",
                     "block rounded-md px-3 py-2 text-base font-medium"
                   )}
-                  aria-current={item.current ? "page" : undefined}
+                  aria-current={isActiveRoute(item.href) ? "page" : undefined}
                 >
                   {item.name}
                 </Disclosure.Button>
