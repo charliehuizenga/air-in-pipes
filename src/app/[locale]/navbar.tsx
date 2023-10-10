@@ -3,31 +3,36 @@
 import { Disclosure } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
-
-type NavigationItem = {
-  name: string;
-  href: string;
-};
-
-const navigation: NavigationItem[] = [
-  { name: "Principal", href: "/" },
-  { name: "Profile Data", href: "/profile-data" },
-  { name: "Tophography Data", href: "/tophography-data" },
-  { name: "Graph", href: "/graph" },
-  { name: "Tube Data", href: "/tube-data" },
-  { name: "Valve Details", href: "/valve-details" },
-  { name: "Report", href: "/report" },
-];
 
 function classNames(...classes: (string | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function NavBar({}) {
+interface Props {
+  locale: string;
+}
+
+export default function NavBar({ locale }: Props) {
   // the current path name
   const pathname = usePathname();
   const isActiveRoute = (href: string) => pathname === href;
+
+  type NavigationItem = {
+    name: string;
+    href: string;
+  };
+  const t = useTranslations("nav-bar");
+  const navigation: NavigationItem[] = [
+    { name: t("principal"), href: "/" },
+    { name: t("profile-data"), href: `/${locale}/profile-data` },
+    { name: t("topography-data"), href: `/${locale}/tophography-data` },
+    { name: t("graph"), href: `/${locale}/graph` },
+    { name: t("tube-data"), href: `/${locale}/tube-data` },
+    { name: t("valve-details"), href: `/${locale}/valve-details` },
+    { name: t("report"), href: `/$${locale}/report` },
+  ];
 
   return (
     <Disclosure as="nav" className="bg-gray-800 font-inter">
@@ -79,7 +84,7 @@ export default function NavBar({}) {
                     type="button"
                     className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-300 active:bg-sky-300 px-3 py-2 text-sm font-semibold text-sky-900 shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-50"
                   >
-                    Calculate
+                    {t("calculate")}
                   </button>
                 </div>
               </div>

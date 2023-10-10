@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "i18nexus pull && next dev",
+    "build": "i18nexus pull && next build",
+    "start": "i18nexus pull && next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -15,9 +15,13 @@
     "flowbite": "^1.8.1",
     "flowbite-react": "^0.6.1",
     "headlessui": "^0.0.0",
+    "i18next": "^23.5.1",
     "next": "latest",
+    "next-i18next": "^14.0.3",
+    "next-intl": "^2.20.2",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "react-i18next": "^13.2.2"
   },
   "devDependencies": {
     "@types/node": "latest",
@@ -26,6 +30,7 @@
     "autoprefixer": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",
+    "i18nexus-cli": "^3.3.0",
     "postcss": "latest",
     "tailwindcss": "latest",
     "typescript": "latest"

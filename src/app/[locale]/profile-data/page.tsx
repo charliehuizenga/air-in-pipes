@@ -1,6 +1,7 @@
 "use client";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 type Point = {
   label: string;
@@ -13,6 +14,7 @@ type InputValues = {
 };
 
 export default function ProfileData() {
+  const t = useTranslations("profile-data");
   const [inputValues, setInputValues] = useState<InputValues[]>([]);
   const [topo, setTopo] = useState<Point[]>([
     { label: "1", length: 0, height: 0 },
