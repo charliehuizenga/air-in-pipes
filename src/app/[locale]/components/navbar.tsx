@@ -4,20 +4,34 @@ import { Disclosure } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { ProjectState } from "../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { getDesign } from "../api/fetch-design";
+import { setData } from "../redux/report-slice";
+import Alert from "./alert";
 import Link from "next/link";
+import { useState } from "react";
 
 function classNames(...classes: (string | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
 }
 
-interface Props {
+export interface NavBarProps {
   locale: string;
 }
 
-export default function NavBar({ locale }: Props) {
+export default function NavBar({ locale }: NavBarProps) {
   // the current path name
   const pathname = usePathname();
   const isActiveRoute = (href: string) => pathname === href;
+  const dispatch = useDispatch();
+
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("success");
+
+  // The json object
+  const project = useSelector((state: ProjectState) => state.project);
 
   type NavigationItem = {
     name: string;
@@ -26,18 +40,40 @@ export default function NavBar({ locale }: Props) {
   const t = useTranslations("nav-bar");
   const navigation: NavigationItem[] = [
     { name: t("principal"), href: "/" },
-    { name: t("profile-data"), href: `/${locale}/profile-data` },
-    { name: t("topography-data"), href: `/${locale}/tophography-data` },
-    { name: t("graph"), href: `/${locale}/graph` },
+    { name: t("input-data"), href: `/${locale}/input-data` },
     { name: t("tube-data"), href: `/${locale}/tube-data` },
-    { name: t("valve-details"), href: `/${locale}/valve-details` },
-    { name: t("report"), href: `/$${locale}/report` },
+    { name: t("report"), href: `/${locale}/report` },
   ];
+
+  async function fetchData() {
+    // Reset the showAlert state
+    setShowAlert(false);
+    try {
+      const report = await getDesign(project);
+      dispatch(setData(report));
+      // Check if design_summary exists and is not undefined
+      if (report.design_summary !== undefined) {
+        setAlertMessage("Successfully calculated!");
+        setShowAlert(true);
+        setAlertType("success");
+      } else {
+        setAlertMessage("Cannot calculate with current input data.");
+        setShowAlert(true);
+        setAlertType("error");
+      }
+
+      // Ensure the alert is shown every time
+      setShowAlert(true);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }
 
   return (
     <Disclosure as="nav" className="bg-gray-800 font-inter">
       {({ open }) => (
         <>
+          {showAlert && <Alert message={alertMessage} type={alertType} />}
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex h-16 justify-between">
               <div className="flex">
@@ -54,7 +90,7 @@ export default function NavBar({ locale }: Props) {
                   </Disclosure.Button>
                 </div>
                 <div className="flex flex-shrink-0 items-center"></div>
-                <div className="flex font-semibold text-xl tracking-wide text-sky-400 px-1 items-center ">
+                <div className="flex flex-shrink-0 font-semibold text-xl tracking-wide text-sky-400 px-1 items-center ">
                   {" "}
                   Agua Para La Vida
                 </div>
@@ -82,7 +118,8 @@ export default function NavBar({ locale }: Props) {
                 <div className="flex-shrink-0">
                   <button
                     type="button"
-                    className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-300 active:bg-sky-300 px-3 py-2 text-sm font-semibold text-sky-900 shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-50"
+                    onClick={fetchData}
+                    className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
                   >
                     {t("calculate")}
                   </button>

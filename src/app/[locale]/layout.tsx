@@ -2,9 +2,9 @@ import { NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import NavBar from "./navbar";
-import LanguageSelector from "./language-selector";
-
+import NavBar from "./components/navbar";
+import LanguageSelector from "./components/language-selector";
+import ReduxProvider from "./redux-provider";
 export function generateStaticParams() {
   return [{ locale: "en" }, { locale: "es" }];
 }
@@ -33,13 +33,15 @@ export default async function LocalLayout({
     <html lang={locale} className="h-screen bg-white">
       <body className={inter.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <div>
-            <NavBar locale={locale} />
-            <div className="flex justify-end">
-              <LanguageSelector />
+          <ReduxProvider>
+            <div>
+              <NavBar locale={locale} />
+              <div className="flex justify-end">
+                <LanguageSelector />
+              </div>
+              {children}
             </div>
-            {children}
-          </div>
+          </ReduxProvider>
         </NextIntlClientProvider>
       </body>
     </html>

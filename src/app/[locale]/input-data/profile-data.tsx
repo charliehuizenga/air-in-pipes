@@ -1,108 +1,132 @@
+/** The page for profile-data, where the user can input their own topography data */
 "use client";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
+import { isHighPoint, calculateSlope, calculateStart } from "./utils";
+import { useSelector, useDispatch } from "react-redux";
+import { setTopo, Topo, removeTopo } from "../redux/project-slice";
+import { ProjectState } from "../redux/store";
 
-type Point = {
-  label: string;
-  length: number;
-  height: number;
-};
+// ----- Types ----- //
 
 type InputValues = {
-  [K in keyof Point]?: string;
+  [K in keyof Topo]?: string;
 };
 
 export default function ProfileData() {
   const t = useTranslations("profile-data");
-  const [inputValues, setInputValues] = useState<InputValues[]>([]);
-  const [topo, setTopo] = useState<Point[]>([
-    { label: "1", length: 0, height: 0 },
-    { label: "2", length: 20.46, height: -6.1 },
-    { label: "4", length: 30.42, height: -7.1 },
-    // More points...
-  ]);
+  const topo = useSelector((state: ProjectState) => state.project.topo);
+  const dispatch = useDispatch();
+
+  // ----- States ----- //
+
+  // State to hold the points of the profile-data table
+
+  const [inputValues, setInputValues] = useState<InputValues[]>([]); // Temporary state for when use adds a new point and type in values
+  const [checkedItems, setCheckedItems] = useState<boolean[]>([]); // State to hold the points that are high-point (needs a valve)
+
+  //----- useEffects ----- //
   useEffect(() => {
     // Code to run on component mount
     const newInputValues = topo.map((point) => ({
-      label: point.label,
-      length: point.length.toString(),
-      height: point.height.toString(),
+      name: point.name,
+      l: point.l.toString(),
+      h: point.h.toString(),
     }));
 
     setInputValues(newInputValues);
+    setCheckedItems(topo.map(() => false)); // All unchecked by default
   }, []);
+
+  useEffect(() => {
+    setCheckedItems(
+      topo.map((point, idx) => {
+        const prevHeight = idx > 0 ? topo[idx - 1].h : point.h;
+        const nextHeight = idx < topo.length - 1 ? topo[idx + 1].h : point.h;
+        return isHighPoint(prevHeight, point.h, nextHeight);
+      })
+    );
+  }, [topo]);
+
+  // ----- Handle functions ----- //
+
+  // Function to deal with removing a table point
   const handleRemove = (index: number) => {
-    const newTopo = [...topo];
-    newTopo.splice(index, 1);
-    setTopo(newTopo);
+    dispatch(removeTopo(index));
+    const newCheckedItems = [...checkedItems];
+    newCheckedItems.splice(index, 1);
+    setCheckedItems(newCheckedItems);
+    const newInputValues = [...inputValues];
+    newInputValues.splice(index, 1);
+    setInputValues(newInputValues);
   };
 
-  // Slope calculation function with type checks
-  function calculateSlope(
-    next_length: number,
-    current_length: number,
-    next_height: number,
-    current_height: number
-  ): number {
-    if (
-      !isNaN(current_length) &&
-      !isNaN(current_height) &&
-      !isNaN(next_length) &&
-      !isNaN(next_height)
-    ) {
-      const deltaY = next_height - current_height;
-      const deltaX = next_length - current_length;
-      const result = deltaY / deltaX;
-      return parseFloat(result.toFixed(2));
-    } else {
-      return 0;
-    }
-  }
+  // Function to deal with user adding a new point
+  const handleAddPoint = () => {
+    const newPoint = { name: "", l: NaN, h: NaN };
+    const newTopo = [...topo, newPoint];
 
-  function calculateStart(next_length: number, current_length: number): number {
-    if (!isNaN(current_length) && !isNaN(next_length)) {
-      return current_length;
-    } else {
-      return 0;
-    }
-  }
-  const handleChange = (index: number, key: keyof Point, value: string) => {
+    console.log("topo: " + JSON.stringify(topo));
+    setCheckedItems((prevCheckedItems) => [
+      ...prevCheckedItems,
+      newTopo.length > 2
+        ? isHighPoint(
+            newTopo[newTopo.length - 3].h,
+            newTopo[newTopo.length - 2].h,
+            newTopo[newTopo.length - 1].h
+          )
+        : false,
+    ]);
+
+    dispatch(setTopo({ topoData: newTopo, valveCount: checkedCount }));
+  };
+
+  // Function to deal with clicking a highpoint checkbox
+  const handleCheckboxClick = (index: number) => {
+    setCheckedItems((prevState) => {
+      const newState = [...prevState];
+      newState[index] = !newState[index];
+      return newState;
+    });
+  };
+
+  // Function to deal with user mid-typing a point
+  const handleChange = (index: number, key: keyof Topo, value: string) => {
     const newInputValues = [...inputValues];
     newInputValues[index] = { ...newInputValues[index], [key]: value };
     setInputValues(newInputValues);
 
     // Try to convert to number and update topo state if it's a valid number or intermediary input
-    if (key === "length" || key === "height") {
+    if (key === "l" || key === "h") {
       const numericValue = parseFloat(value);
       if (!isNaN(numericValue) || value === "") {
         const newTopo = [...topo];
-        newTopo[index][key] = isNaN(numericValue) ? 0 : numericValue;
-        setTopo(newTopo);
+        newTopo[index] = {
+          ...newTopo[index],
+          [key]: isNaN(parseFloat(value)) ? 0 : parseFloat(value),
+        };
+        dispatch(setTopo({ topoData: newTopo, valveCount: checkedCount }));
       }
     } else {
       const newTopo = [...topo];
-      newTopo[index][key] = value;
-      setTopo(newTopo);
+      newTopo[index] = { ...newTopo[index], [key]: value };
+      dispatch(setTopo({ topoData: newTopo, valveCount: checkedCount }));
     }
   };
-  const handleAddPoint = () => {
-    setTopo((prevTopo) => [
-      ...prevTopo,
-      { label: "", length: NaN, height: NaN },
-    ]);
-  };
+
+  const checkedCount = checkedItems.reduce(
+    (total, isChecked) => total + (isChecked ? 1 : 0),
+    0
+  );
 
   return (
-    <div className="mx-auto max-w-5xl py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl sm:px-6 lg:px-8 mb-4">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
-            <h1 className="text-base font-semibold leading-6 text-gray-900">
-              Profile Data
-            </h1>
             <p className="mt-2 text-sm text-gray-700">
-              A list of all the conduction line points
+              {t("profile-data-note")}
             </p>
           </div>
           <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
@@ -111,45 +135,51 @@ export default function ProfileData() {
               onClick={handleAddPoint}
               className="block rounded-md bg-sky-500 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
             >
-              Add Point
+              {t("add-point")}
             </button>
           </div>
         </div>
         <div className="mt-8 flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full  py-2 align-middle sm:px-6 lg:px-8">
-              <table className="min-w-full divide-y divide-gray-300">
+              <table className="min-w-full divide-y divide-gray-300 mb-16">
                 <thead>
                   <tr>
                     <th
                       scope="col"
                       className="w-1/5 py-3.5 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
                     >
-                      Label
+                      {t("label")}
                     </th>
                     <th
                       scope="col"
                       className="w-1/5 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Length
+                      {t("length")}
                     </th>
                     <th
                       scope="col"
                       className="w-1/5 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Height
+                      {t("height")}
                     </th>
                     <th
                       scope="col"
                       className="w-1/5 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Slope
+                      {t("slope")}
                     </th>
                     <th
                       scope="col"
                       className="w-1/5 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
-                      Start
+                      {t("start")}
+                    </th>
+                    <th
+                      scope="col"
+                      className="w-1/5 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
+                      {t("valve")}
                     </th>
                     <th
                       scope="col"
@@ -165,9 +195,9 @@ export default function ProfileData() {
                       <td className="whitespace-nowrap px-3 py-4 pl-4 pr-3 text-sm font-medium text-gray-500 sm:pl-0">
                         <input
                           type="text"
-                          value={point.label}
+                          value={point.name}
                           onChange={(e) =>
-                            handleChange(index, "label", e.target.value)
+                            handleChange(index, "name", e.target.value)
                           }
                           className="w-full px-2 py-1 text-sm border-0 rounded-md border-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
                         />
@@ -175,9 +205,9 @@ export default function ProfileData() {
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <input
                           type="text"
-                          value={inputValues[index]?.length || ""}
+                          value={inputValues[index]?.l || ""}
                           onChange={(e) =>
-                            handleChange(index, "length", e.target.value)
+                            handleChange(index, "l", e.target.value)
                           }
                           className="w-full px-2 py-1 text-sm border-0 rounded-md border-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
                         />
@@ -185,9 +215,9 @@ export default function ProfileData() {
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <input
                           type="text"
-                          value={inputValues[index]?.height || ""}
+                          value={inputValues[index]?.h || ""}
                           onChange={(e) =>
-                            handleChange(index, "height", e.target.value)
+                            handleChange(index, "h", e.target.value)
                           }
                           className="w-full px-2 py-1 text-sm border-0 rounded-md border-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
                         />
@@ -195,17 +225,25 @@ export default function ProfileData() {
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 ">
                         {index < topo.length - 1
                           ? calculateSlope(
-                              topo[index + 1].length,
-                              point.length,
-                              topo[index + 1].height,
-                              point.height
+                              topo[index + 1].l,
+                              point.l,
+                              topo[index + 1].h,
+                              point.h
                             )
                           : "0"}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 ">
                         {index < topo.length - 1
-                          ? calculateStart(topo[index + 1].length, point.length)
+                          ? calculateStart(topo[index + 1].l, point.l)
                           : "0"}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        <input
+                          type="checkbox"
+                          checked={checkedItems[index]}
+                          onChange={() => handleCheckboxClick(index)}
+                          className="h-4 w-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500"
+                        />
                       </td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                         <XMarkIcon

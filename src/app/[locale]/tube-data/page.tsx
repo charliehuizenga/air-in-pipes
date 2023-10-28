@@ -1,290 +1,84 @@
 "use client";
-import { useLayoutEffect, useRef, useState } from "react";
-
-type PipeData = {
-  nominal_size: string;
-  sdr: number;
-  id: number;
-  cost: number;
-  available: boolean;
-};
+import { useEffect, useRef, useState } from "react";
+import { setLibrary, togglePipeAvailability } from "../redux/project-slice";
+import { useDispatch, useSelector } from "react-redux";
+import { ProjectState } from "../redux/store";
+import { PipeData } from "./tube_list";
+import { Pipe } from "stream";
 
 function classNames(...classes: (string | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function TubeData() {
-  const [cost, setCost] = useState<number>(380);
-  const [pipeData, setPipeData] = useState<PipeData[]>([
-    {
-      nominal_size: '1/2"',
-      sdr: 13,
-      id: 0.0182,
-      cost: 7.98,
-      available: true,
-    },
-    {
-      nominal_size: '1/2"',
-      sdr: 7.7,
-      id: 0.0158,
-      cost: 15.18,
-      available: true,
-    },
-    {
-      nominal_size: '1/2"',
-      sdr: 5.7,
-      id: 0.0138684,
-      cost: 16.2,
-      available: true,
-    },
-    {
-      nominal_size: '3/4"',
-      sdr: 17,
-      id: 0.0235,
-      cost: 11.14,
-      available: true,
-    },
-    {
-      nominal_size: '3/4"',
-      sdr: 9.3,
-      id: 0.0209296,
-      cost: 22.61,
-      available: true,
-    },
-    {
-      nominal_size: '3/4"',
-      sdr: 6.8,
-      id: 0.0188468,
-      cost: 22.2,
-      available: true,
-    },
-    {
-      nominal_size: '1"',
-      sdr: 26,
-      id: 0.0304,
-      cost: 14.41,
-      available: true,
-    },
-    {
-      nominal_size: '1"',
-      sdr: 17,
-      id: 0.0295,
-      cost: 18.22,
-      available: true,
-    },
-    {
-      nominal_size: '1"',
-      sdr: 9.9,
-      id: 0.0266446,
-      cost: 29.89,
-      available: true,
-    },
-    {
-      nominal_size: '1"',
-      sdr: 7.3,
-      id: 0.0243078,
-      cost: 37.6,
-      available: true,
-    },
-    {
-      nominal_size: '1.5"',
-      sdr: 32.5,
-      id: 0.0453,
-      cost: 21.05,
-      available: true,
-    },
-    {
-      nominal_size: '1.5"',
-      sdr: 26,
-      id: 0.0446,
-      cost: 25.46,
-      available: true,
-    },
-    {
-      nominal_size: '1.5"',
-      sdr: 17,
-      id: 0.0426,
-      cost: 38.13,
-      available: true,
-    },
-    {
-      nominal_size: '1.5"',
-      sdr: 13.1,
-      id: 0.040894,
-      cost: 56.11,
-      available: true,
-    },
-    {
-      nominal_size: '1.5"',
-      sdr: 9.5,
-      id: 0.0381,
-      cost: 68.97,
-      available: true,
-    },
-    {
-      nominal_size: '2"',
-      sdr: 32.5,
-      id: 0.0566,
-      cost: 32.04,
-      available: true,
-    },
-    {
-      nominal_size: '2"',
-      sdr: 26,
-      id: 0.0557,
-      cost: 39.7,
-      available: true,
-    },
-    {
-      nominal_size: '2"',
-      sdr: 17,
-      id: 0.0532,
-      cost: 59.82,
-      available: true,
-    },
-    {
-      nominal_size: '2"',
-      sdr: 15.4,
-      id: 0.0525018,
-      cost: 77.85,
-      available: true,
-    },
-    {
-      nominal_size: '2"',
-      sdr: 10.9,
-      id: 0.0492506,
-      cost: 99.2,
-      available: true,
-    },
-    {
-      nominal_size: '3"',
-      sdr: 32.5,
-      id: 0.0834,
-      cost: 69.81,
-      available: true,
-    },
-    {
-      nominal_size: '3"',
-      sdr: 26,
-      id: 0.0821,
-      cost: 86.8,
-      available: true,
-    },
-    {
-      nominal_size: '3"',
-      sdr: 17,
-      id: 0.0784,
-      cost: 129.43,
-      available: true,
-    },
-    {
-      nominal_size: '3"',
-      sdr: 16.2,
-      id: 0.0779272,
-      cost: 162.54,
-      available: true,
-    },
-    {
-      nominal_size: '3"',
-      sdr: 11.7,
-      id: 0.07366,
-      cost: 205.58,
-      available: true,
-    },
-    {
-      nominal_size: '4"',
-      sdr: 32.5,
-      id: 0.1073,
-      cost: 115.4,
-      available: true,
-    },
-    {
-      nominal_size: '4"',
-      sdr: 26,
-      id: 0.1055,
-      cost: 143,
-      available: true,
-    },
-    {
-      nominal_size: '4"',
-      sdr: 17,
-      id: 0.1008,
-      cost: 214.34,
-      available: true,
-    },
-    {
-      nominal_size: '4"',
-      sdr: 13.4,
-      id: 0.0971804,
-      cost: 309.32,
-      available: true,
-    },
-    {
-      nominal_size: '6"',
-      sdr: 32.5,
-      id: 0.1579,
-      cost: 250.6,
-      available: true,
-    },
-    {
-      nominal_size: '6"',
-      sdr: 26,
-      id: 0.1553,
-      cost: 320.13,
-      available: true,
-    },
-    {
-      nominal_size: '6"',
-      sdr: 17,
-      id: 0.1485,
-      cost: 495.57,
-      available: true,
-    },
-    {
-      nominal_size: '6"',
-      sdr: 15.3,
-      id: 0.1463294,
-      cost: 608.92,
-      available: true,
-    },
-    // More pipes...
-  ]);
+  const dispatch = useDispatch();
+  const pipeData = useSelector(
+    (state: ProjectState) => state.project.library.pipe_data
+  );
+  const cost = useSelector(
+    (state: ProjectState) => state.project.library.valve_cost
+  );
+
   const checkbox = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState<boolean>(false);
   const [indeterminate, setIndeterminate] = useState<boolean>(false);
   const [selectedPipe, setSelectedPipe] = useState<PipeData[]>([]);
 
-  useLayoutEffect(() => {
-    const allAvailable = pipeData.every((pipe) => pipe.available);
-    const someAvailable = pipeData.some((pipe) => pipe.available);
+  useEffect(() => {
+    const allAvailable = pipeData.every((pipe: PipeData) => pipe.available);
+    const someAvailable = pipeData.some((pipe: PipeData) => pipe.available);
     setChecked(allAvailable);
     setIndeterminate(!allAvailable && someAvailable);
-    checkbox.current.indeterminate = !allAvailable && someAvailable;
-  }, [pipeData]);
+    if (checkbox.current) {
+      checkbox.current.indeterminate = !allAvailable && someAvailable;
+    }
+
+    dispatch(setLibrary({ data: pipeData, valveCost: cost }));
+  }, [pipeData, cost, dispatch]);
 
   function toggleAll() {
     if (checked || indeterminate) {
-      setPipeData(pipeData.map((pipe) => ({ ...pipe, available: false })));
+      dispatch(
+        setLibrary({
+          data: pipeData.map((pipe: PipeData) => ({
+            ...pipe,
+            available: false,
+          })),
+          valveCost: cost,
+        })
+      );
     } else {
-      setPipeData(pipeData.map((pipe) => ({ ...pipe, available: true })));
+      dispatch(
+        setLibrary({
+          data: pipeData.map((pipe: PipeData) => ({
+            ...pipe,
+            available: true,
+          })),
+          valveCost: cost,
+        })
+      );
     }
     setChecked(!checked && !indeterminate);
     setIndeterminate(false);
   }
 
   function handleCheckboxClick(pipe: PipeData, isChecked: boolean) {
-    setPipeData((prevPipeData) => {
-      return prevPipeData.map((p) => {
-        if (p.id === pipe.id) {
-          return { ...p, available: isChecked };
-        }
-        return p;
-      });
-    });
+    dispatch(togglePipeAvailability({ pipeId: pipe.id, isChecked: isChecked }));
+    const updatedPipeData = pipeData.map((p: PipeData) =>
+      p.id === pipe.id ? { ...p, available: isChecked } : p
+    );
+    const allAvailable = updatedPipeData.every((p: PipeData) => p.available);
+    const someAvailable = updatedPipeData.some((p: PipeData) => p.available);
+
+    setChecked(allAvailable);
+    setIndeterminate(!allAvailable && someAvailable);
+    if (checkbox.current) {
+      checkbox.current.indeterminate = !allAvailable && someAvailable;
+    }
   }
 
   return (
-    <div className="mx-auto max-w-5xl py-6 sm:px-6 lg:px-8">
+    <div className="mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
@@ -309,7 +103,14 @@ export default function TubeData() {
                 name="project-name"
                 id="project-name"
                 value={cost}
-                onChange={(e) => setCost(Number(e.target.value))}
+                onChange={(e) =>
+                  dispatch(
+                    setLibrary({
+                      data: pipeData,
+                      valveCost: Number(e.target.value),
+                    })
+                  )
+                }
                 className="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
               />
             </div>
@@ -371,7 +172,7 @@ export default function TubeData() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {pipeData.map((pipe) => (
+                    {pipeData.map((pipe: PipeData) => (
                       <tr
                         key={pipe.id}
                         className={

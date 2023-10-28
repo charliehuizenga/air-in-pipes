@@ -5,6 +5,7 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 import { GlobeAltIcon } from "@heroicons/react/24/outline";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next-intl/client";
+import { usePathname } from "next-intl/client";
 
 const classNames = (...classes: (false | null | undefined | string)[]) => {
   return classes.filter(Boolean).join(" ");
@@ -26,8 +27,11 @@ export default function LanguageSelector() {
     { id: "fr", name: t("french") },
   ];
 
+  const pathname = usePathname();
+
   const handleChange = (language: Language) => {
-    router.push("/", { locale: language.id });
+    // Navigate to the new URL while changing the locale.
+    router.replace(pathname, { locale: language.id });
   };
 
   const [selected, setSelected] = useState<Language>(languages[0]);
