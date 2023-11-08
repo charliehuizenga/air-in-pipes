@@ -1,6 +1,7 @@
 "use client"; // Error components must be Client Components
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 export default function Error({
   error,
@@ -14,12 +15,11 @@ export default function Error({
     console.error(error);
   }, [error]);
 
+  const t = useTranslations("report");
+
   return (
     <div className="mx-auto max-w-5xl sm:px-6 lg:px-8 py-12">
-      <h3 className="text-center">
-        Data has not been calculated. Please fill out input data and click
-        calculate to show report.
-      </h3>
+      <h3 className="text-center">{t("error-message")}</h3>
     </div>
   );
 }

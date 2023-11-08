@@ -3,15 +3,14 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { useSelector, useDispatch } from "react-redux";
-import { NavBarProps } from "../components/navbar";
-import { PaperClipIcon } from "@heroicons/react/20/solid";
+
 import { ProjectState } from "../redux/store";
 import { Tab } from "../input-data/page";
 import Summary from "./summary";
+import Graph from "./graph";
 
 export default function Report() {
-  const t = useTranslations("input-data");
-  //   const t = useTranslations("profile-data");
+  const t = useTranslations("report");
   const report = useSelector((state: ProjectState) => state.report);
   const project = useSelector((state: ProjectState) => state.project);
   const dispatch = useDispatch();
@@ -69,10 +68,7 @@ export default function Report() {
       )}
 
       {activeTab === t("graph") && (
-        <div>
-          {/* Your topo-data content here */}
-          Topo Data Content
-        </div>
+        <Graph report={report} project={project}></Graph>
       )}
     </div>
   );
