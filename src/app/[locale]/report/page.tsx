@@ -8,6 +8,7 @@ import { ProjectState } from "../redux/store";
 import { Tab } from "../input-data/page";
 import Summary from "./summary";
 import Graph from "./graph";
+import Detail from "./detail";
 
 export default function Report() {
   const t = useTranslations("report");
@@ -41,6 +42,7 @@ export default function Report() {
   function classNames(...classes: any[]): string {
     return classes.filter(Boolean).join(" ");
   }
+  console.log(report);
   return (
     <div>
       <div className="hidden sm:block mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">
@@ -69,6 +71,10 @@ export default function Report() {
 
       {activeTab === t("graph") && (
         <Graph report={report} project={project}></Graph>
+      )}
+
+      {activeTab === t("detail") && (
+        <Detail report={report} project={project}></Detail>
       )}
     </div>
   );

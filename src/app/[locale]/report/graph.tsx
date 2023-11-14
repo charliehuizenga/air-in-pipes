@@ -44,46 +44,36 @@ export default function Summary({ report, project }: GraphProps) {
   const topoData = project.topo;
   const pipeDesign = report.pipe_design;
 
-  let lastHGL = topoData[0].h; // Initialize with the reference height from the first point of topography data
+  // Function to create a unique identifier for each pipe type
+  const createPipeIdentifier = (nominalSize, sdr) => `${nominalSize}-${sdr}`;
 
-  // Generate datasets for connected HGL lines of each pipe segment
-  const hglDatasets = pipeDesign.map((pipe, index) => {
-    // Generate more muted colors by reducing the saturation and increasing the lightness
-    const hue = (index * 137) % 360; // Unique hue for each pipe
-    const saturation = 60; // Reduced saturation for a more muted color
-    const lightness = 50; // Adjust lightness if needed
-    const color = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.7)`; // Muted color with some transparency
+  // Map to store colors for each pipe type
+  const pipeColorMap = new Map();
 
-    const dataset = {
-      label: `HGL for Pipe ${index + 1}`,
-      data: [
-        { x: pipe.start_pos, y: lastHGL }, // Start of the HGL at the end of the previous pipe's HGL
-        { x: pipe.start_pos + pipe.length, y: pipe.hgl }, // End of the HGL at its value
-      ],
-      borderColor: color,
-      borderWidth: 2,
-      pointRadius: 0, // Hide points on the dataset line
-      fill: false, // No fill below the line
-      tension: 0, // Straight line
-      spanGaps: true,
-    };
+  // Function to get color for a pipe type
+  const getPipeColor = (nominalSize, sdr) => {
+    const identifier = createPipeIdentifier(nominalSize, sdr);
+    if (!pipeColorMap.has(identifier)) {
+      // Generate a new color if not already present
+      const hue = (pipeColorMap.size * 137) % 360; // Using golden angle for color spread
+      const color = `hsla(${hue}, 60%, 70%, 0.3)`;
+      pipeColorMap.set(identifier, color);
+    }
+    return pipeColorMap.get(identifier);
+  };
 
-    lastHGL = pipe.hgl; // Update lastHGL to the current pipe's HGL for the next iteration
-    return dataset;
-  });
-
-  const pipeInfoMap = pipeDesign.map((pipe, index) => ({
-    nominalSize: pipe.nominal_size,
-    sdr: pipe.sdr,
-    hgl: pipe.hgl,
-    length: pipe.length,
-    start: pipe.start_pos,
+  // Generate annotations for each pipe segment
+  const annotations = pipeDesign.map((pipe) => ({
+    type: "box",
+    xMin: pipe.start_pos,
+    xMax: pipe.start_pos + pipe.length,
+    backgroundColor: getPipeColor(pipe.nominal_size, pipe.sdr),
+    borderColor: getPipeColor(pipe.nominal_size, pipe.sdr),
+    borderWidth: 1,
   }));
 
   const data = {
     datasets: [
-      ...hglDatasets,
-      // Then add the topography data
       {
         label: "Topo Data",
         data: project.topo.map((point) => ({ x: point.l, y: point.h })),
@@ -95,6 +85,7 @@ export default function Summary({ report, project }: GraphProps) {
       },
     ],
   };
+
   // Define the options with the correct type
   const options: ChartOptions<"line"> = {
     scales: {
@@ -115,25 +106,16 @@ export default function Summary({ report, project }: GraphProps) {
       },
     },
     plugins: {
-      tooltip: {
-        callbacks: {
-          title: function (tooltipItems) {
-            // Assuming the point's name is in the same order as your data array
-            const index = tooltipItems[0].dataIndex;
-            return topoData[index].name; // Return the name of the point
-          },
-          // Adjust the label callback to display pipe information
-          label: function (context) {
-            const datasetIndex = context.datasetIndex;
-            const pipeInfo = pipeInfoMap[datasetIndex];
+      annotation: {
+        annotations: annotations,
+      },
 
-            // Check if the hovered dataset corresponds to a pipe segment
-            if (pipeInfo) {
-              return `Pipe Size: ${pipeInfo.nominalSize}, SDR: ${pipeInfo.sdr}, HGL: ${pipeInfo.hgl}`;
-            } else {
-              // Handle other datasets, e.g., topography
-              return `Height: ${context.parsed.y}, Length: ${context.parsed.x}`;
-            }
+      tooltip: {
+        enabled: true,
+        callbacks: {
+          label: function (context) {
+            const index = context.dataIndex;
+            return context.label;
           },
         },
       },
@@ -148,9 +130,49 @@ export default function Summary({ report, project }: GraphProps) {
     },
   };
 
+  const CustomLegend = () => (
+    <div
+      style={{
+        padding: "10px",
+        border: "1px solid #ccc",
+        borderRadius: "5px",
+        marginTop: "10px",
+      }}
+    >
+      {pipeDesign.map((pipe, index) => {
+        const color = getPipeColor(pipe.nominal_size, pipe.sdr);
+        return (
+          <div
+            key={index}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "5px",
+            }}
+          >
+            <div
+              style={{
+                width: "20px",
+                height: "20px",
+                backgroundColor: color,
+                marginRight: "10px",
+              }}
+            ></div>
+            <span>
+              {pipe.nominal_size} SDR: {pipe.sdr}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className="hidden sm:block mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">
       <Line data={data} options={options} />
+      <div style={{ width: "25%" }}>
+        <CustomLegend />
+      </div>
     </div>
   );
 }

@@ -3,9 +3,9 @@ import { createSlice } from "@reduxjs/toolkit";
 import { PipeData, pipeData } from "../tube-data/tube_list";
 
 export interface Topo {
-  name: string;
+  name?: string;
   l: number;
-  h: number;
+  h: number | null;
 }
 
 export interface Project {
