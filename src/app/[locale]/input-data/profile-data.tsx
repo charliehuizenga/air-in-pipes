@@ -8,6 +8,8 @@ import { useSelector, useDispatch } from "react-redux";
 import { setTopo, Topo, removeTopo } from "../redux/project-slice";
 import { ProjectState } from "../redux/store";
 
+
+
 // ----- Types ----- //
 
 type InputValues = {
@@ -32,6 +34,7 @@ export default function ProfileData() {
     const newInputValues = topo.map((point) => ({
       name: point.name,
       l: point.l.toString(),
+      // @ts-ignore
       h: point.h.toString(),
     }));
 
@@ -44,6 +47,7 @@ export default function ProfileData() {
       topo.map((point, idx) => {
         const prevHeight = idx > 0 ? topo[idx - 1].h : point.h;
         const nextHeight = idx < topo.length - 1 ? topo[idx + 1].h : point.h;
+        // @ts-ignore
         return isHighPoint(prevHeight, point.h, nextHeight);
       })
     );
@@ -72,6 +76,7 @@ export default function ProfileData() {
       ...prevCheckedItems,
       newTopo.length > 2
         ? isHighPoint(
+              // @ts-ignore
             newTopo[newTopo.length - 3].h,
             newTopo[newTopo.length - 2].h,
             newTopo[newTopo.length - 1].h
@@ -227,6 +232,7 @@ export default function ProfileData() {
                           ? calculateSlope(
                               topo[index + 1].l,
                               point.l,
+                                // @ts-ignore
                               topo[index + 1].h,
                               point.h
                             )

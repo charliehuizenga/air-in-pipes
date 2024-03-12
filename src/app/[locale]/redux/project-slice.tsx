@@ -1,6 +1,13 @@
 "use client";
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice, PayloadAction} from "@reduxjs/toolkit";
 import { PipeData, pipeData } from "../tube-data/tube_list";
+import example0 from '../../../../examples/Example0.json';
+import example1 from '../../../../examples/Example1.json';
+import example2 from '../../../../examples/Example2.json'
+import example3 from '../../../../examples/Example3.json';
+import example6 from '../../../../examples/Example6.json';
+import example7 from '../../../../examples/Example7.json';
+
 
 export interface Topo {
   name?: string;
@@ -22,6 +29,7 @@ export interface Project {
   nSocks: number;
   valveFlags: boolean[];
   [key: string]: any;
+  examples: any[];
 }
 
 const initialState: Project = {
@@ -41,6 +49,7 @@ const initialState: Project = {
     valve_cost: 380,
     pipe_data: pipeData,
   },
+  examples: [example0, example1, example2, example3, example6, example7],
 };
 
 const projectSlice = createSlice({
@@ -71,6 +80,13 @@ const projectSlice = createSlice({
         return p;
       });
     },
+    loadExample: (state, action: PayloadAction<number>) => {
+      const exampleIndex = action.payload;
+      return {
+        ...state,
+        ...state.examples[exampleIndex],
+      };
+    },
   },
 });
 
@@ -80,5 +96,6 @@ export const {
   removeTopo,
   setLibrary,
   togglePipeAvailability,
+  loadExample,
 } = projectSlice.actions;
 export default projectSlice.reducer;

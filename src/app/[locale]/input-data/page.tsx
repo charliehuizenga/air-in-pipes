@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { NavBarProps } from "../components/navbar";
 import ProfileData from "./profile-data";
+import { useDispatch } from 'react-redux';
+import { loadExample } from '../redux/project-slice';
 
 // ----- Types ----- //
 
@@ -12,8 +14,15 @@ export interface Tab {
   current: boolean;
 }
 
-export default function InputData({ locale }: NavBarProps) {
+export default function InputData() {
   const t = useTranslations("input-data");
+
+  const dispatch = useDispatch();
+
+  // Function that loads example json projects
+  const handleLoadExample = (index: number) => {
+    dispatch(loadExample(index));
+  }
 
   const inputTabs: Tab[] = [
     {
@@ -59,13 +68,53 @@ export default function InputData({ locale }: NavBarProps) {
         </nav>
       </div>
 
+      {/* Example load buttons */}
+      <div className="my-4 flex justify-center space-x-2">
+        <button
+            onClick={() => handleLoadExample(0)}
+            className={"bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"}
+        >
+          Example 0
+        </button>
+        <button
+            onClick={() => handleLoadExample(1)}
+            className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
+        >
+          Example 1
+        </button>
+        <button
+            onClick={() => handleLoadExample(2)}
+            className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
+        >
+          Example 2
+        </button>
+        <button
+            onClick={() => handleLoadExample(3)}
+            className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
+        >
+          Example 3
+        </button>
+        <button
+            onClick={() => handleLoadExample(4)}
+            className="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"
+        >
+          Example 6
+        </button>
+        <button
+            onClick={() => handleLoadExample(5)}
+            className={"bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded"}
+        >
+          Example 7
+        </button>
+      </div>
+
       {activeTab === t("profile-data") && <ProfileData></ProfileData>}
 
       {activeTab === t("topo-data") && (
-        <div>
-          {/* Your topo-data content here */}
-          Topo Data Content
-        </div>
+          <div>
+            {/* Your topo-data content here */}
+            Topo Data Content
+          </div>
       )}
     </div>
   );

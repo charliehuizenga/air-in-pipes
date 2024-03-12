@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Project } from "../redux/project-slice";
 import { Report } from "../redux/report-slice";
 import React from "react";
+
 interface SummaryProps {
   report: Report;
   project: Project;
@@ -54,7 +55,7 @@ export default function Detail({ report, project }: SummaryProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {pipeDesign.map((pipe, index) => (
+            {pipeDesign.map((pipe: { hgl: React.Key | null | undefined; start_pos: number; length: number; nominal_size: any; sdr: any; }, index: number) => (
               <tr key={pipe.hgl}>
                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
                   {pipe.start_pos.toFixed(1)}

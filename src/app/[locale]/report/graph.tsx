@@ -45,13 +45,13 @@ export default function Summary({ report, project }: GraphProps) {
   const pipeDesign = report.pipe_design;
 
   // Function to create a unique identifier for each pipe type
-  const createPipeIdentifier = (nominalSize, sdr) => `${nominalSize}-${sdr}`;
+  const createPipeIdentifier = (nominalSize: any, sdr: any) => `${nominalSize}-${sdr}`;
 
   // Map to store colors for each pipe type
   const pipeColorMap = new Map();
 
   // Function to get color for a pipe type
-  const getPipeColor = (nominalSize, sdr) => {
+  const getPipeColor = (nominalSize: any, sdr: any) => {
     const identifier = createPipeIdentifier(nominalSize, sdr);
     if (!pipeColorMap.has(identifier)) {
       // Generate a new color if not already present
@@ -63,7 +63,7 @@ export default function Summary({ report, project }: GraphProps) {
   };
 
   // Generate annotations for each pipe segment
-  const annotations = pipeDesign.map((pipe) => ({
+  const annotations = pipeDesign.map((pipe: { start_pos: any; length: any; nominal_size: any; sdr: any; }) => ({
     type: "box",
     xMin: pipe.start_pos,
     xMax: pipe.start_pos + pipe.length,
@@ -139,7 +139,7 @@ export default function Summary({ report, project }: GraphProps) {
         marginTop: "10px",
       }}
     >
-      {pipeDesign.map((pipe, index) => {
+      {pipeDesign.map((pipe: { nominal_size: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined; sdr: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | React.PromiseLikeOfReactNode | null | undefined; }, index: React.Key | null | undefined) => {
         const color = getPipeColor(pipe.nominal_size, pipe.sdr);
         return (
           <div

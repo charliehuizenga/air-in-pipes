@@ -5,6 +5,12 @@ export interface Report {
   [key: string]: any;
 }
 
+interface ExampleData {
+  qmin: number;
+  qmax: number;
+
+}
+
 interface DesignSummary {
   nominal_size: string;
   sdr: number;

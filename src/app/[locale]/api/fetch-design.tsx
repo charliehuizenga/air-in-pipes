@@ -1,7 +1,7 @@
 import { Project } from "../redux/project-slice";
 
 export async function getDesign(project: Project) {
-  const res = await fetch("https://twordle.fun/air/", {
+  const res = await fetch("https://twordle-django-r8ozy.ondigitalocean.app/air/", {
     method: "POST", // Use POST method
     headers: {
       "Content-Type": "application/json", // Specify JSON content type
