@@ -44,33 +44,6 @@ export default function NavBar({ locale }: NavBarProps) {
     { name: t("tube-data"), href: `/${locale}/tube-data` },
     { name: t("report"), href: `/${locale}/report` },
   ];
-  function downloadFile(content: string, fileName: string, contentType: string) {
-    const a = document.createElement("a");
-    const file = new Blob([content], { type: contentType });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-    
-    URL.revokeObjectURL(a.href); // Cleanup
-  }
-  
-  const promptForFileNameAndDownload = (content: string, defaultFileName: string, contentType:string) => {
-    const userFileName = prompt('Enter file name', defaultFileName);
-    if (userFileName) {
-      downloadFile(content, `${userFileName}.json`, contentType);
-    }
-  };
-  const handleSave = () => {
-    const jsonStr = JSON.stringify(project);
-    promptForFileNameAndDownload(jsonStr, "project-data.json", "text/json");
-  };
-
-  const handleLoadClick = () => {
-    document.getElementById('file-input')?.click();
-  };
-  const handleFileLoad = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    
-  };
 
   async function fetchData() {
     // Reset the showAlert state
@@ -82,7 +55,7 @@ export default function NavBar({ locale }: NavBarProps) {
       if (report.design_summary !== undefined) {
         setAlertMessage("Successfully calculated!");
         setShowAlert(true);
-        setAlertType("success"); // have the user be able to save data here
+        setAlertType("success");
       } else {
         setAlertMessage("Cannot calculate with current input data.");
         setShowAlert(true);
@@ -143,9 +116,6 @@ export default function NavBar({ locale }: NavBarProps) {
                   ))}
                 </div>
                 <div className="flex-shrink-0">
-                  <button onClick={handleSave} className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600">Save</button>
-                  <button onClick={handleLoadClick} className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500">Load</button>
-                  <input type="file" id="file-input" style={{ display: 'none' }} onChange={handleFileLoad} accept=".json" />
                   <button
                     type="button"
                     onClick={fetchData}
