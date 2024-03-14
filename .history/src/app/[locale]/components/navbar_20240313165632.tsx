@@ -11,6 +11,7 @@ import { setData } from "../redux/report-slice";
 import Alert from "./alert";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from 'next/router';
 
 function classNames(...classes: (string | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
@@ -19,12 +20,21 @@ function classNames(...classes: (string | undefined)[]): string {
 export interface NavBarProps {
   locale: string;
 }
-
+function downloadFile(content: string, fileName: string, contentType: string) {
+  const a = document.createElement("a");
+  const file = new Blob([content], { type: contentType });
+  a.href = URL.createObjectURL(file);
+  a.download = fileName;
+  a.click();
+  
+  URL.revokeObjectURL(a.href); // Cleanup
+}
 export default function NavBar({ locale }: NavBarProps) {
   // the current path name
   const pathname = usePathname();
   const isActiveRoute = (href: string) => pathname === href;
   const dispatch = useDispatch();
+  const router = useRouter(); 
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -44,32 +54,40 @@ export default function NavBar({ locale }: NavBarProps) {
     { name: t("tube-data"), href: `/${locale}/tube-data` },
     { name: t("report"), href: `/${locale}/report` },
   ];
-  function downloadFile(content: string, fileName: string, contentType: string) {
-    const a = document.createElement("a");
-    const file = new Blob([content], { type: contentType });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-    
-    URL.revokeObjectURL(a.href); // Cleanup
-  }
-  
-  const promptForFileNameAndDownload = (content: string, defaultFileName: string, contentType:string) => {
-    const userFileName = prompt('Enter file name', defaultFileName);
-    if (userFileName) {
-      downloadFile(content, `${userFileName}.json`, contentType);
-    }
-  };
+
   const handleSave = () => {
     const jsonStr = JSON.stringify(project);
-    promptForFileNameAndDownload(jsonStr, "project-data.json", "text/json");
+    downloadFile(jsonStr, "project-data.json", "text/json");
   };
 
   const handleLoadClick = () => {
     document.getElementById('file-input')?.click();
   };
   const handleFileLoad = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    
+    const file = event.target.files![0];
+    if (!file) {
+      return;
+    }
+
+
+    const reader = new FileReader();
+    reader.onload = async (e: ProgressEvent<FileReader>) => {
+      const content = e.target!.result as string;
+      try {
+        const jsonData = JSON.parse(content);
+        await dispatch(setData(jsonData)); // Dispatch the loaded data
+        
+        // Redirect to the report tab
+        // Update this URL to the correct path for your report tab, including dynamic segments if necessary
+        router.push(`/${locale}/report`);
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+      }
+    };
+    if (router.isReady) {
+      router.push(`/${locale}/report`).catch(console.error);
+    }
+    reader.readAsText(file);
   };
 
   async function fetchData() {
