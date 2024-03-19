@@ -1,12 +1,9 @@
 {
-  "homepage": "https://Agua-Para-La-Vida.github.io/air-in-pipes",
   "name": "air-in-pipes",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "i18nexus pull && next dev",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
     "build": "i18nexus pull && next build",
     "start": "i18nexus pull && next start",
     "lint": "next lint"
