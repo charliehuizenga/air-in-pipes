@@ -12,28 +12,30 @@ export interface Tab {
   current: boolean;
 }
 
-const InputData: React.FC<NavBarProps> = ({ locale }) => {
-  const t = useTranslations('input-data');
+export default function InputData({ locale }: NavBarProps) {
+  const t = useTranslations("input-data");
 
   const inputTabs: Tab[] = [
     {
-      name: t('profile-data'),
+      name: t("profile-data"),
       current: true,
     },
     {
-      name: t('topo-data'),
+      name: t("topo-data"),
       current: false,
     },
   ];
 
-  const [activeTab, setActiveTab] = useState(inputTabs.find((tab) => tab.current)?.name);
+  const [activeTab, setActiveTab] = useState(
+    inputTabs.find((tab) => tab.current)?.name
+  );
 
   function handleTabClick(tabName: string) {
     setActiveTab(tabName);
   }
 
   function classNames(...classes: any[]): string {
-    return classes.filter(Boolean).join(' ');
+    return classes.filter(Boolean).join(" ");
   }
   return (
     <div>
@@ -68,4 +70,3 @@ const InputData: React.FC<NavBarProps> = ({ locale }) => {
     </div>
   );
 }
-export default InputData;
