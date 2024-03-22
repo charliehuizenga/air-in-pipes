@@ -1,6 +1,4 @@
 /** The page for profile-data, where the user can input their own topography data */
-/* eslint-disable react-hooks/exhaustive-deps */
-
 "use client";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";

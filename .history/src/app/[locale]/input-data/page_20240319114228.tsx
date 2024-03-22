@@ -12,8 +12,8 @@ export interface Tab {
   current: boolean;
 }
 
-export default function InputData({ locale }: NavBarProps) {
-  const t = useTranslations("input-data");
+const InputData: React.FC<NavBarProps> = ({ locale }) => {
+  const t = useTranslations('input-data');
 
   const inputTabs: Tab[] = [
     {
@@ -26,9 +26,7 @@ export default function InputData({ locale }: NavBarProps) {
     },
   ];
 
-  const [activeTab, setActiveTab] = useState(
-    inputTabs.find((tab) => tab.current)?.name
-  );
+  const [activeTab, setActiveTab] = useState(inputTabs.find((tab) => tab.current)?.name);
 
   function handleTabClick(tabName: string) {
     setActiveTab(tabName);
@@ -70,3 +68,4 @@ export default function InputData({ locale }: NavBarProps) {
     </div>
   );
 }
+export default InputData;

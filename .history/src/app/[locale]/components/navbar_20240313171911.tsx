@@ -19,7 +19,15 @@ function classNames(...classes: (string | undefined)[]): string {
 export interface NavBarProps {
   locale: string;
 }
-
+function downloadFile(content: string, fileName: string, contentType: string) {
+  const a = document.createElement("a");
+  const file = new Blob([content], { type: contentType });
+  a.href = URL.createObjectURL(file);
+  a.download = fileName;
+  a.click();
+  
+  URL.revokeObjectURL(a.href); // Cleanup
+}
 export default function NavBar({ locale }: NavBarProps) {
   // the current path name
   const pathname = usePathname();
@@ -44,16 +52,6 @@ export default function NavBar({ locale }: NavBarProps) {
     { name: t("tube-data"), href: `/${locale}/tube-data` },
     { name: t("report"), href: `/${locale}/report` },
   ];
-  function downloadFile(content: string, fileName: string, contentType: string) {
-    const a = document.createElement("a");
-    const file = new Blob([content], { type: contentType });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-    
-    URL.revokeObjectURL(a.href); // Cleanup
-  }
-  
   const promptForFileNameAndDownload = (content: string, defaultFileName: string, contentType:string) => {
     const userFileName = prompt('Enter file name', defaultFileName);
     if (userFileName) {

@@ -17,11 +17,11 @@ export default function InputData({ locale }: NavBarProps) {
 
   const inputTabs: Tab[] = [
     {
-      name: t('profile-data'),
+      name: t("profile-data"),
       current: true,
     },
     {
-      name: t('topo-data'),
+      name: t("topo-data"),
       current: false,
     },
   ];
@@ -35,7 +35,7 @@ export default function InputData({ locale }: NavBarProps) {
   }
 
   function classNames(...classes: any[]): string {
-    return classes.filter(Boolean).join(' ');
+    return classes.filter(Boolean).join(" ");
   }
   return (
     <div>
