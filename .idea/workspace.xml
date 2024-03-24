@@ -5,11 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="31999483-4349-4503-b4f7-a85cf4191b69" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/Agua-Para-La-Vida.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/[locale]/components/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/[locale]/components/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/Example0 2.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/Example1 2.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/Example2 2.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/Example3 2.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/Example6 2.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/Example7 2.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/[locale]/components/types.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/[locale]/input-data/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/[locale]/input-data/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/[locale]/redux/project-slice.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/[locale]/redux/project-slice.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,7 +44,7 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="ProjectErrors" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
@@ -67,7 +75,7 @@
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "preferences.lookFeel",
-    "ts.external.directory.path": "/Applications/IntelliJ IDEA.app/Contents/plugins/javascript-impl/jsLanguageServicesImpl/external",
+    "ts.external.directory.path": "/Users/mariogonzalez/Desktop/UC Berkeley/Agua-Para-La-Vida/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -240,7 +248,10 @@
       <workItem from="1711232766310" duration="262000" />
       <workItem from="1711233037520" duration="331000" />
       <workItem from="1711233489663" duration="1676000" />
-      <workItem from="1711235171193" duration="3779000" />
+      <workItem from="1711235171193" duration="4076000" />
+      <workItem from="1711246296301" duration="409000" />
+      <workItem from="1711246712513" duration="568000" />
+      <workItem from="1711247282846" duration="1253000" />
     </task>
     <servers />
   </component>
@@ -257,16 +268,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/app/[locale]/input-data/profile-data.tsx</url>
-          <line>114</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

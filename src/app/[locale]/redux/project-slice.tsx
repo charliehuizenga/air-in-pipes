@@ -56,7 +56,7 @@ const projectSlice = createSlice({
   name: "project",
   initialState,
   reducers: {
-    setProject: (state, action) => {
+    setProject: (_state, action) => {
       return action.payload;
     },
     setTopo: (state, action) => {
@@ -82,10 +82,10 @@ const projectSlice = createSlice({
     },
     loadExample: (state, action: PayloadAction<number>) => {
       const exampleIndex = action.payload;
-      return {
-        ...state,
-        ...state.examples[exampleIndex],
-      };
+      const example = state.examples[exampleIndex];
+
+      // Directly mutating the state based on the loaded example
+      Object.assign(state, example);
     },
   },
 });

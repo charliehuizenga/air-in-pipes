@@ -1,8 +1,8 @@
 /** The page for profile-data, where the user can input their own topography data */
 "use client";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useTranslations } from "next-intl";
-import { NavBarProps } from "../components/navbar";
+//import { NavBarProps } from "../components/navbar";
 import ProfileData from "./profile-data";
 import { useDispatch } from 'react-redux';
 import { loadExample } from '../redux/project-slice';
