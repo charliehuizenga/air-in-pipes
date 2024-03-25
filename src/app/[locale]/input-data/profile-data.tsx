@@ -5,9 +5,8 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { isHighPoint, calculateSlope, calculateStart } from "./utils";
 import { useSelector, useDispatch } from "react-redux";
-import { setTopo, Topo, removeTopo } from "../redux/project-slice";
+import {setTopo, Topo, removeTopo, Project, setProject} from "../redux/project-slice";
 import { ProjectState } from "../redux/store";
-
 
 
 // ----- Types ----- //
@@ -15,8 +14,11 @@ import { ProjectState } from "../redux/store";
 type InputValues = {
   [K in keyof Topo]?: string;
 };
+interface ProfileDataProps {
+  onFileProcessed: (data: Project) => void;
+}
 
-export default function ProfileData() {
+export default function ProfileData({ onFileProcessed }: ProfileDataProps) {
   const t = useTranslations("profile-data");
   const topo = useSelector((state: ProjectState) => state.project.topo);
   const dispatch = useDispatch();
@@ -120,6 +122,28 @@ export default function ProfileData() {
     }
   };
 
+  // Function to read and parse json files
+  const handleFileUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = async (loadEvent: ProgressEvent<FileReader>) => {
+      const text = loadEvent.target?.result;
+      try {
+        const json = JSON.parse(text as string);
+        onFileProcessed(json); // Call the callback with the parsed JSON
+      } catch (error) {
+        console.error("Error parsing JSON:", error);
+      }
+    };
+
+    reader.onerror = (error) => {
+      console.error("Error reading file:", error);
+    };
+
+    reader.readAsText(file);
+  };
+
+
+
   const checkedCount = checkedItems.reduce(
     (total, isChecked) => total + (isChecked ? 1 : 0),
     0
@@ -136,12 +160,29 @@ export default function ProfileData() {
           </div>
           <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
             <button
-              type="button"
-              onClick={handleAddPoint}
-              className="block rounded-md bg-sky-500 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                type="button"
+                onClick={handleAddPoint}
+                className="block rounded-md bg-sky-500 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
             >
               {t("add-point")}
             </button>
+            {/* File input for uploading JSON */}
+            <label
+                htmlFor="file-upload"
+                className="rounded-md bg-blue-500 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            >
+              Choose File
+              <input
+                  id="file-upload"
+                  type="file"
+                  className="sr-only"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleFileUpload(e.target.files[0]);
+                    }
+                  }}
+              />
+            </label>
           </div>
         </div>
         <div className="mt-8 flow-root">
@@ -149,14 +190,14 @@ export default function ProfileData() {
             <div className="inline-block min-w-full  py-2 align-middle sm:px-6 lg:px-8">
               <table className="min-w-full divide-y divide-gray-300 mb-16">
                 <thead>
-                  <tr>
-                    <th
+                <tr>
+                  <th
                       scope="col"
                       className="w-1/5 py-3.5 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
-                    >
-                      {t("label")}
-                    </th>
-                    <th
+                  >
+                    {t("label")}
+                  </th>
+                  <th
                       scope="col"
                       className="w-1/5 px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                     >
