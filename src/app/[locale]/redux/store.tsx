@@ -11,4 +11,5 @@ export const store = configureStore({
 });
 
 export type ProjectState = ReturnType<typeof store.getState>;
+// @ts-ignore
 export type AppDispatch = typeof store.dispatch;
