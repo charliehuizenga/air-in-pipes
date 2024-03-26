@@ -9,10 +9,6 @@ import example6 from '../../../../examples/Example6.json';
 import example7 from '../../../../examples/Example7.json';
 
 // Define the type for the payload if necessary
-interface UploadFilePayload {
-  file: File;
-}
-
 export interface Topo {
   name?: string;
   l: number;
