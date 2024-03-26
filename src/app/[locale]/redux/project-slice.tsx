@@ -1,5 +1,5 @@
 "use client";
-import { createSlice } from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { PipeData, pipeData } from "../tube-data/tube_list";
 
 export interface Topo {
@@ -43,17 +43,47 @@ const initialState: Project = {
   },
 };
 
+// Function to user JSON files
+export const uploadFile = createAsyncThunk(
+    'project/uploadFile',
+    async (file: File, thunkAPI) => {
+      try {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          try {
+            const jsonData = JSON.parse(reader.result as string);
+            thunkAPI.dispatch(setProject(jsonData));
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            thunkAPI.rejectWithValue(error);
+          }
+        };
+
+        reader.onerror = (error) => {
+          console.error("Error reading file:", error);
+          thunkAPI.rejectWithValue(error);
+        };
+
+        reader.readAsText(file);
+
+      } catch (error) {
+        return thunkAPI.rejectWithValue(error);
+      }
+    }
+);
+
 const projectSlice = createSlice({
   name: "project",
   initialState,
   reducers: {
-    setProject: (state, action) => {
+    setProject: (_state, action) => {
       return action.payload;
     },
     setTopo: (state, action) => {
       state.topo = action.payload.topoData;
       state.nSocks = action.payload.valveCount;
-      state.valveFlags = Array(action.payload.nvalvesCount).fill(false);
+      state.valveFlags = Array(action.payload.nSocks).fill(false);
     },
     removeTopo: (state, action) => {
       state.topo.splice(action.payload, 1);
