@@ -4,7 +4,7 @@ import { Disclosure } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ProjectState } from "../redux/store";
+import { ProjectState, AppDispatch } from "../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { getDesign } from "../api/fetch-design";
 import { setData } from "../redux/report-slice";
@@ -24,26 +24,24 @@ export interface NavBarProps {
 export default function NavBar({ locale }: NavBarProps) {
   // the current path name
   const pathname = usePathname();
+  const dispatch: AppDispatch = useDispatch();
   const isActiveRoute = (href: string) => pathname === href;
-  const dispatch = useDispatch();
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      // @ts-ignore
       dispatch(uploadFile(file)); // Dispatch the async thunk action
     }
   };
 
   // This function will be called when the 'Upload File' button is clicked
   const handleUploadClick = () => {
-    // @ts-ignore
-    fileInputRef.current.click();
+    fileInputRef.current?.click();
   };
 
   // The json object
