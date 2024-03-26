@@ -12,7 +12,8 @@ export interface Tab {
   current: boolean;
 }
 
-export default function InputData({ locale }: NavBarProps) {
+// @ts-ignore
+export default function InputData({ }: NavBarProps) {
   const t = useTranslations("input-data");
 
   const inputTabs: Tab[] = [

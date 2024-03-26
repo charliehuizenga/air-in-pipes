@@ -10,7 +10,7 @@ import { getDesign } from "../api/fetch-design";
 import { setData } from "../redux/report-slice";
 import Alert from "./alert";
 import Link from "next/link";
-import {useRef, useState } from "react";
+import {useCallback, useRef, useState } from "react";
 import { uploadFile } from '../redux/project-slice';
 
 function classNames(...classes: (string | undefined)[]): string {
@@ -27,10 +27,12 @@ export default function NavBar({ locale }: NavBarProps) {
   const isActiveRoute = (href: string) => pathname === href;
   const dispatch: AppDispatch = useDispatch();
 
+
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const reportData = useSelector((state: ProjectState) => state.report);
 
   // The json object
   const project = useSelector((state: ProjectState) => state.project);
@@ -55,7 +57,7 @@ export default function NavBar({ locale }: NavBarProps) {
     }
   };
 
-  // This function will be called when the 'Upload File' button is clicked
+  // Helper function to trigger file parsing when 'Upload File' button is clicked
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
@@ -76,10 +78,17 @@ export default function NavBar({ locale }: NavBarProps) {
       downloadFile(content, `${userFileName}.json`, contentType);
     }
   };
-  const handleSave = () => {
-    const jsonStr = JSON.stringify(project, null, 2);
-    promptForFileNameAndDownload(jsonStr, "project-data.json", "text/json");
-  };
+
+  const handleSave = useCallback(() => {
+    const jsonStr = JSON.stringify(reportData, null, 2);
+    promptForFileNameAndDownload(jsonStr, 'project-data.json', 'text/json');
+  }, [reportData]);
+
+  // const handleSave = () => {
+  //   const reportData = useSelector((state: ProjectState) => state.report);
+  //   const jsonStr = JSON.stringify(project, null, 2);
+  //   promptForFileNameAndDownload(jsonStr, "project-data.json", "text/json");
+  // };
 
   // const handleLoadClick = () => {
   //   document.getElementById('file-input')?.click();
@@ -171,25 +180,18 @@ export default function NavBar({ locale }: NavBarProps) {
                       </Link>
                   ))}
                 </div>
-                <div className="flex-shrink-0">
-                  <button onClick={handleSave}
-                          className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-                  >
-                    Save
-                  </button>
-                  {/*<button onClick={handleLoadClick}*/}
-                  {/*        className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-500 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500">Load*/}
-                  {/*</button>*/}
-                  {/*<input type="file" id="file-input" style={{display: 'none'}} onChange={handleFileLoad}*/}
-                  {/*       accept=".json"/>*/}
-                  <button
-                      type="button"
-                      onClick={fetchData}
-                      className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-                  >
-                    {t("calculate")}
-                  </button>
-                </div>
+                <button onClick={handleSave}
+                        className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                >
+                  Save
+                </button>
+                <button
+                    type="button"
+                    onClick={fetchData}
+                    className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                >
+                  {t("calculate")}
+                </button>
               </div>
             </div>
           </div>
