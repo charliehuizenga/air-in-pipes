@@ -14,11 +14,8 @@ import { ProjectState } from "../redux/store";
 type InputValues = {
   [K in keyof Topo]?: string;
 };
-interface ProfileDataProps {
-  onFileProcessed: (data: Project) => void;
-}
 
-export default function ProfileData({ onFileProcessed }: ProfileDataProps) {
+export default function ProfileData() {
   const t = useTranslations("profile-data");
   const topo = useSelector((state: ProjectState) => state.project.topo);
   const dispatch = useDispatch();
@@ -122,28 +119,6 @@ export default function ProfileData({ onFileProcessed }: ProfileDataProps) {
     }
   };
 
-  // Function to read and parse json files
-  const handleFileUpload = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = async (loadEvent: ProgressEvent<FileReader>) => {
-      const text = loadEvent.target?.result;
-      try {
-        const json = JSON.parse(text as string);
-        onFileProcessed(json); // Call the callback with the parsed JSON
-      } catch (error) {
-        console.error("Error parsing JSON:", error);
-      }
-    };
-
-    reader.onerror = (error) => {
-      console.error("Error reading file:", error);
-    };
-
-    reader.readAsText(file);
-  };
-
-
-
   const checkedCount = checkedItems.reduce(
     (total, isChecked) => total + (isChecked ? 1 : 0),
     0
@@ -166,23 +141,6 @@ export default function ProfileData({ onFileProcessed }: ProfileDataProps) {
             >
               {t("add-point")}
             </button>
-            {/* File input for uploading JSON */}
-            <label
-                htmlFor="file-upload"
-                className="rounded-md bg-blue-500 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-            >
-              Choose File
-              <input
-                  id="file-upload"
-                  type="file"
-                  className="sr-only"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      handleFileUpload(e.target.files[0]);
-                    }
-                  }}
-              />
-            </label>
           </div>
         </div>
         <div className="mt-8 flow-root">

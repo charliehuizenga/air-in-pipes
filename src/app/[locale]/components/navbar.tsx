@@ -10,7 +10,8 @@ import { getDesign } from "../api/fetch-design";
 import { setData } from "../redux/report-slice";
 import Alert from "./alert";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useRef, useState } from 'react';
+import { uploadFile } from '../redux/project-slice';
 
 function classNames(...classes: (string | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
@@ -29,6 +30,21 @@ export default function NavBar({ locale }: NavBarProps) {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("success");
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    if (file) {
+      // @ts-ignore
+      dispatch(uploadFile(file)); // Dispatch the async thunk action
+    }
+  };
+
+  // This function will be called when the 'Upload File' button is clicked
+  const handleUploadClick = () => {
+    // @ts-ignore
+    fileInputRef.current.click(); // Programmatically click the hidden file input
+  };
 
   // The json object
   const project = useSelector((state: ProjectState) => state.project);
@@ -61,11 +77,13 @@ export default function NavBar({ locale }: NavBarProps) {
         setShowAlert(true);
         setAlertType("error");
       }
-
       // Ensure the alert is shown every time
       setShowAlert(true);
     } catch (error) {
       console.error("Error fetching data:", error);
+      setAlertMessage("Error fetching data.");
+      setShowAlert(true);
+      setAlertType("error");
     }
   }
 
@@ -96,30 +114,43 @@ export default function NavBar({ locale }: NavBarProps) {
                 </div>
               </div>
               <div className="flex items-center space-x-4">
+                <button
+                    type="button"
+                    className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                    onClick={handleUploadClick} // When this button is clicked, it will trigger the file input
+                >
+                  Upload File
+                </button>
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                />
                 <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
                   {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={classNames(
-                        isActiveRoute(item.href)
-                          ? " bg-gray-900 text-white"
-                          : " text-gray-300 hover:bg-gray-700 hover:text-white",
-                        "rounded-md px-2 py-2 text-sm font-medium"
-                      )}
-                      aria-current={
-                        isActiveRoute(item.href) ? "page" : undefined
-                      }
-                    >
-                      {item.name}
-                    </Link>
+                      <Link
+                          key={item.name}
+                          href={item.href}
+                          className={classNames(
+                              isActiveRoute(item.href)
+                                  ? " bg-gray-900 text-white"
+                                  : " text-gray-300 hover:bg-gray-700 hover:text-white",
+                              "rounded-md px-2 py-2 text-sm font-medium"
+                          )}
+                          aria-current={
+                            isActiveRoute(item.href) ? "page" : undefined
+                          }
+                      >
+                        {item.name}
+                      </Link>
                   ))}
                 </div>
                 <div className="flex-shrink-0">
                   <button
-                    type="button"
-                    onClick={fetchData}
-                    className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                      type="button"
+                      onClick={fetchData}
+                      className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
                   >
                     {t("calculate")}
                   </button>
@@ -131,20 +162,20 @@ export default function NavBar({ locale }: NavBarProps) {
           <Disclosure.Panel className="md:hidden">
             <div className="space-y-1 px-2 pb-3 pt-2 sm:px-3">
               {navigation.map((item) => (
-                <Disclosure.Button
-                  key={item.name}
-                  as="a"
-                  href={item.href}
-                  className={classNames(
-                    isActiveRoute(item.href)
-                      ? "font-semibold bg-beige text-darkest-blue"
-                      : " font-semibold text-beige text-opacity-80 hover:bg-darkest-blue hover:text-beige",
-                    "block rounded-md px-3 py-2 text-base font-medium"
-                  )}
-                  aria-current={isActiveRoute(item.href) ? "page" : undefined}
-                >
-                  {item.name}
-                </Disclosure.Button>
+                  <Disclosure.Button
+                      key={item.name}
+                      as="a"
+                      href={item.href}
+                      className={classNames(
+                          isActiveRoute(item.href)
+                              ? "font-semibold bg-beige text-darkest-blue"
+                              : " font-semibold text-beige text-opacity-80 hover:bg-darkest-blue hover:text-beige",
+                          "block rounded-md px-3 py-2 text-base font-medium"
+                      )}
+                      aria-current={isActiveRoute(item.href) ? "page" : undefined}
+                  >
+                    {item.name}
+                  </Disclosure.Button>
               ))}
             </div>
           </Disclosure.Panel>

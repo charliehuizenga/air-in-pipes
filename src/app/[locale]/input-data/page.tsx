@@ -1,12 +1,12 @@
 /** The page for profile-data, where the user can input their own topography data */
 "use client";
-import React, {useState} from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { NavBarProps } from "../components/navbar";
 import ProfileData from "./profile-data";
-import { useDispatch } from 'react-redux';
-import {loadExample, Project, setProject} from '../redux/project-slice';
 
 // ----- Types ----- //
+
 export interface Tab {
   name: string;
   current: boolean;
@@ -15,31 +15,19 @@ export interface Tab {
 export default function InputData() {
   const t = useTranslations("input-data");
 
-  const dispatch = useDispatch();
-
-
-    // Function that loads example json projects
-  const handleLoadExample = (index: number) => {
-    dispatch(loadExample(index));
-  }
-
-  const onFileProcessed = (projectData: Project) => {
-    dispatch(setProject(projectData));
-  };
-
   const inputTabs: Tab[] = [
     {
-      name: t("profile-data"),
+      name: t('profile-data'),
       current: true,
     },
     {
-      name: t("topo-data"),
+      name: t('topo-data'),
       current: false,
     },
   ];
 
   const [activeTab, setActiveTab] = useState(
-    inputTabs.find((tab) => tab.current)?.name
+      inputTabs.find((tab) => tab.current)?.name
   );
 
   function handleTabClick(tabName: string) {
@@ -47,7 +35,7 @@ export default function InputData() {
   }
 
   function classNames(...classes: any[]): string {
-    return classes.filter(Boolean).join(" ");
+    return classes.filter(Boolean).join(' ');
   }
   return (
       <div>
@@ -71,10 +59,9 @@ export default function InputData() {
           </nav>
         </div>
 
-          <div className="my-4 flex justify-center space-x-2">
-            <ProfileData onFileProcessed={onFileProcessed} />
-          </div>
-          {activeTab === t("topo-data") && (
+        {activeTab === t("profile-data") && <ProfileData></ProfileData>}
+
+        {activeTab === t("topo-data") && (
             <div>
               {/* Your topo-data content here */}
               Topo Data Content

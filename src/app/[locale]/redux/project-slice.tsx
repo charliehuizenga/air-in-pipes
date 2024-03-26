@@ -1,5 +1,5 @@
 "use client";
-import {createSlice, PayloadAction} from "@reduxjs/toolkit";
+import {createAsyncThunk, createSlice, PayloadAction} from "@reduxjs/toolkit";
 import { PipeData, pipeData } from "../tube-data/tube_list";
 import example0 from '../../../../examples/Example0.json';
 import example1 from '../../../../examples/Example1.json';
@@ -8,6 +8,10 @@ import example3 from '../../../../examples/Example3.json';
 import example6 from '../../../../examples/Example6.json';
 import example7 from '../../../../examples/Example7.json';
 
+// Define the type for the payload if necessary
+interface UploadFilePayload {
+  file: File;
+}
 
 export interface Topo {
   name?: string;
@@ -52,6 +56,38 @@ const initialState: Project = {
   examples: [example0, example1, example2, example3, example6, example7],
 };
 
+// Function to upload and parse JSON files
+export const uploadFile = createAsyncThunk(
+    'project/uploadFile',
+    async (file: File, thunkAPI) => {
+      try {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          try {
+            const jsonData = JSON.parse(reader.result as string);
+            thunkAPI.dispatch(setProject(jsonData)); // Use thunkAPI.dispatch
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+            thunkAPI.rejectWithValue(error);
+          }
+        };
+
+        reader.onerror = (error) => {
+          console.error("Error reading file:", error);
+          thunkAPI.rejectWithValue(error);
+        };
+
+        reader.readAsText(file);
+
+        // Since FileReader is asynchronous, you cannot return a promise from here
+        // The executor of a Promise should not be async
+      } catch (error) {
+        return thunkAPI.rejectWithValue(error);
+      }
+    }
+);
+
 const projectSlice = createSlice({
   name: "project",
   initialState,
@@ -87,11 +123,17 @@ const projectSlice = createSlice({
       // Directly mutating the state based on the loaded example
       Object.assign(state, example);
     },
+    setUploadedData: (state, action: PayloadAction<any>) => {
+      state.uploadedData = action.payload;
+    },
   },
 });
 
+
+
 export const {
   setProject,
+  setUploadedData,
   setTopo,
   removeTopo,
   setLibrary,
