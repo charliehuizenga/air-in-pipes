@@ -43,7 +43,7 @@ export default function NavBar({ locale }: NavBarProps) {
   // This function will be called when the 'Upload File' button is clicked
   const handleUploadClick = () => {
     // @ts-ignore
-    fileInputRef.current.click(); // Programmatically click the hidden file input
+    fileInputRef.current.click();
   };
 
   // The json object

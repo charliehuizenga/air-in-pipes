@@ -66,7 +66,7 @@ export const uploadFile = createAsyncThunk(
         reader.onload = () => {
           try {
             const jsonData = JSON.parse(reader.result as string);
-            thunkAPI.dispatch(setProject(jsonData)); // Use thunkAPI.dispatch
+            thunkAPI.dispatch(setProject(jsonData));
           } catch (error) {
             console.error("Error parsing JSON:", error);
             thunkAPI.rejectWithValue(error);
@@ -80,8 +80,6 @@ export const uploadFile = createAsyncThunk(
 
         reader.readAsText(file);
 
-        // Since FileReader is asynchronous, you cannot return a promise from here
-        // The executor of a Promise should not be async
       } catch (error) {
         return thunkAPI.rejectWithValue(error);
       }
