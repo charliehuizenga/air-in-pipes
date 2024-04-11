@@ -1,0 +1,1 @@
+self.__SSG_MANIFEST=new Set(["\u002F[locale]","\u002F[locale]\u002Finput-data","\u002F[locale]\u002Freport","\u002F[locale]\u002Ftube-data"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()
