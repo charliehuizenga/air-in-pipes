@@ -12,6 +12,23 @@ interface SummaryProps {
 export default function Summary({ report, project }: SummaryProps) {
   const t = useTranslations("report");
 
+  // show user that report is loading if both 'report' and 'report.design_summary' are present
+  if (!report || !report.design_summary) {
+    return <div>Loading report data...</div>;
+  }
+
+  // return an error message if design_summary is not present in ''report'
+  if (!report.design_summary) {
+    return <div>Error: Report summary data is not available.</div>
+  }
+
+  // if design_summary is present but empty, show user message code compiled but is empty
+  if (report.design_summary.length == 0) {
+    return <div>No summary data available for this report</div>;
+  }
+
+  // If all above checks passed, begin rendering summary
+
   // Access design_summary from the data
   const designSummary = report.design_summary;
 
