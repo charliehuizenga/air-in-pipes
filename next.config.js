@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+const isProd = process.env.NODE_ENV === 'production';
 const nextConfig = {
     typescript: {
       // !! WARN !!
@@ -7,7 +8,8 @@ const nextConfig = {
       // !! WARN !!
       ignoreBuildErrors: false,
     },
-    output: 'export'
+    basePath: isProd ? '/air-in-pipes' : '',
+    assetPrefix: isProd ? '/air-in-pipes/' : '',
   };
   
   module.exports = nextConfig;
