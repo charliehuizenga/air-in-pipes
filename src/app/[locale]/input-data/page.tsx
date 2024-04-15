@@ -2,7 +2,7 @@
 "use client";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { NavBarProps } from "../components/navbar";
+//import { NavBarProps } from "../components/navbar";
 import ProfileData from "./profile-data";
 
 // ----- Types ----- //
@@ -12,8 +12,7 @@ export interface Tab {
   current: boolean;
 }
 
-// @ts-ignore
-export default function InputData({ }: NavBarProps) {
+export default function InputData() {
   const t = useTranslations("input-data");
 
   const inputTabs: Tab[] = [
