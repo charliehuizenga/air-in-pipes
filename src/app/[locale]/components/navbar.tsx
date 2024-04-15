@@ -201,7 +201,6 @@ export default function NavBar({ locale }: NavBarProps) {
                     className="rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-500"
                 >
                   <option value="">Examples</option>
-                  {/* Placeholder option */}
                   {manualExampleFiles.map((file) => (
                       <option key={file.name} value={file.name}>
                         {file.name}
@@ -213,7 +212,7 @@ export default function NavBar({ locale }: NavBarProps) {
                     className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
                     onClick={handleUploadClick}
                 >
-                  Upload File
+                  Load
                 </button>
                 <button onClick={handleSave}
                         className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
