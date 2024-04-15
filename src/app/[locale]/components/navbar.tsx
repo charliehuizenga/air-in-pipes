@@ -11,7 +11,23 @@ import { setData } from "../redux/report-slice";
 import Alert from "./alert";
 import Link from "next/link";
 import {useCallback, useRef, useState } from "react";
-import { uploadFile } from '../redux/project-slice';
+import {setProject, uploadFile} from '../redux/project-slice';
+import example0 from '../../../../examples/Example0.json';
+import example1 from '../../../../examples/Example1.json';
+import example2 from '../../../../examples/Example2.json'
+import example3 from '../../../../examples/Example3.json';
+import example6 from '../../../../examples/Example6.json';
+import example7 from '../../../../examples/Example7.json';
+
+const manualExampleFiles = [
+  { name: 'Example 0', content: example0 },
+  { name: 'Example 1', content: example1 },
+  { name: 'Example 2', content: example2 },
+  { name: 'Example 3', content: example3 },
+  { name: 'Example 6', content: example6 },
+  { name: 'Example 7', content: example7 }
+];
+
 
 function classNames(...classes: (string | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
@@ -49,11 +65,25 @@ export default function NavBar({ locale }: NavBarProps) {
     { name: t("report"), href: `/${locale}/report` },
   ];
 
+  const [selectedExampleName, setSelectedExampleName] = useState("");
+
+
+  const handleExampleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newFileName = event.target.value;
+    const exampleFile = manualExampleFiles.find(file => file.name === newFileName);
+    if (exampleFile) {
+      dispatch(setProject(exampleFile.content));
+      setSelectedExampleName(newFileName);
+    } else {
+      console.error("Example file not found:", newFileName);
+    }
+  };
+
   // Begin parsing user's json project
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files ? event.target.files[0] : null;
     if (file) {
-      dispatch(uploadFile(file)); // Dispatch the async thunk action
+      dispatch(uploadFile(file));
     }
   };
 
@@ -84,18 +114,6 @@ export default function NavBar({ locale }: NavBarProps) {
     promptForFileNameAndDownload(jsonStr, 'project-data.json', 'text/json');
   }, [reportData]);
 
-  // const handleSave = () => {
-  //   const reportData = useSelector((state: ProjectState) => state.report);
-  //   const jsonStr = JSON.stringify(project, null, 2);
-  //   promptForFileNameAndDownload(jsonStr, "project-data.json", "text/json");
-  // };
-
-  // const handleLoadClick = () => {
-  //   document.getElementById('file-input')?.click();
-  // };
-  // const handleFileLoad = async (event: React.ChangeEvent<HTMLInputElement>) => {
-  //
-  // };
 
   async function fetchData() {
     // Reset the showAlert state
@@ -148,13 +166,6 @@ export default function NavBar({ locale }: NavBarProps) {
                 </div>
               </div>
               <div className="flex items-center space-x-4">
-                <button
-                    type="button"
-                    className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-                    onClick={handleUploadClick}
-                >
-                  Upload File
-                </button>
                 <input
                     ref={fileInputRef}
                     type="file"
@@ -180,6 +191,30 @@ export default function NavBar({ locale }: NavBarProps) {
                       </Link>
                   ))}
                 </div>
+                <label htmlFor="example-select" className="sr-only">
+                  Select an example file:
+                </label>
+                <select
+                    id="example-select"
+                    value={selectedExampleName}
+                    onChange={handleExampleChange}
+                    className="rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-500"
+                >
+                  <option value="">Examples</option>
+                  {/* Placeholder option */}
+                  {manualExampleFiles.map((file) => (
+                      <option key={file.name} value={file.name}>
+                        {file.name}
+                      </option>
+                  ))}
+                </select>
+                <button
+                    type="button"
+                    className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+                    onClick={handleUploadClick}
+                >
+                  Upload File
+                </button>
                 <button onClick={handleSave}
                         className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
                 >
