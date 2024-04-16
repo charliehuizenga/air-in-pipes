@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "i18nexus pull && next dev",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d out -b main",
+    "deploy": "gh-pages -d out -b gh-pages",
     "build": "i18nexus pull && next build",
     "start": "npx serve@latest out",
     "lint": "next lint"
