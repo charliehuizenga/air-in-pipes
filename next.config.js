@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: "export",
+    output: 'export',
+    basePath: '',
+    assetPrefix: '',
     typescript: {
       // !! WARN !!
       // Dangerously allow production builds to successfully complete even if
