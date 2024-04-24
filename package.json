@@ -4,7 +4,8 @@
   "version": "0.1.0",
   "private": false,
   "scripts": {
-    "dev": "i18nexus pull && next dev",
+    //"dev": "i18nexus pull && next dev",
+    "dev": "next dev",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d out",
     "build": "i18nexus pull && next build",
