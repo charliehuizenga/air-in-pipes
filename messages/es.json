@@ -1,1 +1,67 @@
-{"profile-data":{"add-point":"Agregar punto","cancel":"Cancelar","height":"Altura","label":"Etiqueta","length":"Longitud","profile-data-note":"Una lista de todos los puntos de la línea de conducción.","save":"Ahorrar","slope":"Pendiente","start":"Comenzar","valve":"Válvula"},"language-selector":{"english":"Inglés","french":"Francés","spanish":"Español"},"nav-bar":{"calculate":"Calcular","graph":"Grafico","input-data":"Datos de entrada","principal":"Principal","report":"Informe","tube-data":"Datos del tubo","valve-details":"Detalles de la válvula","load": "Cargar", "examples": "Ejemplos", "save": "Guardar"},"input-data":{"profile-data":"Datos de perfil","topo-data":"Datos topográficos"},"principal":{"automatic-valve-design":"Diseño de válvula automática.","cancel":"Cancelar","date":"Fecha","designer":"Diseñador","design-id":"Identificación del diseño","design-options":"Opciones de diseño","manual-valve-design":"Diseño de válvula manual","maximum-flow":"Caudal máximo (l/s)","minimum-flow":"Caudal mínimo (l/s)","notes":"Notas","project":"Proyecto","project-information":"Información del proyecto","save":"Ahorrar","valve-design":"Diseño de válvula","valve-design-note":"Se recomienda el diseño de válvula automática. Utilice el método manual con precauciones."},"report":{"automatic-valve-location":"Ubicaciones de válvulas automáticas (m)","case-intro":"Este es un caso","description":"Descripción","detail":"Detalle","error-message":"Los datos no han sido calculados. Complete los datos de entrada y haga clic en calcular para mostrar el informe.","graph":"Grafico","length":"Longitud","length-detail":"Longitud (m)","number-air-valves":"Número de válvulas de aire","pipe-cost":"Costo de la tubería","pipe-design":"Diseño de tuberías","position":"Posición (m)","summary":"Resumen","total-cost":"Coste total","valve-cost":"Costo de la válvula"}}
+{
+    "report": {
+        "graph": "Grafico",
+        "detail": "Detalle",
+        "length": "Longitud",
+        "summary": "Resumen",
+        "position": "Posición (m)",
+        "pipe-cost": "Costo de la tubería",
+        "case-intro": "Este es un caso",
+        "total-cost": "Coste total",
+        "valve-cost": "Costo de la válvula",
+        "description": "Descripción",
+        "pipe-design": "Diseño de tuberías",
+        "error-message": "Los datos no han sido calculados. Complete los datos de entrada y haga clic en calcular para mostrar el informe.",
+        "length-detail": "Longitud (m)",
+        "number-air-valves": "Número de válvulas de aire",
+        "automatic-valve-location": "Ubicaciones de válvulas automáticas (m)"
+    },
+    "nav-bar": {
+        "graph": "Grafico",
+        "report": "Informe",
+        "calculate": "Calcular",
+        "principal": "Principal",
+        "tube-data": "Datos del tubo",
+        "input-data": "Datos de entrada",
+        "valve-details": "Detalles de la válvula",
+        "example10": "mi ejemplo"
+    },
+    "principal": {
+        "date": "Fecha",
+        "save": "Ahorrar",
+        "notes": "Notas",
+        "cancel": "Cancelar",
+        "project": "Proyecto",
+        "designer": "Diseñador",
+        "design-id": "Identificación del diseño",
+        "maximum-flow": "Caudal máximo (l/s)",
+        "minimum-flow": "Caudal mínimo (l/s)",
+        "valve-design": "Diseño de válvula",
+        "design-options": "Opciones de diseño",
+        "valve-design-note": "Se recomienda el diseño de válvula automática. Utilice el método manual con precauciones.",
+        "manual-valve-design": "Diseño de válvula manual",
+        "project-information": "Información del proyecto",
+        "automatic-valve-design": "Diseño de válvula automática."
+    },
+    "input-data": {
+        "topo-data": "Datos topográficos",
+        "profile-data": "Datos de perfil"
+    },
+    "profile-data": {
+        "save": "Ahorrar",
+        "label": "Etiqueta",
+        "slope": "Pendiente",
+        "start": "Comenzar",
+        "valve": "Válvula",
+        "cancel": "Cancelar",
+        "height": "Altura",
+        "length": "Longitud",
+        "add-point": "Agregar punto",
+        "profile-data-note": "Una lista de todos los puntos de la línea de conducción."
+    },
+    "language-selector": {
+        "french": "Francés",
+        "english": "Inglés",
+        "spanish": "Español"
+    }
+}
