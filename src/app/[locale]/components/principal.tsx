@@ -1,9 +1,9 @@
 "use client";
 
-import { setProject } from "./redux/project-slice";
+import { setProject } from "../redux/project-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
-import { ProjectState } from "./redux/store";
+import { ProjectState } from "../redux/store";
 
 export default function Principal() {
   const dispatch = useDispatch();
@@ -35,14 +35,10 @@ export default function Principal() {
 
   return (
     <main>
-      <div className="mx-auto max-w-4xl py-12 sm:px-6 lg:px-8">
+      <div>
         <form id="principal-form">
-          <div className="space-y-12">
+          <div className="space-y-12">  
             <div className="border-b border-gray-900/10 pb-12">
-              <h2 className="text-base font-semibold leading-7 text-gray-900">
-                {t("project-information")}
-              </h2>
-
               <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                 <div className="sm:col-span-3">
                   <label
@@ -202,7 +198,7 @@ export default function Principal() {
                         type="radio"
                         onChange={handleChange}
                         value="auto"
-                        checked
+                        checked={project.airvalve_selection == "auto"}
                         className="h-4 w-4 border-gray-300 text-sky-500 focus:ring-sky-500"
                       />
                       <label
@@ -219,6 +215,7 @@ export default function Principal() {
                         type="radio"
                         onChange={handleChange}
                         value="manual"
+                        checked={project.airvalve_selection == "manual"}
                         className="h-4 w-4 border-gray-300 text-sky-500 focus:ring-sky-500"
                       />
                       <label

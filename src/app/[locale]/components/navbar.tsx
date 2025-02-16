@@ -59,7 +59,7 @@ export default function NavBar({ locale }: NavBarProps) {
   };
   const t = useTranslations("nav-bar");
   const navigation: NavigationItem[] = [
-    { name: t("principal"), href: "/" },
+    { name: t("projects"), href: `/${locale}/projects` },
     { name: t("input-data"), href: `/${locale}/input-data` },
     { name: t("tube-data"), href: `/${locale}/tube-data` },
     { name: t("report"), href: `/${locale}/report` },
