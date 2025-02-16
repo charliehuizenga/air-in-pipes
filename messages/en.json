@@ -1,67 +1,66 @@
 {
-    "report": {
-        "graph": "Graph",
-        "detail": "Detail",
-        "length": "Length",
-        "summary": "Summary",
-        "position": "Position (m)",
-        "pipe-cost": "Pipe Cost",
-        "case-intro": "This is a case",
-        "total-cost": "Total Cost",
-        "valve-cost": "Valve Cost",
-        "description": "Description",
-        "pipe-design": "Pipe Design",
-        "error-message": "Data has not been calculated. Please fill out input data and click calculate to show report.",
-        "length-detail": "Length (m)",
-        "number-air-valves": "Number of air valves",
-        "automatic-valve-location": "Automatic valve locations (m)"
-    },
-    "nav-bar": {
-        "graph": "Graph",
-        "report": "Report",
-        "calculate": "Calculate",
-        "principal": "Principal",
-        "tube-data": "Tube Data",
-        "input-data": "Input Data",
-        "valve-details": "Valve Details",
-        "example10": "my newbie"
-    },
-    "principal": {
-        "date": "Date",
-        "save": "Save",
-        "notes": "Notes",
-        "cancel": "Cancel",
-        "project": "Project",
-        "designer": "Designer",
-        "design-id": "Design ID",
-        "maximum-flow": "Maximum flow (l/s)",
-        "minimum-flow": "Minimum flow (l/s)",
-        "valve-design": "Valve Design",
-        "design-options": "Design Options",
-        "valve-design-note": "Automatic valve design is recommended. Use manual method with cautions.",
-        "manual-valve-design": "Manual valve design",
-        "project-information": "Project Information",
-        "automatic-valve-design": "Automatic valve design"
-    },
-    "input-data": {
-        "topo-data": "Topography Data",
-        "profile-data": "Profile Data"
-    },
-    "profile-data": {
-        "save": "Save",
-        "label": "Label",
-        "slope": "Slope",
-        "start": "Start",
-        "valve": "Valve",
-        "cancel": "Cancel",
-        "height": "Height",
-        "length": "Length",
-        "add-point": "Add Point",
-        "profile-data-note": "A list of all the conduction line points"
-    },
-    "language-selector": {
-        "french": "French",
-        "english": "English",
-        "spanish": "Spanish"
-    }
+  "profile-data": {
+    "add-point": "Add Point",
+    "cancel": "Cancel",
+    "height": "Height",
+    "label": "Label",
+    "length": "Length",
+    "profile-data-note": "A list of all the conduction line points",
+    "save": "Save",
+    "slope": "Slope",
+    "start": "Start",
+    "valve": "Valve"
+  },
+  "language-selector": {
+    "english": "English",
+    "french": "French",
+    "spanish": "Spanish"
+  },
+  "nav-bar": {
+    "calculate": "Calculate",
+    "graph": "Graph",
+    "input-data": "Input Data",
+    "projects": "Projects",
+    "report": "Report",
+    "tube-data": "Tube Data",
+    "valve-details": "Valve Details"
+  },
+  "input-data": {
+    "profile-data": "Profile Data",
+    "topo-data": "Topography Data"
+  },
+  "principal": {
+    "automatic-valve-design": "Automatic valve design",
+    "cancel": "Cancel",
+    "date": "Date",
+    "designer": "Designer",
+    "design-id": "Design ID",
+    "design-options": "Design Options",
+    "manual-valve-design": "Manual valve design",
+    "maximum-flow": "Maximum flow (l/s)",
+    "minimum-flow": "Minimum flow (l/s)",
+    "notes": "Notes",
+    "project": "Project",
+    "project-information": "Project Information",
+    "save": "Save",
+    "valve-design": "Valve Design",
+    "valve-design-note": "Automatic valve design is recommended. Use manual method with cautions."
+  },
+  "report": {
+    "automatic-valve-location": "Automatic valve locations (m)",
+    "case-intro": "This is a case",
+    "description": "Description",
+    "detail": "Detail",
+    "error-message": "Data has not been calculated. Please fill out input data and click calculate to show report.",
+    "graph": "Graph",
+    "length": "Length",
+    "length-detail": "Length (m)",
+    "number-air-valves": "Number of air valves",
+    "pipe-cost": "Pipe Cost",
+    "pipe-design": "Pipe Design",
+    "position": "Position (m)",
+    "summary": "Summary",
+    "total-cost": "Total Cost",
+    "valve-cost": "Valve Cost"
+  }
 }
