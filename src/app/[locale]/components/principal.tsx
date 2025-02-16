@@ -4,6 +4,22 @@ import { setProject } from "../redux/project-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
 import { ProjectState } from "../redux/store";
+import { useState } from "react";
+import example0 from "../../../../examples/Example0.json";
+import example1 from "../../../../examples/Example1.json";
+import example2 from "../../../../examples/Example2.json";
+import example3 from "../../../../examples/Example3.json";
+import example6 from "../../../../examples/Example6.json";
+import example7 from "../../../../examples/Example7.json";
+
+const manualExampleFiles = [
+  { name: "Example 0", content: example0 },
+  { name: "Example 1", content: example1 },
+  { name: "Example 2", content: example2 },
+  { name: "Example 3", content: example3 },
+  { name: "Example 6", content: example6 },
+  { name: "Example 7", content: example7 },
+];
 
 export default function Principal() {
   const dispatch = useDispatch();
@@ -33,11 +49,31 @@ export default function Principal() {
     (document.getElementById("principal-form") as HTMLFormElement).reset();
   };
 
+  const [selectedExampleName, setSelectedExampleName] = useState("");
+
+  const handleExampleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    if (event.target.value == "") {
+      setSelectedExampleName("");
+      return;
+    }
+
+    const newFileName = event.target.value;
+    const exampleFile = manualExampleFiles.find(
+      (file) => file.name === newFileName
+    );
+    if (exampleFile) {
+      dispatch(setProject(exampleFile.content));
+      setSelectedExampleName(newFileName);
+    } else {
+      console.error("Example file not found:", newFileName);
+    }
+  };
+
   return (
     <main>
       <div>
         <form id="principal-form">
-          <div className="space-y-12">  
+          <div className="space-y-12">
             <div className="border-b border-gray-900/10 pb-12">
               <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                 <div className="sm:col-span-3">
@@ -58,7 +94,30 @@ export default function Principal() {
                     />
                   </div>
                 </div>
-
+                <div className="sm:col-span-3">
+                <label
+                    htmlFor="template"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    {t("template")}
+                  </label>
+                  <div className="mt-2">
+                  <select
+                    name="project"
+                    id="project"
+                    value={project.template || ""}
+                    onChange={handleExampleChange}
+                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+                  >
+                    <option value="">None (Optional)</option>
+                    {manualExampleFiles.map((file) => (
+                      <option key={file.name} value={file.name}>
+                        {file.name}
+                      </option>
+                    ))}
+                  </select>
+                  </div>
+                </div>
                 <div className="sm:col-span-3">
                   <label
                     htmlFor="designer-name"
