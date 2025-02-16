@@ -20,6 +20,7 @@
     "calculate": "Calculate",
     "graph": "Graph",
     "input-data": "Input Data",
+    "principal": "Principal",
     "projects": "Projects",
     "report": "Report",
     "tube-data": "Tube Data",
@@ -43,6 +44,7 @@
     "project": "Project",
     "project-information": "Project Information",
     "save": "Save",
+    "template": "Template",
     "valve-design": "Valve Design",
     "valve-design-note": "Automatic valve design is recommended. Use manual method with cautions."
   },
