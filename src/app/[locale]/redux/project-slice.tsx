@@ -18,6 +18,7 @@ export interface Project {
   qmax: number;
   qmin: number;
   airvalve_selection: string;
+  template: string;
   topo: Topo[];
   nSocks: number;
   valveFlags: boolean[];
@@ -34,6 +35,7 @@ const initialState: Project = {
   qmax: 0.25,
   qmin: 0.25,
   airvalve_selection: "auto",
+  template: "",
   topo: [{ name: "1", l: 0, h: 0 }],
   nSocks: 0,
   valveFlags: [],
