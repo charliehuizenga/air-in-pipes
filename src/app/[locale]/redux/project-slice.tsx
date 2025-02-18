@@ -9,11 +9,11 @@ export interface Topo {
 }
 
 export interface Project {
+  uuid: string;
   project_name: string;
   json_format: number;
   designer: string;
   description: string;
-  date: string;
   notes: string;
   qmax: number;
   qmin: number;
@@ -25,12 +25,12 @@ export interface Project {
   [key: string]: any;
 }
 
-const initialState: Project = {
+export const initialState: Project = {
+  uuid: "",
   project_name: "Example Project",
   json_format: 1,
   designer: "Example Designer",
   description: "Test",
-  date: "10/23/2023",
   notes: "Testing for web application",
   qmax: 0.25,
   qmin: 0.25,
