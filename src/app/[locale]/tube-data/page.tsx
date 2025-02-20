@@ -6,7 +6,6 @@ import { ProjectState } from "../redux/store";
 import { PipeData } from "./tube_list";
 import { Pipe } from "stream";
 
-
 function classNames(...classes: (string | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
@@ -24,6 +23,10 @@ export default function TubeData() {
   const [checked, setChecked] = useState<boolean>(false);
   const [indeterminate, setIndeterminate] = useState<boolean>(false);
   const [selectedPipe, setSelectedPipe] = useState<PipeData[]>([]);
+  const [newPipeId, setNewPipeId] = useState("");
+  const [newPipeSize, setNewPipeSize] = useState("");
+  const [newPipeSdr, setNewPipeSdr] = useState("");
+  const [newPipeCost, setNewPipeCost] = useState("");
 
   useEffect(() => {
     const allAvailable = pipeData.every((pipe: PipeData) => pipe.available);
@@ -78,6 +81,21 @@ export default function TubeData() {
     }
   }
 
+  function handleAddPipe() {
+    if (!newPipeId || !newPipeSize || !newPipeSdr || !newPipeCost) return;
+    const newPipe: PipeData = {
+      id: parseFloat(newPipeId),
+      nominal_size: newPipeSize,
+      sdr: parseFloat(newPipeSdr),
+      cost: parseFloat(newPipeCost),
+      available: true,
+    };
+    dispatch(setLibrary({ data: [...pipeData, newPipe], valveCost: cost }));
+    setNewPipeSize("");
+    setNewPipeSdr("");
+    setNewPipeCost("");
+  }
+
   return (
     <div className="mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -115,14 +133,43 @@ export default function TubeData() {
                 className="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
               />
             </div>
-
-            <button
-              type="button"
-              className="block rounded-md bg-sky-500 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-            >
-              Add Pipe
-            </button>
           </div>
+        </div>
+        <div className="mt-4 flex gap-3">
+          <input
+            type="text"
+            placeholder="Nominal Size"
+            value={newPipeSize}
+            onChange={(e) => setNewPipeSize(e.target.value)}
+            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+          />
+          <input
+            type="text"
+            placeholder="SDR"
+            value={newPipeSdr}
+            onChange={(e) => setNewPipeSdr(e.target.value)}
+            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+          />
+          <input
+            type="number"
+            placeholder="Id"
+            value={newPipeCost}
+            onChange={(e) => setNewPipeId(e.target.value)}
+            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+          />
+          <input
+            type="number"
+            placeholder="Cost"
+            value={newPipeCost}
+            onChange={(e) => setNewPipeCost(e.target.value)}
+            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+          />
+          <button
+            onClick={handleAddPipe}
+            className="rounded-md bg-sky-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-sky-600 focus:ring-2 focus:ring-inset focus:ring-sky-600"
+          >
+            Add Pipe
+          </button>
         </div>
         <div className="mt-8 flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
