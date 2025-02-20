@@ -12,6 +12,8 @@ import { Pipe } from "stream";
 import { createClient } from "@supabase/supabase-js";
 import { useRouter, usePathname } from "next/navigation";
 import { useProjectLoader } from "../reload_fetch";
+import { getDesign } from "../api/fetch-design";
+import { setData } from "../redux/report-slice";
 
 function classNames(...classes: (string | undefined)[]) {
   return classes.filter(Boolean).join(" ");
@@ -35,6 +37,8 @@ export default function TubeData() {
   const router = useRouter(); // Initialize router
   const pathname = usePathname();
   const locale = pathname.split("/")[1];
+  const report = useSelector((state: ProjectState) => state.report);
+
   useProjectLoader((proj) => dispatch(setProject(proj)));
   const checkbox = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState<boolean>(false);
@@ -155,6 +159,21 @@ export default function TubeData() {
       alert("An unexpected error occurred.");
     }
   };
+
+  async function calculate() {
+      try {
+        const report = await getDesign(project);
+        dispatch(setData(report));
+        if (report.design_summary !== undefined) {
+          console.log("Successfully calculated!");
+        } else {
+          console.log("Cannot calculate with current input data.");
+        }
+  
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
 
   return (
     <div className="mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">
@@ -329,12 +348,14 @@ export default function TubeData() {
               <button
                 type="button"
                 onClick={() => {
+                  calculate();
                   saveProject();
+                  console.log(project);
                   router.push(`/${locale}/report?uuid=${project.uuid}`);
                 }}
                 className="px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600"
               >
-                Save and Next
+                Calculate
               </button>
             </div>
           </div>
