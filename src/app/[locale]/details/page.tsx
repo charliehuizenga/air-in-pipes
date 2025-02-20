@@ -2,6 +2,8 @@
 
 import { setProject } from "../redux/project-slice";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter, usePathname } from "next/navigation"; // Import Next.js router
+import { useProjectLoader } from "../reload_fetch";
 import { useTranslations } from "next-intl";
 import { ProjectState } from "../redux/store";
 import { useState } from "react";
@@ -25,7 +27,11 @@ const manualExampleFiles = [
 export default function Principal() {
   const dispatch = useDispatch();
   const t = useTranslations("principal");
+  const router = useRouter(); // Initialize router
   const project = useSelector((state: ProjectState) => state.project);
+  const pathname = usePathname();
+  const locale = pathname.split("/")[1];
+  useProjectLoader((proj) => dispatch(setProject(proj)));
 
   // Handle changes and dispatch immediately to Redux
   const handleChange = (
@@ -60,10 +66,10 @@ export default function Principal() {
     );
     if (exampleFile) {
       dispatch(
-        setProject(({
+        setProject({
           ...exampleFile.content,
-          uuid: project.uuid || exampleFile.content.uuid, 
-        }))
+          uuid: project.uuid || exampleFile.content.uuid,
+        })
       );
 
       setSelectedExampleName(newFileName);
@@ -77,15 +83,21 @@ export default function Principal() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const createNewProject = async () => {
+  const saveProject = async () => {
     if (!project.project_name) {
       console.error("Project name is required");
       alert("Please enter a project name before saving.");
       return;
     }
 
-    const uuid = project.uuid ?? crypto.randomUUID();
-    console.log(uuid);
+    if (!project.uuid) {
+      console.error("Project creation error");
+      alert("Error in creating project");
+      return;
+    }
+
+    const uuid = project.uuid;
+
     try {
       const newProject = {
         uuid: uuid,
@@ -112,22 +124,21 @@ export default function Principal() {
       dispatch(
         setProject({
           ...project,
-          uuid: uuid,
         })
       );
 
       const { data, error } = await supabase
         .from("projects")
-        .update([newProject])
-        .eq("uuid", project.uuid);
+        .upsert([{ ...newProject, uuid }], { onConflict: ["uuid"] });
 
       if (error) {
         console.error("Error inserting project:", error.message);
-        alert("Failed to save the project. Please try again.");
+        // alert("Failed to save the project. Please try again.");
       } else {
         console.log("Project saved successfully:", project.uuid);
-        alert("Project created successfully!");
+        // alert("Project created successfully!");
       }
+
     } catch (err) {
       console.error("Unexpected error:", err);
       alert("An unexpected error occurred.");
@@ -353,10 +364,10 @@ export default function Principal() {
                 </fieldset>
                 <button
                   type="button"
-                  onClick={createNewProject}
+                  onClick={() => {saveProject(); router.push(`/${locale}/input-data?uuid=${project.uuid}`);}}
                   className="px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600"
                 >
-                  Save Project
+                  Save and Next
                 </button>
               </div>
             </div>
@@ -366,3 +377,4 @@ export default function Principal() {
     </main>
   );
 }
+

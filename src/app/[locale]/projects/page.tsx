@@ -22,8 +22,8 @@ export default function App() {
   const project = useSelector((state: ProjectState) => state.project);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const pathname = usePathname(); 
-  const locale = pathname.split("/")[1]; 
+  const pathname = usePathname();
+  const locale = pathname.split("/")[1];
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -38,18 +38,24 @@ export default function App() {
   }, []);
 
   // Navigate to /details when a project is selected
-  const handleSelectProject = (uuid: string) => {
+  const handleSelectProject = async (uuid: string) => {
     if (uuid === "") {
-      dispatch(setProject(initialState)); // Reset state for new project
+      uuid = crypto.randomUUID();
+      dispatch(
+        setProject({
+          ...initialState,
+          uuid: uuid, // Generate a new random UUID
+        })
+      );
     } else {
       const selected = projects.find((p) => p.uuid === uuid);
       if (selected) {
         dispatch(setProject(selected));
-        router.push(`/${locale}/details?uuid=${uuid}`);
       } else {
         console.error("Project not found");
       }
     }
+    router.push(`/${locale}/details?uuid=${uuid}`);
   };
 
   // Delete a project from Supabase
