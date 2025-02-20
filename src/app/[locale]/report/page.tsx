@@ -27,7 +27,6 @@ export default function Report() {
 
   useProjectLoader((proj) => {
     dispatch(setProject(proj));
-    dispatch(setData({design: proj.design, design_summary: proj.design_summary}));
   });
   
   const reportTabs: Tab[] = [
