@@ -1,17 +1,30 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { setLibrary, togglePipeAvailability } from "../redux/project-slice";
+import {
+  setLibrary,
+  togglePipeAvailability,
+  setProject,
+} from "../redux/project-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { ProjectState } from "../redux/store";
 import { PipeData } from "./tube_list";
 import { Pipe } from "stream";
+import { createClient } from "@supabase/supabase-js";
+import { useRouter, usePathname } from "next/navigation";
+import { useProjectLoader } from "../reload_fetch";
 
 function classNames(...classes: (string | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 export default function TubeData() {
   const dispatch = useDispatch();
+  const project = useSelector((state: ProjectState) => state.project);
   const pipeData = useSelector(
     (state: ProjectState) => state.project.library.pipe_data
   );
@@ -19,6 +32,10 @@ export default function TubeData() {
     (state: ProjectState) => state.project.library.valve_cost
   );
 
+  const router = useRouter(); // Initialize router
+  const pathname = usePathname();
+  const locale = pathname.split("/")[1];
+  useProjectLoader((proj) => dispatch(setProject(proj)));
   const checkbox = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState<boolean>(false);
   const [indeterminate, setIndeterminate] = useState<boolean>(false);
@@ -95,6 +112,49 @@ export default function TubeData() {
     setNewPipeSdr("");
     setNewPipeCost("");
   }
+
+  const saveProject = async () => {
+    try {
+      const newProject = {
+        uuid: project.uuid,
+        project_name: project.project_name,
+        template: project.template || null,
+        designer: project.designer || null,
+        description: project.description || null,
+        qmin: project.qmin ?? null,
+        qmax: project.qmax ?? null,
+        airvalve_selection: project.airvalve_selection || null,
+        notes: project.notes || null,
+        created_at: project.created_at || new Date().toISOString(),
+        topo: project.topo || null,
+        nSocks: project.nSocks || 0,
+        valveFlags: project.valveFlags || null,
+        design: project.design || null,
+        design_summary: project.design_summary || null,
+        library: project.library || null,
+        pipe_design: project.pipe_design || null,
+        sock_data: project.sock_data || null,
+        valves: project.valves || null,
+      };
+
+      const { data, error } = await supabase
+        .from("projects")
+        .upsert([{ ...newProject, uuid: project.uuid }], {
+          onConflict: ["uuid"],
+        });
+
+      if (error) {
+        console.error("Error inserting project:", error.message);
+        // alert("Failed to save the project. Please try again.");
+      } else {
+        console.log("Project saved successfully:", project.uuid);
+        // alert("Project created successfully!");
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      alert("An unexpected error occurred.");
+    }
+  };
 
   return (
     <div className="mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">
@@ -266,6 +326,16 @@ export default function TubeData() {
                   </tbody>
                 </table>
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  saveProject();
+                  router.push(`/${locale}/report?uuid=${project.uuid}`);
+                }}
+                className="px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600"
+              >
+                Save and Next
+              </button>
             </div>
           </div>
         </div>
