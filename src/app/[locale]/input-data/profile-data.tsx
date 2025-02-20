@@ -32,7 +32,6 @@ export default function ProfileData() {
   const router = useRouter(); // Initialize router
   const pathname = usePathname();
   const locale = pathname.split("/")[1];
-  useProjectLoader((proj) => dispatch(setProject(proj)));
   useProjectLoader((proj) => {
     dispatch(setTopo({ topoData: proj.topo, valveCount: proj.nSocks }));
     dispatch(setProject(proj));
