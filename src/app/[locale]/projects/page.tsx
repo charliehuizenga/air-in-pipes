@@ -19,13 +19,18 @@ export default function App() {
   const dispatch = useDispatch();
   const router = useRouter(); // Initialize router
   const t = useTranslations("principal");
-  const project = useSelector((state: ProjectState) => state.project);
+  const user = useSelector((state: ProjectState) => state.user);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const locale = pathname.split("/")[1];
 
   useEffect(() => {
+    if (!user.id || !user.email) {
+      router.push(`/`);
+      return;
+    }
+
     const fetchProjects = async () => {
       setLoading(true);
       const { data, error } = await supabase.from("projects").select("*");
@@ -40,11 +45,13 @@ export default function App() {
   // Navigate to /details when a project is selected
   const handleSelectProject = async (uuid: string) => {
     if (uuid === "") {
+      console.log(user.id);
       uuid = crypto.randomUUID();
       dispatch(
         setProject({
           ...initialState,
           uuid: uuid, // Generate a new random UUID
+          user_id: user.id
         })
       );
     } else {

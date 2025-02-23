@@ -29,6 +29,7 @@ export default function Principal() {
   const t = useTranslations("principal");
   const router = useRouter(); // Initialize router
   const project = useSelector((state: ProjectState) => state.project);
+  const user = useSelector((state: ProjectState) => state.user);
   const pathname = usePathname();
   const locale = pathname.split("/")[1];
   useProjectLoader((proj) => dispatch(setProject(proj)));
@@ -97,7 +98,6 @@ export default function Principal() {
     }
 
     const uuid = project.uuid;
-
     try {
       const newProject = {
         uuid: uuid,
@@ -119,6 +119,7 @@ export default function Principal() {
         pipe_design: project.pipe_design || null,
         sock_data: project.sock_data || null,
         valves: project.valves || null,
+        user_id: user.id,
       };
 
       dispatch(

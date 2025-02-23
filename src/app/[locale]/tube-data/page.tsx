@@ -141,6 +141,7 @@ export default function TubeData() {
         valves: project.valves || null,
       };
 
+
       const { data, error } = await supabase
         .from("projects")
         .upsert([{ ...newProject, uuid: project.uuid }], {
@@ -164,6 +165,7 @@ export default function TubeData() {
       try {
         const report = await getDesign(project);
         dispatch(setData(report));
+        console.log(project, report);
         if (report.design_summary !== undefined) {
           console.log("Successfully calculated!");
         } else {
