@@ -1,17 +1,32 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { setLibrary, togglePipeAvailability } from "../redux/project-slice";
+import {
+  setLibrary,
+  togglePipeAvailability,
+  setProject,
+} from "../redux/project-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { ProjectState } from "../redux/store";
 import { PipeData } from "./tube_list";
 import { Pipe } from "stream";
+import { createClient } from "@supabase/supabase-js";
+import { useRouter, usePathname } from "next/navigation";
+import { useProjectLoader } from "../reload_fetch";
+import { getDesign } from "../api/fetch-design";
+import { setData } from "../redux/report-slice";
 
 function classNames(...classes: (string | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
 export default function TubeData() {
   const dispatch = useDispatch();
+  const project = useSelector((state: ProjectState) => state.project);
   const pipeData = useSelector(
     (state: ProjectState) => state.project.library.pipe_data
   );
@@ -19,10 +34,20 @@ export default function TubeData() {
     (state: ProjectState) => state.project.library.valve_cost
   );
 
+  const router = useRouter(); // Initialize router
+  const pathname = usePathname();
+  const locale = pathname.split("/")[1];
+  const report = useSelector((state: ProjectState) => state.report);
+
+  useProjectLoader((proj) => dispatch(setProject(proj)));
   const checkbox = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState<boolean>(false);
   const [indeterminate, setIndeterminate] = useState<boolean>(false);
   const [selectedPipe, setSelectedPipe] = useState<PipeData[]>([]);
+  const [newPipeId, setNewPipeId] = useState("");
+  const [newPipeSize, setNewPipeSize] = useState("");
+  const [newPipeSdr, setNewPipeSdr] = useState("");
+  const [newPipeCost, setNewPipeCost] = useState("");
 
   useEffect(() => {
     const allAvailable = pipeData.every((pipe: PipeData) => pipe.available);
@@ -77,6 +102,81 @@ export default function TubeData() {
     }
   }
 
+  function handleAddPipe() {
+    if (!newPipeId || !newPipeSize || !newPipeSdr || !newPipeCost) return;
+    const newPipe: PipeData = {
+      id: parseFloat(newPipeId),
+      nominal_size: newPipeSize,
+      sdr: parseFloat(newPipeSdr),
+      cost: parseFloat(newPipeCost),
+      available: true,
+    };
+    dispatch(setLibrary({ data: [...pipeData, newPipe], valveCost: cost }));
+    setNewPipeSize("");
+    setNewPipeSdr("");
+    setNewPipeCost("");
+  }
+
+  const saveProject = async () => {
+    try {
+      const newProject = {
+        uuid: project.uuid,
+        project_name: project.project_name,
+        template: project.template || null,
+        designer: project.designer || null,
+        description: project.description || null,
+        qmin: project.qmin ?? null,
+        qmax: project.qmax ?? null,
+        airvalve_selection: project.airvalve_selection || null,
+        notes: project.notes || null,
+        created_at: project.created_at || new Date().toISOString(),
+        topo: project.topo || null,
+        nSocks: project.nSocks || 0,
+        valveFlags: project.valveFlags || null,
+        design: project.design || null,
+        design_summary: project.design_summary || null,
+        library: project.library || null,
+        pipe_design: project.pipe_design || null,
+        sock_data: project.sock_data || null,
+        valves: project.valves || null,
+      };
+
+
+      const { data, error } = await supabase
+        .from("projects")
+        .upsert([{ ...newProject, uuid: project.uuid }], {
+          onConflict: ["uuid"],
+        });
+
+      if (error) {
+        console.error("Error inserting project:", error.message);
+        // alert("Failed to save the project. Please try again.");
+      } else {
+        console.log("Project saved successfully:", project.uuid);
+        // alert("Project created successfully!");
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      alert("An unexpected error occurred.");
+    }
+  };
+
+  async function calculate() {
+      try {
+        const report = await getDesign(project);
+        dispatch(setData(report));
+        console.log(project, report);
+        if (report.design_summary !== undefined) {
+          console.log("Successfully calculated!");
+        } else {
+          console.log("Cannot calculate with current input data.");
+        }
+  
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
   return (
     <div className="mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -114,14 +214,43 @@ export default function TubeData() {
                 className="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
               />
             </div>
-
-            <button
-              type="button"
-              className="block rounded-md bg-sky-500 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
-            >
-              Add Pipe
-            </button>
           </div>
+        </div>
+        <div className="mt-4 flex gap-3">
+          <input
+            type="text"
+            placeholder="Nominal Size"
+            value={newPipeSize}
+            onChange={(e) => setNewPipeSize(e.target.value)}
+            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+          />
+          <input
+            type="text"
+            placeholder="SDR"
+            value={newPipeSdr}
+            onChange={(e) => setNewPipeSdr(e.target.value)}
+            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+          />
+          <input
+            type="number"
+            placeholder="Id"
+            value={newPipeId}
+            onChange={(e) => setNewPipeId(e.target.value)}
+            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+          />
+          <input
+            type="number"
+            placeholder="Cost"
+            value={newPipeCost}
+            onChange={(e) => setNewPipeCost(e.target.value)}
+            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+          />
+          <button
+            onClick={handleAddPipe}
+            className="rounded-md bg-sky-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-sky-600 focus:ring-2 focus:ring-inset focus:ring-sky-600"
+          >
+            Add Pipe
+          </button>
         </div>
         <div className="mt-8 flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -218,6 +347,17 @@ export default function TubeData() {
                   </tbody>
                 </table>
               </div>
+              <button
+                type="button"
+                onClick={() => {
+                  calculate();
+                  saveProject();
+                  router.push(`/${locale}/report?uuid=${project.uuid}`);
+                }}
+                className="px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600"
+              >
+                Calculate
+              </button>
             </div>
           </div>
         </div>

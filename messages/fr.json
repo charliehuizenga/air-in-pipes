@@ -1,67 +1,66 @@
 {
-    "report": {
-        "graph": "Graphique",
-        "detail": "Détail",
-        "length": "Longueur",
-        "summary": "Résumé",
-        "position": "Poste (m)",
-        "pipe-cost": "Coût du tuyau",
-        "case-intro": "C'est un cas",
-        "total-cost": "Coût total",
-        "valve-cost": "Coût de la vanne",
-        "description": "Description",
-        "pipe-design": "Conception de tuyaux",
-        "error-message": "Les données n'ont pas été calculées. Veuillez remplir les données d'entrée et cliquer sur calculer pour afficher le rapport.",
-        "length-detail": "Longueur (m)",
-        "number-air-valves": "Nombre de vannes d'air",
-        "automatic-valve-location": "Emplacements des vannes automatiques (m)"
-    },
-    "nav-bar": {
-        "graph": "Graphique",
-        "report": "Rapport",
-        "calculate": "Calculer",
-        "principal": "Principal",
-        "tube-data": "Données sur les tubes",
-        "input-data": "Des données d'entrée",
-        "valve-details": "Détails de la vanne",
-        "example10": "mon cheri"
-    },
-    "principal": {
-        "date": "Date",
-        "save": "Sauvegarder",
-        "notes": "Remarques",
-        "cancel": "Annuler",
-        "project": "Projet",
-        "designer": "Designer",
-        "design-id": "ID de conception",
-        "maximum-flow": "Débit maximum (l/s)",
-        "minimum-flow": "Débit minimal (l/s)",
-        "valve-design": "Conception de la vanne",
-        "design-options": "Options de conception",
-        "valve-design-note": "Une conception de vanne automatique est recommandée. Utilisez la méthode manuelle avec précaution.",
-        "manual-valve-design": "Conception de vanne manuelle",
-        "project-information": "Renseignements sur le projet",
-        "automatic-valve-design": "Conception de vanne automatique"
-    },
-    "input-data": {
-        "topo-data": "Données topographiques",
-        "profile-data": "Données de profil"
-    },
-    "profile-data": {
-        "save": "Sauvegarder",
-        "label": "Étiquette",
-        "slope": "Pente",
-        "start": "Commencer",
-        "valve": "Soupape",
-        "cancel": "Annuler",
-        "height": "Hauteur",
-        "length": "Longueur",
-        "add-point": "Ajouter un point",
-        "profile-data-note": "Une liste de tous les points de la ligne de conduction"
-    },
-    "language-selector": {
-        "french": "Français",
-        "english": "Anglais",
-        "spanish": "Espagnol"
-    }
+  "profile-data": {
+    "add-point": "Ajouter un point",
+    "cancel": "Annuler",
+    "height": "Hauteur",
+    "label": "Étiquette",
+    "length": "Longueur",
+    "profile-data-note": "Une liste de tous les points de la ligne de conduction",
+    "save": "Sauvegarder",
+    "slope": "Pente",
+    "start": "Commencer",
+    "valve": "Soupape"
+  },
+  "language-selector": {
+    "english": "Anglais",
+    "french": "Français",
+    "spanish": "Espagnol"
+  },
+  "nav-bar": {
+    "calculate": "Calculer",
+    "graph": "Graphique",
+    "input-data": "Des données d'entrée",
+    "principal": "Principal",
+    "report": "Rapport",
+    "tube-data": "Données sur les tubes",
+    "valve-details": "Détails de la vanne"
+  },
+  "input-data": {
+    "profile-data": "Données de profil",
+    "topo-data": "Données topographiques"
+  },
+  "principal": {
+    "automatic-valve-design": "Conception de vanne automatique",
+    "cancel": "Annuler",
+    "date": "Date",
+    "designer": "Designer",
+    "design-id": "ID de conception",
+    "design-options": "Options de conception",
+    "manual-valve-design": "Conception de vanne manuelle",
+    "maximum-flow": "Débit maximum (l/s)",
+    "minimum-flow": "Débit minimal (l/s)",
+    "notes": "Remarques",
+    "project": "Projet",
+    "project-information": "Renseignements sur le projet",
+    "save": "Sauvegarder",
+    "valve-design": "Conception de la vanne",
+    "valve-design-note": "Une conception de vanne automatique est recommandée. Utilisez la méthode manuelle avec précaution."
+  },
+  "report": {
+    "automatic-valve-location": "Emplacements des vannes automatiques (m)",
+    "case-intro": "C'est un cas",
+    "description": "Description",
+    "detail": "Détail",
+    "error-message": "Les données n'ont pas été calculées. Veuillez remplir les données d'entrée et cliquer sur calculer pour afficher le rapport.",
+    "graph": "Graphique",
+    "length": "Longueur",
+    "length-detail": "Longueur (m)",
+    "number-air-valves": "Nombre de vannes d'air",
+    "pipe-cost": "Coût du tuyau",
+    "pipe-design": "Conception de tuyaux",
+    "position": "Poste (m)",
+    "summary": "Résumé",
+    "total-cost": "Coût total",
+    "valve-cost": "Coût de la vanne"
+  }
 }

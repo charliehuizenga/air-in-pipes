@@ -4,11 +4,19 @@
 "use client";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation"; // Import Next.js router
 import { useTranslations } from "next-intl";
 import { isHighPoint, calculateSlope, calculateStart } from "./utils";
 import { useSelector, useDispatch } from "react-redux";
-import { setTopo, Topo, removeTopo } from "../redux/project-slice";
+import { setTopo, Topo, removeTopo, setProject } from "../redux/project-slice";
 import { ProjectState } from "../redux/store";
+import { useProjectLoader } from "../reload_fetch";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 // ----- Types ----- //
 
@@ -19,29 +27,32 @@ type InputValues = {
 export default function ProfileData() {
   const t = useTranslations("profile-data");
   const topo = useSelector((state: ProjectState) => state.project.topo);
+  const project = useSelector((state: ProjectState) => state.project);
   const dispatch = useDispatch();
+  const router = useRouter(); // Initialize router
+  const pathname = usePathname();
+  const locale = pathname.split("/")[1];
+  useProjectLoader((proj) => {
+    dispatch(setTopo({ topoData: proj.topo, valveCount: proj.nSocks }));
+    dispatch(setProject(proj));
+  });
 
   // ----- States ----- //
 
   // State to hold the points of the profile-data table
-
-  const [inputValues, setInputValues] = useState<InputValues[]>([]); // Temporary state for when use adds a new point and type in values
-  const [checkedItems, setCheckedItems] = useState<boolean[]>([]); // State to hold the points that are high-point (needs a valve)
+  const [inputValues, setInputValues] = useState<InputValues[]>([]);
+  const [checkedItems, setCheckedItems] = useState<boolean[]>([]); // State to track high points (need valves)
 
   //----- useEffects ----- //
   useEffect(() => {
-    // Code to run on component mount
+    // Initialize input values and checkboxes when topo changes
     const newInputValues = topo.map((point) => ({
-      name: point.name,
-      l: point.l.toString(),
-      h: point.h.toString(),
+      name: point.name ?? "",
+      l: point.l?.toString() ?? "",
+      h: point.h?.toString() ?? "",
     }));
 
     setInputValues(newInputValues);
-    setCheckedItems(topo.map(() => false)); // All unchecked by default
-  }, []);
-
-  useEffect(() => {
     setCheckedItems(
       topo.map((point, idx) => {
         const prevHeight = idx > 0 ? topo[idx - 1].h : point.h;
@@ -53,23 +64,18 @@ export default function ProfileData() {
 
   // ----- Handle functions ----- //
 
-  // Function to deal with removing a table point
+  // Function to remove a table point
   const handleRemove = (index: number) => {
     dispatch(removeTopo(index));
-    const newCheckedItems = [...checkedItems];
-    newCheckedItems.splice(index, 1);
-    setCheckedItems(newCheckedItems);
-    const newInputValues = [...inputValues];
-    newInputValues.splice(index, 1);
-    setInputValues(newInputValues);
+    setCheckedItems((prev) => prev.filter((_, i) => i !== index));
+    setInputValues((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Function to deal with user adding a new point
+  // Function to add a new point
   const handleAddPoint = () => {
-    const newPoint = { name: "", l: NaN, h: NaN };
+    const newPoint = { name: "", l: 0, h: 0 }; // Ensuring valid initial values
     const newTopo = [...topo, newPoint];
 
-    console.log("topo: " + JSON.stringify(topo));
     setCheckedItems((prevCheckedItems) => [
       ...prevCheckedItems,
       newTopo.length > 2
@@ -81,10 +87,11 @@ export default function ProfileData() {
         : false,
     ]);
 
+    setInputValues((prev) => [...prev, { name: "", l: "", h: "" }]);
     dispatch(setTopo({ topoData: newTopo, valveCount: checkedCount }));
   };
 
-  // Function to deal with clicking a highpoint checkbox
+  // Function to handle checkbox clicks
   const handleCheckboxClick = (index: number) => {
     setCheckedItems((prevState) => {
       const newState = [...prevState];
@@ -93,34 +100,75 @@ export default function ProfileData() {
     });
   };
 
-  // Function to deal with user mid-typing a point
+  // Function to handle input changes
   const handleChange = (index: number, key: keyof Topo, value: string) => {
-    const newInputValues = [...inputValues];
-    newInputValues[index] = { ...newInputValues[index], [key]: value };
-    setInputValues(newInputValues);
+    setInputValues((prev) => {
+      const newValues = [...prev];
+      newValues[index] = { ...newValues[index], [key]: value ?? "" };
+      return newValues;
+    });
 
-    // Try to convert to number and update topo state if it's a valid number or intermediary input
+    const newTopo = [...topo];
     if (key === "l" || key === "h") {
       const numericValue = parseFloat(value);
-      if (!isNaN(numericValue) || value === "") {
-        const newTopo = [...topo];
-        newTopo[index] = {
-          ...newTopo[index],
-          [key]: isNaN(parseFloat(value)) ? 0 : parseFloat(value),
-        };
-        dispatch(setTopo({ topoData: newTopo, valveCount: checkedCount }));
-      }
+      newTopo[index] = {
+        ...newTopo[index],
+        [key]: isNaN(numericValue) ? 0 : numericValue,
+      };
     } else {
-      const newTopo = [...topo];
       newTopo[index] = { ...newTopo[index], [key]: value };
-      dispatch(setTopo({ topoData: newTopo, valveCount: checkedCount }));
     }
+
+    dispatch(setTopo({ topoData: newTopo, valveCount: checkedCount }));
   };
 
   const checkedCount = checkedItems.reduce(
     (total, isChecked) => total + (isChecked ? 1 : 0),
     0
   );
+
+  const saveProject = async () => {
+    try {
+      const newProject = {
+        uuid: project.uuid,
+        project_name: project.project_name,
+        template: project.template || null,
+        designer: project.designer || null,
+        description: project.description || null,
+        qmin: project.qmin ?? null,
+        qmax: project.qmax ?? null,
+        airvalve_selection: project.airvalve_selection || null,
+        notes: project.notes || null,
+        created_at: project.created_at || new Date().toISOString(),
+        topo: project.topo || null,
+        nSocks: project.nSocks || 0,
+        valveFlags: project.valveFlags || null,
+        design: project.design || null,
+        design_summary: project.design_summary || null,
+        library: project.library || null,
+        pipe_design: project.pipe_design || null,
+        sock_data: project.sock_data || null,
+        valves: project.valves || null,
+      };
+
+      const { data, error } = await supabase
+        .from("projects")
+        .upsert([{ ...newProject, uuid: project.uuid }], {
+          onConflict: ["uuid"],
+        });
+
+      if (error) {
+        console.error("Error inserting project:", error.message);
+        // alert("Failed to save the project. Please try again.");
+      } else {
+        console.log("Project saved successfully:", project.uuid);
+        // alert("Project created successfully!");
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      alert("An unexpected error occurred.");
+    }
+  };
 
   return (
     <div className="mx-auto max-w-5xl sm:px-6 lg:px-8 mb-4">
@@ -192,74 +240,95 @@ export default function ProfileData() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {topo.map((point, index) => (
-                    <tr key={index}>
-                      <td className="whitespace-nowrap px-3 py-4 pl-4 pr-3 text-sm font-medium text-gray-500 sm:pl-0">
-                        <input
-                          type="text"
-                          value={point.name}
-                          onChange={(e) =>
-                            handleChange(index, "name", e.target.value)
-                          }
-                          className="w-full px-2 py-1 text-sm border-0 rounded-md border-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <input
-                          type="text"
-                          value={inputValues[index]?.l || ""}
-                          onChange={(e) =>
-                            handleChange(index, "l", e.target.value)
-                          }
-                          className="w-full px-2 py-1 text-sm border-0 rounded-md border-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <input
-                          type="text"
-                          value={inputValues[index]?.h || ""}
-                          onChange={(e) =>
-                            handleChange(index, "h", e.target.value)
-                          }
-                          className="w-full px-2 py-1 text-sm border-0 rounded-md border-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-                        />
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 ">
-                        {index < topo.length - 1
-                          ? calculateSlope(
-                              topo[index + 1].l,
-                              point.l,
-                              topo[index + 1].h,
-                              point.h
-                            )
-                          : "0"}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 ">
-                        {index < topo.length - 1
-                          ? calculateStart(topo[index + 1].l, point.l)
-                          : "0"}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <input
-                          type="checkbox"
-                          checked={checkedItems[index]}
-                          onChange={() => handleCheckboxClick(index)}
-                          className="h-4 w-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500"
-                        />
-                      </td>
-                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                        <XMarkIcon
-                          onClick={() => handleRemove(index)}
-                          className="block h-5 w-5 text-sky-500 hover:text-sky-700"
-                        >
-                          Remove
-                        </XMarkIcon>
+                  {topo.length > 0 ? (
+                    topo.map((point, index) => (
+                      <tr key={index}>
+                        <td className="whitespace-nowrap px-3 py-4 pl-4 pr-3 text-sm font-medium text-gray-500 sm:pl-0">
+                          <input
+                            type="text"
+                            value={inputValues[index]?.name ?? ""}
+                            onChange={(e) =>
+                              handleChange(index, "name", e.target.value)
+                            }
+                            className="w-full px-2 py-1 text-sm border-0 rounded-md border-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+                          />
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <input
+                            type="text"
+                            value={inputValues[index]?.l ?? ""}
+                            onChange={(e) =>
+                              handleChange(index, "l", e.target.value)
+                            }
+                            className="w-full px-2 py-1 text-sm border-0 rounded-md border-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+                          />
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <input
+                            type="text"
+                            value={inputValues[index]?.h ?? ""}
+                            onChange={(e) =>
+                              handleChange(index, "h", e.target.value)
+                            }
+                            className="w-full px-2 py-1 text-sm border-0 rounded-md border-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+                          />
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 ">
+                          {index < topo.length - 1
+                            ? calculateSlope(
+                                topo[index + 1]?.l ?? 0,
+                                point.l ?? 0,
+                                topo[index + 1]?.h ?? 0,
+                                point.h ?? 0
+                              )
+                            : "0"}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 ">
+                          {index < topo.length - 1
+                            ? calculateStart(
+                                topo[index + 1]?.l ?? 0,
+                                point.l ?? 0
+                              )
+                            : "0"}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <input
+                            type="checkbox"
+                            checked={checkedItems[index] ?? false}
+                            onChange={() => handleCheckboxClick(index)}
+                            className="h-4 w-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500"
+                          />
+                        </td>
+                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                          <button
+                            onClick={() => handleRemove(index)}
+                            className="text-sky-500 hover:text-sky-700"
+                          >
+                            <XMarkIcon className="h-5 w-5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={7}
+                        className="text-center text-gray-500 py-4"
+                      >
+                        No data available
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
+            <button
+              type="button"
+              onClick={() => {saveProject(); router.push(`/${locale}/tube-data?uuid=${project.uuid}`);}}
+              className="px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600"
+            >
+              Save and Next
+            </button>
           </div>
         </div>
       </div>

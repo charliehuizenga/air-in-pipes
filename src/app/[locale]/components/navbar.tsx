@@ -59,10 +59,7 @@ export default function NavBar({ locale }: NavBarProps) {
   };
   const t = useTranslations("nav-bar");
   const navigation: NavigationItem[] = [
-    { name: t("principal"), href: "/" },
-    { name: t("input-data"), href: `/${locale}/input-data` },
-    { name: t("tube-data"), href: `/${locale}/tube-data` },
-    { name: t("report"), href: `/${locale}/report` },
+    { name: t("projects"), href: `/${locale}/projects` },
   ];
 
   const [selectedExampleName, setSelectedExampleName] = useState("");
@@ -191,7 +188,7 @@ export default function NavBar({ locale }: NavBarProps) {
                       </Link>
                   ))}
                 </div>
-                <label htmlFor="example-select" className="sr-only">
+                {/* <label htmlFor="example-select" className="sr-only">
                   Select an example file:
                 </label>
                 <select
@@ -206,7 +203,7 @@ export default function NavBar({ locale }: NavBarProps) {
                         {file.name}
                       </option>
                   ))}
-                </select>
+                </select> */}
                 <button
                     type="button"
                     className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"

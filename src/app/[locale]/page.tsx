@@ -1,240 +1,148 @@
 "use client";
 
-import { setProject } from "./redux/project-slice";
-import { useDispatch, useSelector } from "react-redux";
-import { useTranslations } from "next-intl";
-import { ProjectState } from "./redux/store";
+import { useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { createClient } from "@supabase/supabase-js";
+import { setUser } from "./redux/auth-slice"; // Redux slice for authentication
 
-export default function Principal() {
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export default function SignUpLogin() {
+  const pathname = usePathname();
+  const locale = pathname.split("/")[1];
   const dispatch = useDispatch();
-  const t = useTranslations("principal");
-  const project = useSelector((state: ProjectState) => state.project);
+  const router = useRouter();
+  const [isSignUp, setIsSignUp] = useState(false); // Toggle between signup and login
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
-  // Handle changes and dispatch immediately to Redux
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
+  const handleAuth = async () => {
+    setLoading(true);
+    setError("");
+    setMessage("");
 
-    // Dispatching changes directly to Redux
-    dispatch(
-      setProject({
-        ...project,
-        [name]: name === "qmax" || name === "qmin" ? parseFloat(value) : value,
-      })
-    );
+    let data, error;
+    if (isSignUp) {
+      ({ data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+            emailRedirectTo: "http://localhost:3000/en/projects"
+        }
+      }));
+    } else {
+      ({ data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      }));
+    }
 
-    console.log(project);
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    if (data.user) {
+      dispatch(setUser({ email: data.user.email, id: data.user.id }));
+    }
+
+    setLoading(false);
+
+    if (isSignUp) {
+      setMessage("Confirmation email sent. Check your inbox!");
+    } else {
+        router.push(`${locale}/projects`);
+    }
   };
 
-  const handleCancel = () => {
-    (document.getElementById("principal-form") as HTMLFormElement).reset();
+  const handlePasswordReset = async () => {
+    setLoading(true);
+    setError("");
+    setMessage("");
+
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      setMessage("Password reset email sent. Check your inbox!");
+    }
+
+    setLoading(false);
   };
 
   return (
-    <main>
-      <div className="mx-auto max-w-4xl py-12 sm:px-6 lg:px-8">
-        <form id="principal-form">
-          <div className="space-y-12">
-            <div className="border-b border-gray-900/10 pb-12">
-              <h2 className="text-base font-semibold leading-7 text-gray-900">
-                {t("project-information")}
-              </h2>
+    <main className="mx-auto max-w-md py-12">
+      <h2 className="text-xl font-semibold text-gray-900">
+        {isSignUp ? "Sign Up" : "Login"}
+      </h2>
 
-              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="project-name"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    {t("project")}
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="project_name"
-                      id="project-name"
-                      value={project.project_name || ""}
-                      onChange={handleChange}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="designer-name"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    {t("designer")}
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="designer"
-                      value={project.designer || ""}
-                      id="designer-name"
-                      onChange={handleChange}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="description"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    {t("design-id")}
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="description"
-                      value={project.description || ""}
-                      id="description"
-                      onChange={handleChange}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="date"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    {t("date")}
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="date"
-                      id="date"
-                      value={project.date || ""}
-                      onChange={handleChange}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-
-                <div className="col-span-full">
-                  <label
-                    htmlFor="notes"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    {t("notes")}
-                  </label>
-                  <div className="mt-2">
-                    <textarea
-                      id="notes"
-                      name="notes"
-                      defaultValue={project.notes || ""}
-                      rows={3}
-                      onChange={handleChange}
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="border-b border-gray-900/10 pb-12">
-              <h2 className="text-base font-semibold leading-7 text-gray-900">
-                {t("design-options")}
-              </h2>
-              <p className="mt-1 text-sm leading-6 text-gray-600"></p>
-
-              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="minimum-flow"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    {t("minimum-flow")}
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="qmin"
-                      value={project.qmin || ""}
-                      onChange={handleChange}
-                      id="minimum-flow  "
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-
-                <div className="sm:col-span-3">
-                  <label
-                    htmlFor="maximum-flow"
-                    className="block text-sm font-medium leading-6 text-gray-900"
-                  >
-                    {t("maximum-flow")}
-                  </label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="qmax"
-                      value={project.qmax || ""}
-                      onChange={handleChange}
-                      id="maximum-flow"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="mt-10 space-y-10">
-                <fieldset>
-                  <legend className="text-sm font-semibold leading-6 text-gray-900">
-                    {t("valve-design")}
-                  </legend>
-                  <p className="mt-1 text-sm leading-6 text-gray-600">
-                    {t("valve-design-note")}
-                  </p>
-                  <div className="mt-6 space-y-6">
-                    <div className="flex items-center gap-x-3">
-                      <input
-                        id="automatic-valve"
-                        name="airvalve_selection"
-                        type="radio"
-                        onChange={handleChange}
-                        value="auto"
-                        checked
-                        className="h-4 w-4 border-gray-300 text-sky-500 focus:ring-sky-500"
-                      />
-                      <label
-                        htmlFor="automatic-valve"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        {t("automatic-valve-design")}
-                      </label>
-                    </div>
-                    <div className="flex items-center gap-x-3">
-                      <input
-                        id="manual-valve"
-                        name="airvalve_selection"
-                        type="radio"
-                        onChange={handleChange}
-                        value="manual"
-                        className="h-4 w-4 border-gray-300 text-sky-500 focus:ring-sky-500"
-                      />
-                      <label
-                        htmlFor="manual-valve"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        {t("manual-valve-design")}
-                      </label>
-                    </div>
-                  </div>
-                </fieldset>
-              </div>
-            </div>
-          </div>
-        </form>
+      <div className="mt-4">
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md"
+        />
       </div>
+
+      <div className="mt-4">
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-md"
+        />
+      </div>
+
+      {error && <p className="text-red-500 mt-2">{error}</p>}
+      {message && <p className="text-green-500 mt-2">{message}</p>}
+
+      <button
+        onClick={handleAuth}
+        disabled={loading}
+        className="w-full mt-4 px-4 py-2 bg-sky-500 text-white font-semibold rounded-md shadow-sm hover:bg-sky-600"
+      >
+        {loading
+          ? isSignUp
+            ? "Signing Up..."
+            : "Logging in..."
+          : isSignUp
+          ? "Sign Up"
+          : "Login"}
+      </button>
+
+      {!isSignUp && (
+        <button
+          onClick={handlePasswordReset}
+          disabled={loading || !email}
+          className="mt-2 text-sm text-blue-500 underline"
+        >
+          Forgot Password?
+        </button>
+      )}
+
+      <p className="mt-4 text-gray-600">
+        {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+        <button
+          onClick={() => setIsSignUp(!isSignUp)}
+          className="text-blue-500 underline"
+        >
+          {isSignUp ? "Login here" : "Sign up here"}
+        </button>
+      </p>
     </main>
   );
 }

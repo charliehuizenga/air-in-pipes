@@ -2,11 +2,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import projectReducer from "./project-slice";
 import reportReducer from "./report-slice";
+import userReducer from "./auth-slice";
 
 export const store = configureStore({
   reducer: {
     project: projectReducer,
     report: reportReducer,
+    user: userReducer
   },
 });
 
