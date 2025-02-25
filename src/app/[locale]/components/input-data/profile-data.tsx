@@ -4,19 +4,12 @@
 "use client";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation"; // Import Next.js router
 import { useTranslations } from "next-intl";
 import { isHighPoint, calculateSlope, calculateStart } from "./utils";
 import { useSelector, useDispatch } from "react-redux";
-import { setTopo, Topo, removeTopo, setProject } from "../redux/project-slice";
-import { ProjectState } from "../redux/store";
-import { useProjectLoader } from "../reload_fetch";
+import { setTopo, Topo, removeTopo, setProject } from "../../redux/project-slice";
+import { ProjectState } from "../../redux/store";
 import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 // ----- Types ----- //
 
@@ -27,15 +20,7 @@ type InputValues = {
 export default function ProfileData() {
   const t = useTranslations("profile-data");
   const topo = useSelector((state: ProjectState) => state.project.topo);
-  const project = useSelector((state: ProjectState) => state.project);
   const dispatch = useDispatch();
-  const router = useRouter(); // Initialize router
-  const pathname = usePathname();
-  const locale = pathname.split("/")[1];
-  useProjectLoader((proj) => {
-    dispatch(setTopo({ topoData: proj.topo, valveCount: proj.nSocks }));
-    dispatch(setProject(proj));
-  });
 
   // ----- States ----- //
 
@@ -126,49 +111,6 @@ export default function ProfileData() {
     (total, isChecked) => total + (isChecked ? 1 : 0),
     0
   );
-
-  const saveProject = async () => {
-    try {
-      const newProject = {
-        uuid: project.uuid,
-        project_name: project.project_name,
-        template: project.template || null,
-        designer: project.designer || null,
-        description: project.description || null,
-        qmin: project.qmin ?? null,
-        qmax: project.qmax ?? null,
-        airvalve_selection: project.airvalve_selection || null,
-        notes: project.notes || null,
-        created_at: project.created_at || new Date().toISOString(),
-        topo: project.topo || null,
-        nSocks: project.nSocks || 0,
-        valveFlags: project.valveFlags || null,
-        design: project.design || null,
-        design_summary: project.design_summary || null,
-        library: project.library || null,
-        pipe_design: project.pipe_design || null,
-        sock_data: project.sock_data || null,
-        valves: project.valves || null,
-      };
-
-      const { data, error } = await supabase
-        .from("projects")
-        .upsert([{ ...newProject, uuid: project.uuid }], {
-          onConflict: ["uuid"],
-        });
-
-      if (error) {
-        console.error("Error inserting project:", error.message);
-        // alert("Failed to save the project. Please try again.");
-      } else {
-        console.log("Project saved successfully:", project.uuid);
-        // alert("Project created successfully!");
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      alert("An unexpected error occurred.");
-    }
-  };
 
   return (
     <div className="mx-auto max-w-5xl sm:px-6 lg:px-8 mb-4">
@@ -322,13 +264,6 @@ export default function ProfileData() {
                 </tbody>
               </table>
             </div>
-            <button
-              type="button"
-              onClick={() => {saveProject(); router.push(`/${locale}/tube-data?uuid=${project.uuid}`);}}
-              className="px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600"
-            >
-              Save and Next
-            </button>
           </div>
         </div>
       </div>

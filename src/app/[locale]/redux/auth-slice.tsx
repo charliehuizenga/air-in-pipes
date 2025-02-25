@@ -18,12 +18,12 @@ const authSlice = createSlice({
       state.email = action.payload.email;
       state.id = action.payload.id;
     },
-    signOut: (state) => {
+    clearUser: (state) => {
       state.email = null;
       state.id = null;
     },
   },
 });
 
-export const { setUser, signOut } = authSlice.actions;
+export const { setUser, clearUser } = authSlice.actions;
 export default authSlice.reducer;

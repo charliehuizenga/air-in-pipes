@@ -26,11 +26,6 @@ export default function App() {
   const locale = pathname.split("/")[1];
 
   useEffect(() => {
-    if (!user.id || !user.email) {
-      router.push(`/`);
-      return;
-    }
-
     const fetchProjects = async () => {
       setLoading(true);
       const { data, error } = await supabase.from("projects").select("*");

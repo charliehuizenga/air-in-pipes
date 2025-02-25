@@ -17,11 +17,11 @@ export default function InputData() {
 
   const inputTabs: Tab[] = [
     {
-      name: t('profile-data'),
+      name: t("profile-data"),
       current: true,
     },
     {
-      name: t('topo-data'),
+      name: t("topo-data"),
       current: false,
     },
   ];
@@ -35,8 +35,9 @@ export default function InputData() {
   }
 
   function classNames(...classes: any[]): string {
-    return classes.filter(Boolean).join(' ');
+    return classes.filter(Boolean).join(" ");
   }
+  
   return (
     <div>
       <div className="hidden sm:block mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">

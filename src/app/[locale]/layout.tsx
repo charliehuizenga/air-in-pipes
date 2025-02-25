@@ -5,6 +5,8 @@ import { Inter } from "next/font/google";
 import NavBar from "./components/navbar";
 import LanguageSelector from "./components/language-selector";
 import ReduxProvider from "./redux-provider";
+import AuthProvider from "./components/AuthProvider";
+
 export function generateStaticParams() {
   return [{ locale: "en" }, { locale: "es" }];
 }
@@ -34,13 +36,15 @@ export default async function LocalLayout({
       <body className={inter.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ReduxProvider>
-            <div>
-              <NavBar locale={locale} />
-              <div className="flex justify-end">
-                <LanguageSelector />
-              </div>
-              {children}
-            </div>
+              <AuthProvider>
+                <div>
+                  <NavBar locale={locale} />
+                  <div className="flex justify-end">
+                    <LanguageSelector />
+                  </div>
+                  {children}
+                </div>
+              </AuthProvider>
           </ReduxProvider>
         </NextIntlClientProvider>
       </body>
