@@ -172,9 +172,9 @@ export default function TubeData() {
           />
           <button
             onClick={handleAddPipe}
-            className="rounded-md bg-sky-500 px-3 py-1 text-xs font-semibold text-white shadow-sm hover:bg-sky-600 focus:ring-2 focus:ring-inset focus:ring-sky-600"
+            className="rounded-md bg-sky-500 px-3 py-1 text-l font-semibold text-white shadow-sm hover:bg-sky-600 focus:ring-2 focus:ring-inset focus:ring-sky-600"
           >
-            Add Pipe
+            Add
           </button>
         </div>
         <div className="mt-8 flow-root">
