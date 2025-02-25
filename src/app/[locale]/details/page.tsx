@@ -13,6 +13,7 @@ import { ProjectState } from "../redux/store";
 import Details from "../components/details";
 import InputData from "../components/input-data/input-data";
 import TubeData from "../components/tube-data/tube-data";
+import Report from "../report/page";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -23,8 +24,7 @@ export default function ProjectTabs() {
   const [activeTab, setActiveTab] = useState("details");
   const dispatch = useDispatch();
   const project = useSelector((state: ProjectState) => state.project);
-  const pathname = usePathname();
-  const locale = pathname.split("/")[1];
+  const [showReport, toggleReport] = useState(false);
 
   useProjectLoader((proj) => dispatch(setProject(proj)));
 
@@ -34,6 +34,7 @@ export default function ProjectTabs() {
       dispatch(setData(report));
       if (report.design_summary !== undefined) {
         console.log("Successfully calculated!");
+        toggleReport(true);
       } else {
         console.log("Cannot calculate with current input data.");
       }
@@ -99,6 +100,7 @@ export default function ProjectTabs() {
 
   return (
     <div className="p-4 flex flex-col items-center justify-start min-h-screen pt-10 w-full">
+      <h1 className="text-2xl font-bold mb-4">{project.project_name}</h1>
       <div className="w-full max-w-5xl">
         <div className="flex justify-around border-b w-full">
           <button
@@ -138,6 +140,19 @@ export default function ProjectTabs() {
           {activeTab === "tube_data" && <TubeData />}
         </div>
       </div>
+      {showReport ? (
+        <Report calculate={calculate}/>
+      ) : (
+        <button
+          className="mt-3 px-5 py-3 bg-sky-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 max-w-sm"
+          onClick={async () => {
+            await saveProject();
+            await calculate();
+          }}
+        >
+          Calculate Report
+        </button>
+      )}
     </div>
   );
 }
