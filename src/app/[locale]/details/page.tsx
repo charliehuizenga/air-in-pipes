@@ -132,7 +132,7 @@ export default function ProjectTabs() {
             Tube Data
           </button>
         </div>
-        <div className="p-4 text-center w-full">
+        <div className="p-4 w-full">
           {activeTab === "details" && <Details />}
           {activeTab === "input_data" && <InputData />}
           {activeTab === "tube_data" && <TubeData />}
