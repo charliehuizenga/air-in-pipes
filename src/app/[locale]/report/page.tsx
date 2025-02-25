@@ -10,6 +10,7 @@ import Graph from "./graph";
 import Detail from "./detail";
 import { createClient } from "@supabase/supabase-js";
 import { useProjectLoader } from "../reload_fetch";
+import { exportReportToPDF } from "./export";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -81,6 +82,7 @@ export default function Report(props) {
           <button
             type="button"
             className="px-5 py-3 bg-green-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+            onClick={() => exportReportToPDF(report)}
           >
             Export to PDF
           </button>
