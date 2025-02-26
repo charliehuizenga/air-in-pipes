@@ -6,6 +6,7 @@ import {
   setProject,
 } from "../../redux/project-slice";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslations } from "next-intl";
 import { ProjectState } from "../../redux/store";
 import { PipeData } from "./tube_list";
 import { useProjectLoader } from "../../reload_fetch";
@@ -22,6 +23,7 @@ export default function TubeData() {
   const cost = useSelector(
     (state: ProjectState) => state.project.library.valve_cost
   );
+  const t = useTranslations("pipes");
 
   useProjectLoader((proj) => dispatch(setProject(proj)));
   const checkbox = useRef<HTMLInputElement>(null);
@@ -108,10 +110,10 @@ export default function TubeData() {
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
             <h1 className="text-base font-semibold leading-6 text-gray-900">
-              Tube Data
+              {t("pipe-data")}
             </h1>
             <p className="mt-2 text-sm text-gray-700">
-              A list of all the available pipes
+              {t("list")}
             </p>
           </div>
 
@@ -120,7 +122,7 @@ export default function TubeData() {
               htmlFor="project-name"
               className="block text-sm font-medium font-italicize  text-gray-700"
             >
-              Cost of valves that extract air
+              {t("valve-cost")}
             </label>
             <div className="flex-shrink-0">
               <input
@@ -144,28 +146,28 @@ export default function TubeData() {
         <div className="mt-4 flex gap-3">
           <input
             type="text"
-            placeholder="Nominal Size"
+            placeholder={t("nominal-size")}
             value={newPipeSize}
             onChange={(e) => setNewPipeSize(e.target.value)}
             className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
           />
           <input
             type="text"
-            placeholder="SDR"
+            placeholder={t("sdr")}
             value={newPipeSdr}
             onChange={(e) => setNewPipeSdr(e.target.value)}
             className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
           />
           <input
             type="number"
-            placeholder="Id"
+            placeholder={t("id")}
             value={newPipeId}
             onChange={(e) => setNewPipeId(e.target.value)}
             className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
           />
           <input
             type="number"
-            placeholder="Cost"
+            placeholder={t("cost")}
             value={newPipeCost}
             onChange={(e) => setNewPipeCost(e.target.value)}
             className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
@@ -174,7 +176,7 @@ export default function TubeData() {
             onClick={handleAddPipe}
             className="rounded-md bg-sky-500 px-3 py-1 text-l font-semibold text-white shadow-sm hover:bg-sky-600 focus:ring-2 focus:ring-inset focus:ring-sky-600"
           >
-            Add
+            {t("add")}
           </button>
         </div>
         <div className="mt-8 flow-root">
@@ -194,7 +196,7 @@ export default function TubeData() {
                             onChange={toggleAll}
                           />
                           <span className="px-4 text-sm font-semibold text-gray-900">
-                            Available
+                            {t("available")}
                           </span>
                         </div>
                       </th>
@@ -203,25 +205,25 @@ export default function TubeData() {
                         scope="col"
                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                       >
-                        Nominal Size
+                        {t("nominal-size")}
                       </th>
                       <th
                         scope="col"
                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                       >
-                        SDR
+                        {t("sdr")}
                       </th>
                       <th
                         scope="col"
                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                       >
-                        ID
+                        {t("id")}
                       </th>
                       <th
                         scope="col"
                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                       >
-                        Cost
+                        {t("cost")}
                       </th>
                     </tr>
                   </thead>

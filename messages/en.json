@@ -21,10 +21,12 @@
     "graph": "Graph",
     "input-data": "Input Data",
     "principal": "Principal",
-    "projects": "Projects",
     "report": "Report",
-    "tube-data": "Tube Data",
-    "valve-details": "Valve Details"
+    "tube-data": "Pipe Data",
+    "valve-details": "Valve Details",
+    "projects": "My projects",
+    "load": "Import",
+    "save": "Export"
   },
   "input-data": {
     "profile-data": "Profile Data",
@@ -44,15 +46,16 @@
     "project": "Project",
     "project-information": "Project Information",
     "save": "Save",
-    "template": "Template",
     "valve-design": "Valve Design",
-    "valve-design-note": "Automatic valve design is recommended. Use manual method with cautions."
+    "valve-design-note": "Automatic valve design is recommended. Use manual method with cautions.",
+    "template": "Template"
   },
   "report": {
     "automatic-valve-location": "Automatic valve locations (m)",
     "case-intro": "This is a case",
     "description": "Description",
     "detail": "Detail",
+    "details": "Details",
     "error-message": "Data has not been calculated. Please fill out input data and click calculate to show report.",
     "graph": "Graph",
     "length": "Length",
@@ -63,6 +66,25 @@
     "position": "Position (m)",
     "summary": "Summary",
     "total-cost": "Total Cost",
-    "valve-cost": "Valve Cost"
+    "valve-cost": "Valve Cost",
+    "input-data": "Input Data"
+  },
+  "projects": {
+    "dashboard": "Project Dashboard",
+    "name": "Project Name",
+    "actions": "Actions",
+    "no-projects": "No projects found",
+    "create": "Create New Project"
+  },
+  "pipes": {
+    "pipe-data": "Pipe Data",
+    "valve-cost": "Air valve unit cost",
+    "available": "available",
+    "sdr": "SDR",
+    "nominal-size": "Nominal size",
+    "id": "ID",
+    "cost": "Cost",
+    "list": "Pipe database",
+    "add": "Add"
   }
 }
