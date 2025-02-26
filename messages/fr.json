@@ -62,5 +62,12 @@
     "summary": "Résumé",
     "total-cost": "Coût total",
     "valve-cost": "Coût de la vanne"
+  },
+  "projects": {
+    "dashboard": "Project Dashboard",
+    "name": "Project Name",
+    "actions": "Actions",
+    "no-projects": "No projects found",
+    "create": "Create New Project"
   }
 }
