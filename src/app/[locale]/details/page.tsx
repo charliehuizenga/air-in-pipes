@@ -141,7 +141,7 @@ export default function ProjectTabs() {
         </div>
       </div>
       {showReport ? (
-        <Report calculate={calculate}/>
+        <Report calculate={calculate} saveProject={saveProject}/>
       ) : (
         <button
           className="mt-3 px-5 py-3 bg-sky-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 max-w-sm"
