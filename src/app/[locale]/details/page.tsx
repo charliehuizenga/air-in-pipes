@@ -24,6 +24,7 @@ export default function ProjectTabs() {
   const [activeTab, setActiveTab] = useState("details");
   const dispatch = useDispatch();
   const project = useSelector((state: ProjectState) => state.project);
+  const user =  useSelector((state: ProjectState) => state.user);
   const [showReport, toggleReport] = useState(false);
 
   useProjectLoader((proj) => dispatch(setProject(proj)));
@@ -55,7 +56,6 @@ export default function ProjectTabs() {
       alert("Error in creating project");
       return;
     }
-
     const uuid = project.uuid;
     try {
       const newProject = {
@@ -78,7 +78,7 @@ export default function ProjectTabs() {
         pipe_design: project.pipe_design || null,
         sock_data: project.sock_data || null,
         valves: project.valves || null,
-        user_id: project.user_id,
+        user_id: project.user_id || user.id,
       };
 
       dispatch(setProject({ ...project }));
