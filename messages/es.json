@@ -22,8 +22,12 @@
     "input-data": "Datos de entrada",
     "principal": "Principal",
     "report": "Informe",
-    "tube-data": "Datos del tubo",
-    "valve-details": "Detalles de la válvula"
+    "tube-data": "Datos del tuberia",
+    "valve-details": "Detalles de la válvula",
+    "projects": "Mis proyectos",
+    "load": "Importar",
+    "save": "Exportar"
+
   },
   "input-data": {
     "profile-data": "Datos de perfil",
@@ -44,13 +48,15 @@
     "project-information": "Información del proyecto",
     "save": "Ahorrar",
     "valve-design": "Diseño de válvula",
-    "valve-design-note": "Se recomienda el diseño de válvula automática. Utilice el método manual con precauciones."
+    "valve-design-note": "Se recomienda el diseño de válvula automática. Utilice el método manual con precauciones.",
+    "template": "Plantilla"
   },
   "report": {
     "automatic-valve-location": "Ubicaciones de válvulas automáticas (m)",
     "case-intro": "Este es un caso",
     "description": "Descripción",
     "detail": "Detalle",
+    "details": "Detalles",
     "error-message": "Los datos no han sido calculados. Complete los datos de entrada y haga clic en calcular para mostrar el informe.",
     "graph": "Grafico",
     "length": "Longitud",
@@ -61,6 +67,26 @@
     "position": "Posición (m)",
     "summary": "Resumen",
     "total-cost": "Coste total",
-    "valve-cost": "Costo de la válvula"
+    "valve-cost": "Costo de la válvula",
+    "input-data": "Datos de Entrada"
+
+  },
+  "projects": {
+    "dashboard": "Salpicadero",
+    "name": "Nombre de Proyecto",
+    "actions": "Actiones",
+    "no-projects": "No hay projects",
+    "create": "Proyecto Nuevo"
+  },
+  "pipes": {
+    "pipe-data": "Datos de tuberia",
+    "valve-cost": "Costo de un valvula",
+    "available": "Disponible",
+    "sdr": "SDR",
+    "nominal-size": "Diam. nominal",
+    "id": "DI",
+    "cost": "Costo",
+    "list": "Lista de todos de los tuberias",
+    "add": "Añade"
   }
 }
