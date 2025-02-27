@@ -26,6 +26,8 @@ export default function ProjectTabs() {
   const project = useSelector((state: ProjectState) => state.project);
   const user =  useSelector((state: ProjectState) => state.user);
   const [showReport, toggleReport] = useState(false);
+  const t = useTranslations("report");
+  const tnav = useTranslations("nav-bar");
 
   useProjectLoader((proj) => dispatch(setProject(proj)));
 
@@ -111,7 +113,7 @@ export default function ProjectTabs() {
             }`}
             onClick={() => setActiveTab("details")}
           >
-            Details
+            {t("details")}
           </button>
           <button
             className={`flex-1 text-center p-2 ${
@@ -121,7 +123,7 @@ export default function ProjectTabs() {
             }`}
             onClick={() => setActiveTab("input_data")}
           >
-            Input Data
+            {tnav("input-data")}
           </button>
           <button
             className={`flex-1 text-center p-2 ${
@@ -131,7 +133,7 @@ export default function ProjectTabs() {
             }`}
             onClick={() => setActiveTab("tube_data")}
           >
-            Tube Data
+            {tnav("tube-data")}
           </button>
         </div>
         <div className="p-4 w-full">
@@ -150,7 +152,7 @@ export default function ProjectTabs() {
             await calculate();
           }}
         >
-          Calculate Report
+            {tnav("calculate")}
         </button>
       )}
     </div>
