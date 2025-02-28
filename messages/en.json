@@ -33,21 +33,21 @@
     "topo-data": "Topography Data"
   },
   "principal": {
-    "automatic-valve-design": "Automatic valve design",
+    "automatic-valve-design": "Automatically locate any needed air valves (recommended)",
     "cancel": "Cancel",
     "date": "Date",
     "designer": "Designer",
     "design-id": "Design ID",
     "design-options": "Design Options",
-    "manual-valve-design": "Manual valve design",
+    "manual-valve-design": "Manually place air valves (advanced users only)",
     "maximum-flow": "Maximum flow (l/s)",
     "minimum-flow": "Minimum flow (l/s)",
     "notes": "Notes",
     "project": "Project",
     "project-information": "Project Information",
     "save": "Save",
-    "valve-design": "Valve Design",
-    "valve-design-note": "Automatic valve design is recommended. Use manual method with cautions.",
+    "valve-design": "Valve Design Method",
+    "valve-design-note": "Air valve design method (use manual method with caution).",
     "template": "Template"
   },
   "report": {

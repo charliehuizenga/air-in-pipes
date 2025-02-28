@@ -34,21 +34,21 @@
     "topo-data": "Datos topográficos"
   },
   "principal": {
-    "automatic-valve-design": "Diseño de válvula automática.",
+    "automatic-valve-design": "Localiza automáticamente las válvulas de aire necesarias (recomendado)",
     "cancel": "Cancelar",
     "date": "Fecha",
     "designer": "Diseñador",
     "design-id": "Identificación del diseño",
     "design-options": "Opciones de diseño",
-    "manual-valve-design": "Diseño de válvula manual",
+    "manual-valve-design": "Colocar manualmente las válvulas de aire (sólo usuarios avanzados)",
     "maximum-flow": "Caudal máximo (l/s)",
     "minimum-flow": "Caudal mínimo (l/s)",
     "notes": "Notas",
     "project": "Proyecto",
     "project-information": "Información del proyecto",
     "save": "Ahorrar",
-    "valve-design": "Diseño de válvula",
-    "valve-design-note": "Se recomienda el diseño de válvula automática. Utilice el método manual con precauciones.",
+    "valve-design": "Modo de diseño de válvulas de aire",
+    "valve-design-note": "Modo de diseño de las válvulas de aire. Utilice el método manual con precauciones.",
     "template": "Plantilla"
   },
   "report": {
