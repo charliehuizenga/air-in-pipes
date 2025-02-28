@@ -87,7 +87,7 @@ export default function ProjectTabs() {
 
       const { data, error } = await supabase
         .from("projects")
-        .upsert([{ ...newProject, uuid }], { onConflict: ["uuid"] });
+        .upsert([{ ...newProject, uuid }], { onConflict: "uuid" });
 
       if (error) {
         console.error("Error inserting project:", error.message);

@@ -10,11 +10,9 @@ export default function EmailVerified() {
   return (
     <main className="mx-auto max-w-md py-12 text-center">
       <h2 className="text-xl font-semibold text-gray-900">
-        🎉 You've successfully verified your email!
+        🎉 You&apos;ve successfully verified your email!
       </h2>
-      <p className="mt-4 text-gray-700">
-        Please log in to use the app 😊
-      </p>
+      <p className="mt-4 text-gray-700">Please log in to use the app 😊</p>
 
       <button
         onClick={() => router.push(`/`)}
