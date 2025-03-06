@@ -15,6 +15,13 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+export const fetchProjects = async () => {
+  const { data, error } = await supabase.from("projects").select("*");
+  if (!error && data) {
+    return data;
+  }
+};
+
 export default function App() {
   const dispatch = useDispatch();
   const router = useRouter(); // Initialize router
@@ -26,15 +33,9 @@ export default function App() {
   const locale = pathname.split("/")[1];
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      setLoading(true);
-      const { data, error } = await supabase.from("projects").select("*");
-      if (!error && data) {
-        setProjects(data);
-      }
-      setLoading(false);
-    };
-    fetchProjects();
+    setLoading(true);
+    fetchProjects().then(data => setProjects(data));
+    setLoading(false);
   }, []);
 
   // Navigate to /details when a project is selected
