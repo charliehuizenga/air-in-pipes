@@ -60,6 +60,7 @@ export default function NavBar({ locale }: NavBarProps) {
   const t = useTranslations("nav-bar");
   const navigation: NavigationItem[] = [
     { name: t("projects"), href: `/${locale}/projects` },
+    { name: t("about"), href: `/${locale}/about` },
   ];
 
   const [selectedExampleName, setSelectedExampleName] = useState("");

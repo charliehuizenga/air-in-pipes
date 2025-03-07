@@ -37,3 +37,4 @@ next-env.d.ts
 /.vs/slnx.sqlite
 /.vs/air-in-pipes/config/applicationhost.config
 /.vs/air-in-pipes/v17/.suo
+/.vs/ProjectSettings.json

@@ -26,7 +26,8 @@
     "valve-details": "Valve Details",
     "projects": "My projects",
     "load": "Import",
-    "save": "Export"
+    "save": "Export",
+    "about": "About"
   },
   "input-data": {
     "profile-data": "Profile Data",
@@ -86,5 +87,18 @@
     "cost": "Cost",
     "list": "Pipe database",
     "add": "Add"
+  },
+  "about": {
+    "about-APLV": "About Agua Para La Vida",
+    "about-APLV-text": "Agua Para La Vida (APLV) has been working with rural communities in Nicaragua since 1987 to help them build their own water and sanitation systems and improve the health and hygiene of their inhabitants. Most of the water systems we build are gravity flow systems where water flows from a spring above the community to a tank near the community and from the tank to faucets at homes and schools.",
+    "about-learn": "Learn more about APLV at ",
+    "about-air": "About Air In Pipes",
+    "about-air-text-p1": "When you design a pipeline for a gravity flow water system, you usually assume that the water flow will fill the pipe. In this case, the flow rate out of the pipe is controlled by the available head, the length, diameter and roughness of the pipe and the so-called minor losses due to various obstructions (contractions, elbows, expansions, tees and especially valves). We will call this the full-pipe or friction controlled case. It is adequately explained in many textbooks and manuals. But if for some reason the pipe is not completely full of water, the relation between head available and flow rate is very different. This will happen in several cases. For instance:",
+    "about-air-text-bullet1": "When you first turn on the water in a new installation with dry or partially filled pipes",
+    "about-air-text-bullet2": "If you have cavitations somewhere in your circuits (too much suction)",
+    "about-air-text-bullet3": "If the pipe is fed by a through a small spring box and the output of the spring is smaller than the one for which you designed the pipe system",
+    "about-air-text-p2": "Now the general belief is that if you have air in the pipes you need to get rid of it so that the pipes will run full. This is because the presence of air often increases the head required for a given flow. In fact, it is not at all rare that this air acts as a block so that no water at all comes out at the end of the pipe. On the other hand, it turns out that very frequently, in systems with springs of small, uncertain or variable output, there is a big advantage in operating with air in the pipes. The advantage is that you can design such a system so that it will operate like a canal, instead of a pipeline: within limits, which you can easily calculate, it will deliver to the end of the line whatever flow rate is provided by the spring and this without having to adjust a valve or operate any controls",
+    "about-air-text-p3": "This online tool allows the user to specify the topography of terrain between the spring and the tank and specify the minumum and maximum desired flow rate. The tool will then caluclate the diameters of pipe required to construct the system. In some cases, air valves may be required and the location and type of these valves will also be specified. ",
+    "about-download-manual": "Links to English and Spanish versions of the complete design manual are here:"
   }
-}
+} 
