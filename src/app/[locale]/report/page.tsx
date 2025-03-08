@@ -18,7 +18,7 @@ const supabase = createClient(
 );
 
 export default function Report(props) {
-  const { calculate } = props;
+  const { calculate, saveProject } = props;
   const t = useTranslations("report");
   const report = useSelector((state: ProjectState) => state.report);
   const project = useSelector((state: ProjectState) => state.project);
@@ -75,7 +75,7 @@ export default function Report(props) {
           <button
             type="button"
             className="px-5 py-3 bg-red-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
-            onClick={calculate}
+            onClick={() => {calculate(); saveProject();}}
           >
             Re-Calculate
           </button>

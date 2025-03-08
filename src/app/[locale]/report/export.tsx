@@ -30,7 +30,7 @@ export function exportReportToPDF(report) {
   // Design Summary
   autoTable(doc, {
     startY: finalY + 10,
-    head: [["Design Case", "Calculation Version", "Cost", "Valve Count", "Total Head Available"]],
+    head: [["Design Case", "Calculation Version", "Design Cost", "Valve Count", "Total Head Available"]],
     body: [[
       report.design.design_case,
       report.design.calculation_version,

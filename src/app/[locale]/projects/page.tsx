@@ -25,12 +25,13 @@ export const fetchProjects = async () => {
 export default function App() {
   const dispatch = useDispatch();
   const router = useRouter(); // Initialize router
-  const t = useTranslations("principal");
+  const t = useTranslations("projects");
   const user = useSelector((state: ProjectState) => state.user);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const locale = pathname.split("/")[1];
+
 
   useEffect(() => {
     setLoading(true);
@@ -74,12 +75,12 @@ export default function App() {
       dispatch(setProject(initialState)); // Reset state if deleted
     }
   };
-
+  
   return (
     <main className="mx-auto max-w-4xl py-12 sm:px-6 lg:px-8">
       <div className="border-b border-gray-900/10 pb-12">
         <h2 className="text-base font-semibold leading-7 text-gray-900">
-          Project Dashboard
+          {t("dashboard")}
         </h2>
 
         <div className="mt-6 flex justify-end">
@@ -87,7 +88,7 @@ export default function App() {
             onClick={() => handleSelectProject("")}
             className="px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600"
           >
-            Create New Project
+            {t("create")}
           </button>
         </div>
 
@@ -98,10 +99,10 @@ export default function App() {
             <thead>
               <tr className="bg-gray-100">
                 <th className="border border-gray-300 px-4 py-2 text-left">
-                  Project Name
+                    {t("name")}
                 </th>
                 <th className="border border-gray-300 px-2 py-2 text-center w-12">
-                  Actions
+                    {t("actions")}
                 </th>
               </tr>
             </thead>
@@ -131,7 +132,7 @@ export default function App() {
               ) : (
                 <tr>
                   <td colSpan={2} className="text-center text-gray-500 py-4">
-                    No projects found.
+                        {t("no-projects")}
                   </td>
                 </tr>
               )}

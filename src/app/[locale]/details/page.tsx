@@ -24,7 +24,10 @@ export default function ProjectTabs() {
   const [activeTab, setActiveTab] = useState("details");
   const dispatch = useDispatch();
   const project = useSelector((state: ProjectState) => state.project);
+  const user =  useSelector((state: ProjectState) => state.user);
   const [showReport, toggleReport] = useState(false);
+  const t = useTranslations("report");
+  const tnav = useTranslations("nav-bar");
 
   useProjectLoader((proj) => dispatch(setProject(proj)));
 
@@ -55,7 +58,6 @@ export default function ProjectTabs() {
       alert("Error in creating project");
       return;
     }
-
     const uuid = project.uuid;
     try {
       const newProject = {
@@ -78,14 +80,14 @@ export default function ProjectTabs() {
         pipe_design: project.pipe_design || null,
         sock_data: project.sock_data || null,
         valves: project.valves || null,
-        user_id: project.user_id,
+        user_id: project.user_id || user.id,
       };
 
       dispatch(setProject({ ...project }));
 
       const { data, error } = await supabase
         .from("projects")
-        .upsert([{ ...newProject, uuid }], { onConflict: ["uuid"] });
+        .upsert([{ ...newProject, uuid }], { onConflict: "uuid" });
 
       if (error) {
         console.error("Error inserting project:", error.message);
@@ -111,7 +113,7 @@ export default function ProjectTabs() {
             }`}
             onClick={() => setActiveTab("details")}
           >
-            Details
+            {t("details")}
           </button>
           <button
             className={`flex-1 text-center p-2 ${
@@ -121,7 +123,7 @@ export default function ProjectTabs() {
             }`}
             onClick={() => setActiveTab("input_data")}
           >
-            Input Data
+            {tnav("input-data")}
           </button>
           <button
             className={`flex-1 text-center p-2 ${
@@ -131,7 +133,7 @@ export default function ProjectTabs() {
             }`}
             onClick={() => setActiveTab("tube_data")}
           >
-            Tube Data
+            {tnav("tube-data")}
           </button>
         </div>
         <div className="p-4 w-full">
@@ -141,7 +143,7 @@ export default function ProjectTabs() {
         </div>
       </div>
       {showReport ? (
-        <Report calculate={calculate}/>
+        <Report calculate={calculate} saveProject={saveProject}/>
       ) : (
         <button
           className="mt-3 px-5 py-3 bg-sky-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 max-w-sm"
@@ -150,7 +152,7 @@ export default function ProjectTabs() {
             await calculate();
           }}
         >
-          Calculate Report
+            {tnav("calculate")}
         </button>
       )}
     </div>

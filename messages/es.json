@@ -10,6 +10,7 @@
     "slope": "Pendiente",
     "start": "Comenzar",
     "valve": "Válvula"
+
   },
   "language-selector": {
     "english": "Inglés",
@@ -22,35 +23,42 @@
     "input-data": "Datos de entrada",
     "principal": "Principal",
     "report": "Informe",
-    "tube-data": "Datos del tubo",
-    "valve-details": "Detalles de la válvula"
+    "tube-data": "Datos del tuberia",
+    "valve-details": "Detalles de la válvula",
+    "projects": "Mis proyectos",
+    "load": "Importar",
+    "save": "Exportar",
+    "about": "Sobre"
+
   },
   "input-data": {
     "profile-data": "Datos de perfil",
     "topo-data": "Datos topográficos"
   },
   "principal": {
-    "automatic-valve-design": "Diseño de válvula automática.",
+    "automatic-valve-design": "Localiza automáticamente las válvulas de aire necesarias (recomendado)",
     "cancel": "Cancelar",
     "date": "Fecha",
     "designer": "Diseñador",
     "design-id": "Identificación del diseño",
     "design-options": "Opciones de diseño",
-    "manual-valve-design": "Diseño de válvula manual",
+    "manual-valve-design": "Colocar manualmente las válvulas de aire (sólo usuarios avanzados)",
     "maximum-flow": "Caudal máximo (l/s)",
     "minimum-flow": "Caudal mínimo (l/s)",
     "notes": "Notas",
     "project": "Proyecto",
     "project-information": "Información del proyecto",
     "save": "Ahorrar",
-    "valve-design": "Diseño de válvula",
-    "valve-design-note": "Se recomienda el diseño de válvula automática. Utilice el método manual con precauciones."
+    "valve-design": "Modo de diseño de válvulas de aire",
+    "valve-design-note": "Modo de diseño de las válvulas de aire. Utilice el método manual con precauciones.",
+    "template": "Plantilla"
   },
   "report": {
     "automatic-valve-location": "Ubicaciones de válvulas automáticas (m)",
     "case-intro": "Este es un caso",
     "description": "Descripción",
     "detail": "Detalle",
+    "details": "Detalles",
     "error-message": "Los datos no han sido calculados. Complete los datos de entrada y haga clic en calcular para mostrar el informe.",
     "graph": "Grafico",
     "length": "Longitud",
@@ -61,6 +69,41 @@
     "position": "Posición (m)",
     "summary": "Resumen",
     "total-cost": "Coste total",
-    "valve-cost": "Costo de la válvula"
+    "valve-cost": "Costo de la válvula",
+    "input-data": "Datos de Entrada"
+
+  },
+  "projects": {
+    "dashboard": "Salpicadero",
+    "name": "Nombre de Proyecto",
+    "actions": "Actiones",
+    "no-projects": "No hay projects",
+    "create": "Proyecto Nuevo"
+  },
+  "pipes": {
+    "pipe-data": "Datos de tuberia",
+    "valve-cost": "Costo de un valvula",
+    "available": "Disponible",
+    "sdr": "SDR",
+    "nominal-size": "Diam. nominal",
+    "id": "DI",
+    "cost": "Costo",
+    "list": "Lista de todos de los tuberias",
+    "add": "Añade"
+  },
+  "about": {
+    "about-APLV": "Sobre Agua Para La Vida",
+    "about-APLV-text": "Agua Para La Vida (APLV) trabaja con comunidades rurales de Nicaragua desde 1987 para ayudarles a construir sus propios sistemas de agua y saneamiento y mejorar la salud y la higiene de sus habitantes. La mayoría de los sistemas de agua que construimos son sistemas de flujo por gravedad en los que el agua fluye desde un manantial situado por encima de la comunidad hasta un depósito cercano a la comunidad y desde el depósito hasta los grifos de las casas y las escuelas.",
+    "about-learn": "Más información sobre APLV en ",
+    "about-air": "Sobre Aires en Tuberia",
+    "about-air-text-p1": "Cuando se diseña una tubería para un sistema de agua por gravedad, se suele suponer que el caudal de agua llenará la tubería. En este caso, el caudal que sale de la tubería está controlado por la altura de elevación disponible, la longitud, el diámetro y la rugosidad de la tubería y las denominadas pérdidas menores debidas a diversas obstrucciones (contracciones, codos, expansiones, tes y, especialmente, válvulas). Este es el caso de la tubería llena o controlada por fricción. Se explica adecuadamente en muchos libros de texto y manuales. Pero si por alguna razón la tubería no está completamente llena de agua, la relación entre la altura disponible y el caudal es muy diferente. Esto ocurrirá en varios casos. Por ejemplo:",
+    "about-air-text-bullet1": "Cuando abra el agua por primera vez en una instalación nueva con tuberías secas o parcialmente llenas",
+    "about-air-text-bullet2": "Si tiene cavitaciones en alguna parte de sus circuitos (demasiada succión)",
+    "about-air-text-bullet3": "Si la tubería se alimenta a través de una pequeña caja de manantial y el caudal es menor que aquella para la que diseñó el sistema de tuberías",
+    "about-air-text-p2": "Ahora bien, la creencia general es que si hay aire en las tuberías hay que eliminarlo para que éstas funcionen llenas. Esto se debe a que la presencia de aire suele aumentar la altura de elevación necesaria para un caudal determinado. De hecho, no es nada raro que este aire actúe como un bloqueo de manera que no salga nada de agua por el extremo de la tubería. Por otro lado, resulta que muy a menudo, en sistemas con manantiales de caudal pequeño, incierto o variable, hay una gran ventaja en funcionar con aire en las tuberías. La ventaja es que se puede diseñar un sistema de este tipo para que funcione como un canal, en lugar de como una tubería: dentro de unos límites, que se pueden calcular fácilmente, llevará al final de la línea el caudal que proporcione el muelle, sin tener que ajustar ninguna válvula ni accionar ningún control.",
+    "about-air-text-p3": "Esta herramienta en línea permite al usuario especificar la topografía del terreno entre el manantial y el depósito y especificar el caudal mínimo y máximo deseado. A continuación, la herramienta calculará los diámetros de tubería necesarios para construir el sistema. En algunos casos, pueden ser necesarias válvulas de aire, cuya ubicación y tipo también se especifican.",
+    "about-download-manual": "Aquí encontrará enlaces a las versiones en inglés y español del manual de diseño completo:"
+
   }
+
 }

@@ -6,6 +6,7 @@ import {
   setProject,
 } from "../../redux/project-slice";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslations } from "next-intl";
 import { ProjectState } from "../../redux/store";
 import { PipeData } from "./tube_list";
 import { useProjectLoader } from "../../reload_fetch";
@@ -20,6 +21,7 @@ export default function TubeData() {
   const cost = useSelector(
     (state: ProjectState) => state.project.library.valve_cost
   );
+  const t = useTranslations("pipes");
 
   useProjectLoader((proj) => dispatch(setProject(proj)));
   const checkbox = useRef<HTMLInputElement>(null);
@@ -97,17 +99,15 @@ export default function TubeData() {
         <div className="sm:flex sm:items-center">
           <div className="sm:flex-auto">
             <h1 className="text-base font-semibold leading-6 text-gray-900">
-              Tube Data
+              {t("pipe-data")}
             </h1>
-            <p className="mt-2 text-sm text-gray-700">
-              A list of all the available pipes
-            </p>
+            <p className="mt-2 text-sm text-gray-700">{t("list")}</p>
           </div>
 
           <div className="flex flex-row items-center gap-7">
             <ImportPipeData isOpen={isPopupOpen} setIsOpen={setIsPopupOpen} />
             <label className="block text-sm font-medium text-gray-700">
-              Cost of valves that extract air
+              {t("valve-cost")}
             </label>
             <div className="flex-shrink-0">
               <input
@@ -130,28 +130,28 @@ export default function TubeData() {
         <div className="mt-4 flex gap-3">
           <input
             type="text"
-            placeholder="Nominal Size"
+            placeholder={t("nominal-size")}
             value={newPipeSize}
             onChange={(e) => setNewPipeSize(e.target.value)}
             className="border rounded-md p-2"
           />
           <input
             type="text"
-            placeholder="SDR"
+            placeholder={t("sdr")}
             value={newPipeSdr}
             onChange={(e) => setNewPipeSdr(e.target.value)}
             className="border rounded-md p-2"
           />
           <input
             type="number"
-            placeholder="Id"
+            placeholder={t("id")}
             value={newPipeId}
             onChange={(e) => setNewPipeId(e.target.value)}
             className="border rounded-md p-2"
           />
           <input
             type="number"
-            placeholder="Cost"
+            placeholder={t("cost")}
             value={newPipeCost}
             onChange={(e) => setNewPipeCost(e.target.value)}
             className="border rounded-md p-2"
@@ -160,7 +160,7 @@ export default function TubeData() {
             onClick={handleAddPipe}
             className="bg-sky-500 text-white px-3 py-1 rounded-md"
           >
-            Add
+            {t("add")}
           </button>
         </div>
 
@@ -181,21 +181,33 @@ export default function TubeData() {
                             onChange={toggleAll}
                           />
                           <span className="px-4 text-sm font-semibold text-gray-900">
-                            Available
+                            {t("available")}
                           </span>
                         </div>
                       </th>
-                      <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                        Nominal Size
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        {t("nominal-size")}
                       </th>
-                      <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                        SDR
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        {t("sdr")}
                       </th>
-                      <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                        ID
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        {t("id")}
                       </th>
-                      <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                        Cost
+                      <th
+                        scope="col"
+                        className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                      >
+                        {t("cost")}
                       </th>
                     </tr>
                   </thead>
