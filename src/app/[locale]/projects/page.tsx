@@ -6,9 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
 import { ProjectState } from "../redux/store";
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
 import { initialState } from "../redux/project-slice";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { fetchProjects } from "./fetch-proj";
+import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,15 +28,9 @@ export default function App() {
 
 
   useEffect(() => {
-    const fetchProjects = async () => {
-      setLoading(true);
-      const { data, error } = await supabase.from("projects").select("*");
-      if (!error && data) {
-        setProjects(data);
-      }
-      setLoading(false);
-    };
-    fetchProjects();
+    setLoading(true);
+    fetchProjects().then(data => setProjects(data));
+    setLoading(false);
   }, []);
 
   // Navigate to /details when a project is selected

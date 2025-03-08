@@ -10,10 +10,8 @@ import { useTranslations } from "next-intl";
 import { ProjectState } from "../../redux/store";
 import { PipeData } from "./tube_list";
 import { useProjectLoader } from "../../reload_fetch";
-
-function classNames(...classes: (string | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
-}
+import { fetchProjects } from "../../projects/fetch-proj";
+import ImportPipeData from "./import";
 
 export default function TubeData() {
   const dispatch = useDispatch();
@@ -29,15 +27,21 @@ export default function TubeData() {
   const checkbox = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState<boolean>(false);
   const [indeterminate, setIndeterminate] = useState<boolean>(false);
-  const [selectedPipe, setSelectedPipe] = useState<PipeData[]>([]);
+  const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
+  const [projects, setProjects] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
   const [newPipeId, setNewPipeId] = useState("");
   const [newPipeSize, setNewPipeSize] = useState("");
   const [newPipeSdr, setNewPipeSdr] = useState("");
   const [newPipeCost, setNewPipeCost] = useState("");
 
   useEffect(() => {
-    const allAvailable = pipeData.every((pipe: PipeData) => pipe.available);
-    const someAvailable = pipeData.some((pipe: PipeData) => pipe.available);
+    fetchProjects().then((data) => setProjects(data));
+  }, []);
+
+  useEffect(() => {
+    const allAvailable = pipeData?.every((pipe: PipeData) => pipe.available);
+    const someAvailable = pipeData?.some((pipe: PipeData) => pipe.available);
     setChecked(allAvailable);
     setIndeterminate(!allAvailable && someAvailable);
     if (checkbox.current) {
@@ -48,44 +52,17 @@ export default function TubeData() {
   }, [pipeData, cost, dispatch]);
 
   function toggleAll() {
-    if (checked || indeterminate) {
-      dispatch(
-        setLibrary({
-          data: pipeData.map((pipe: PipeData) => ({
-            ...pipe,
-            available: false,
-          })),
-          valveCost: cost,
-        })
-      );
-    } else {
-      dispatch(
-        setLibrary({
-          data: pipeData.map((pipe: PipeData) => ({
-            ...pipe,
-            available: true,
-          })),
-          valveCost: cost,
-        })
-      );
-    }
+    dispatch(
+      setLibrary({
+        data: pipeData?.map((pipe: PipeData) => ({
+          ...pipe,
+          available: !checked && !indeterminate,
+        })),
+        valveCost: cost,
+      })
+    );
     setChecked(!checked && !indeterminate);
     setIndeterminate(false);
-  }
-
-  function handleCheckboxClick(pipe: PipeData, isChecked: boolean) {
-    dispatch(togglePipeAvailability({ pipeId: pipe.id, isChecked: isChecked }));
-    const updatedPipeData = pipeData.map((p: PipeData) =>
-      p.id === pipe.id ? { ...p, available: isChecked } : p
-    );
-    const allAvailable = updatedPipeData.every((p: PipeData) => p.available);
-    const someAvailable = updatedPipeData.some((p: PipeData) => p.available);
-
-    setChecked(allAvailable);
-    setIndeterminate(!allAvailable && someAvailable);
-    if (checkbox.current) {
-      checkbox.current.indeterminate = !allAvailable && someAvailable;
-    }
   }
 
   function handleAddPipe() {
@@ -104,6 +81,18 @@ export default function TubeData() {
     setNewPipeCost("");
   }
 
+  function handleSelectChange(event) {
+    const project = projects.find((p) => p.uuid === event.target.value);
+    setSelectedProject(project || null);
+  }
+
+  function importData() {
+    if (selectedProject) {
+      dispatch(setProject(selectedProject));
+      setIsPopupOpen(false);
+    }
+  }
+
   return (
     <div className="mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -112,23 +101,17 @@ export default function TubeData() {
             <h1 className="text-base font-semibold leading-6 text-gray-900">
               {t("pipe-data")}
             </h1>
-            <p className="mt-2 text-sm text-gray-700">
-              {t("list")}
-            </p>
+            <p className="mt-2 text-sm text-gray-700">{t("list")}</p>
           </div>
 
-          <div className="flex flex-row items-center gap-3 ">
-            <label
-              htmlFor="project-name"
-              className="block text-sm font-medium font-italicize  text-gray-700"
-            >
+          <div className="flex flex-row items-center gap-7">
+            <ImportPipeData isOpen={isPopupOpen} setIsOpen={setIsPopupOpen} />
+            <label className="block text-sm font-medium text-gray-700">
               {t("valve-cost")}
             </label>
             <div className="flex-shrink-0">
               <input
                 type="text"
-                name="project-name"
-                id="project-name"
                 value={cost}
                 onChange={(e) =>
                   dispatch(
@@ -143,42 +126,44 @@ export default function TubeData() {
             </div>
           </div>
         </div>
+
         <div className="mt-4 flex gap-3">
           <input
             type="text"
             placeholder={t("nominal-size")}
             value={newPipeSize}
             onChange={(e) => setNewPipeSize(e.target.value)}
-            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+            className="border rounded-md p-2"
           />
           <input
             type="text"
             placeholder={t("sdr")}
             value={newPipeSdr}
             onChange={(e) => setNewPipeSdr(e.target.value)}
-            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+            className="border rounded-md p-2"
           />
           <input
             type="number"
             placeholder={t("id")}
             value={newPipeId}
             onChange={(e) => setNewPipeId(e.target.value)}
-            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+            className="border rounded-md p-2"
           />
           <input
             type="number"
             placeholder={t("cost")}
             value={newPipeCost}
             onChange={(e) => setNewPipeCost(e.target.value)}
-            className="block rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
+            className="border rounded-md p-2"
           />
           <button
             onClick={handleAddPipe}
-            className="rounded-md bg-sky-500 px-3 py-1 text-l font-semibold text-white shadow-sm hover:bg-sky-600 focus:ring-2 focus:ring-inset focus:ring-sky-600"
+            className="bg-sky-500 text-white px-3 py-1 rounded-md"
           >
             {t("add")}
           </button>
         </div>
+
         <div className="mt-8 flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
             <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -190,7 +175,7 @@ export default function TubeData() {
                         <div className="flex items-center space-x-2">
                           <input
                             type="checkbox"
-                            className="absolute left-4 top-1/2 -mt-2  h-4 w-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500"
+                            className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500"
                             ref={checkbox}
                             checked={checked}
                             onChange={toggleAll}
@@ -200,7 +185,6 @@ export default function TubeData() {
                           </span>
                         </div>
                       </th>
-
                       <th
                         scope="col"
                         className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
@@ -228,36 +212,24 @@ export default function TubeData() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {pipeData.map((pipe: PipeData) => (
-                      <tr
-                        key={pipe.id}
-                        className={
-                          selectedPipe.includes(pipe) ? "bg-gray-50" : undefined
-                        }
-                      >
+                    {pipeData?.map((pipe: PipeData) => (
+                      <tr key={pipe.id}>
                         <td className="relative px-7 sm:w-12 sm:px-6">
-                          {selectedPipe.includes(pipe) && (
-                            <div className="absolute inset-y-0 left-0 w-0.5 bg-indigo-600" />
-                          )}
                           <input
                             type="checkbox"
                             className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500"
-                            value={pipe.id}
                             checked={pipe.available}
                             onChange={(e) =>
-                              handleCheckboxClick(pipe, e.target.checked)
+                              dispatch(
+                                togglePipeAvailability({
+                                  pipeId: pipe.id,
+                                  isChecked: e.target.checked,
+                                })
+                              )
                             }
                           />
                         </td>
-
-                        <td
-                          className={classNames(
-                            "whitespace-nowrap py-4 px-3 text-sm font-medium",
-                            selectedPipe.includes(pipe)
-                              ? "text-indigo-600"
-                              : "text-gray-900"
-                          )}
-                        >
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {pipe.nominal_size}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

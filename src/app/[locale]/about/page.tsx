@@ -1,20 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { useSelector, useDispatch } from "react-redux";
-import { setProject } from "../redux/project-slice";
-import { ProjectState } from "../redux/store";
-import Summary from "./summary";
-import Graph from "./graph";
-import Detail from "./detail";
-import { createClient } from "@supabase/supabase-js";
-import { useProjectLoader } from "../reload_fetch";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 export default function About() {
 
