@@ -10,7 +10,7 @@ import { useTranslations } from "next-intl";
 import { ProjectState } from "../../redux/store";
 import { PipeData } from "./tube_list";
 import { useProjectLoader } from "../../reload_fetch";
-import { fetchProjects } from "../../projects/page";
+import { fetchProjects } from "../../projects/fetch-proj";
 import ImportPipeData from "./import";
 
 export default function TubeData() {

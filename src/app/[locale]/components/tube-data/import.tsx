@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchProjects } from "../../projects/page";
+import { fetchProjects } from "../../projects/fetch-proj";
 import { useDispatch } from "react-redux";
 import { setLibrary } from "../../redux/project-slice";
 
