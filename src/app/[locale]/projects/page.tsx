@@ -9,6 +9,12 @@ import { useState, useEffect } from "react";
 import { initialState } from "../redux/project-slice";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { fetchProjects } from "./fetch-proj";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function App() {
   const dispatch = useDispatch();
