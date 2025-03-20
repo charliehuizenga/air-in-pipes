@@ -49,7 +49,7 @@ export default function getGraph(topoData, pipeDesign) {
     datasets: [
       {
         label: "Valves",
-        data: topoData.map((point) => ({ x: point.l, y: point.h })),
+        data: topoData?.map((point) => ({ x: point.l, y: point.h })),
         borderWidth: 3,
         fill: false,
         tension: 0.1,
@@ -124,7 +124,7 @@ export default function getGraph(topoData, pipeDesign) {
         marginTop: "10px",
       }}
     >
-      {pipeDesign.map((pipe, index) => {
+      {pipeDesign?.map((pipe, index) => {
         const color = getPipeColor(pipe.nominal_size, pipe.sdr);
         return (
           <div

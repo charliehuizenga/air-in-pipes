@@ -54,7 +54,7 @@ export default function Detail({ report, project }: SummaryProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {pipeDesign.map((pipe, index) => (
+            {pipeDesign?.map((pipe, index) => (
               <tr key={pipe.hgl}>
                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
                   {pipe.start_pos.toFixed(1)}
