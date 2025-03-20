@@ -38,31 +38,34 @@ export default function getGraph(topoData, pipeDesign) {
     const identifier = createPipeIdentifier(nominalSize, sdr);
     if (!pipeColorMap.has(identifier)) {
       const hue = (pipeColorMap.size * 137) % 360;
-      const color = `hsla(${hue}, 60%, 70%, 0.3)`;
+      const color = `hsl(${hue}, 80%, 50%)`; // Distinct colors
       pipeColorMap.set(identifier, color);
     }
     return pipeColorMap.get(identifier);
   };
 
-  const annotations = pipeDesign.map((pipe) => ({
-    type: "box",
-    xMin: pipe.start_pos,
-    xMax: pipe.start_pos + pipe.length,
-    backgroundColor: getPipeColor(pipe.nominal_size, pipe.sdr),
-    borderColor: getPipeColor(pipe.nominal_size, pipe.sdr),
-    borderWidth: 1,
-  }));
-
+  // Create a single dataset with segment coloring
   const data = {
     datasets: [
       {
-        label: "Topo Data",
+        label: "Valves",
         data: topoData.map((point) => ({ x: point.l, y: point.h })),
-        borderColor: "rgb(75, 192, 192)",
-        borderWidth: 2,
+        borderWidth: 3,
         fill: false,
         tension: 0.1,
         pointRadius: 5,
+        segment: {
+          borderColor: (ctx) => {
+            if (!ctx.p1 || !ctx.p0) return "black"; // Default fallback color
+            const segmentStart = ctx.p0.parsed.x;
+            const pipe = pipeDesign.find(
+              (pipe) =>
+                segmentStart >= pipe.start_pos &&
+                segmentStart <= pipe.start_pos + pipe.length
+            );
+            return pipe ? getPipeColor(pipe.nominal_size, pipe.sdr) : "gray"; // Assign pipe color or fallback
+          },
+        },
       },
     ],
   };
@@ -93,14 +96,13 @@ export default function getGraph(topoData, pipeDesign) {
       },
     },
     plugins: {
-      annotation: { annotations },
       tooltip: {
         enabled: true,
         titleFont: { size: 18 },
         bodyFont: { size: 16 },
       },
       legend: {
-        display: false,
+        display: true,
         labels: { font: { size: 16 } },
       },
       title: {
@@ -110,7 +112,6 @@ export default function getGraph(topoData, pipeDesign) {
       },
     },
   };
-  
 
   const chartRef = createRef();
 
