@@ -48,7 +48,7 @@ export default function getGraph(topoData, pipeDesign) {
   const data = {
     datasets: [
       {
-        label: "Valves",
+        label: "Start and End Positions of Pipes",
         data: topoData?.map((point) => ({ x: point.l, y: point.h })),
         borderWidth: 3,
         fill: false,
