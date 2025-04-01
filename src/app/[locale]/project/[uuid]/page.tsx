@@ -4,16 +4,15 @@ import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
-import { setProject } from "../redux/project-slice";
-import { setData } from "../redux/report-slice";
-import { getDesign } from "../api/fetch-design";
-import { useProjectLoader } from "../reload_fetch";
-import { ProjectState } from "../redux/store";
-import Details from "../components/details";
-import InputData from "../components/input-data/input-data";
-import TubeData from "../components/tube-data/tube-data";
-import Report from "../report/page";
+import { setProject } from "../../redux/project-slice";
+import { setData } from "../../redux/report-slice";
+import { getDesign } from "../../api/fetch-design";
+import { useProjectLoader } from "../../reload_fetch";
+import { ProjectState } from "../../redux/store";
+import Details from "../../components/details";
+import InputData from "../../components/input-data/input-data";
+import TubeData from "../../components/tube-data/tube-data";
+import Report from "../../report/page";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -137,9 +136,9 @@ export default function ProjectTabs() {
           </button>
         </div>
         <div className="p-4 w-full">
-          {activeTab === "details" && <Details />}
-          {activeTab === "input_data" && <InputData />}
-          {activeTab === "tube_data" && <TubeData />}
+          {activeTab === "details" && <Details/>}
+          {activeTab === "input_data" && <InputData/>}
+          {activeTab === "tube_data" && <TubeData project={project}/>}
         </div>
       </div>
       {showReport ? (

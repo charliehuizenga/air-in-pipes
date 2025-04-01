@@ -8,7 +8,6 @@ import { ProjectState } from "../redux/store";
 import Summary from "./summary";
 import Graph from "./graph";
 import Detail from "./detail";
-import { useProjectLoader } from "../reload_fetch";
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 
@@ -17,11 +16,6 @@ export default function Report(props) {
   const t = useTranslations("report");
   const report = useSelector((state: ProjectState) => state.report);
   const project = useSelector((state: ProjectState) => state.project);
-  const dispatch = useDispatch();
-
-  useProjectLoader((proj) => {
-    dispatch(setProject(proj));
-  });
 
   const [activeTab, setActiveTab] = useState("summary");
 

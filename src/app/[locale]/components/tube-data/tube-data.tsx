@@ -9,11 +9,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
 import { ProjectState } from "../../redux/store";
 import { PipeData } from "./tube_list";
-import { useProjectLoader } from "../../reload_fetch";
 import { fetchProjects } from "../../projects/fetch-proj";
 import ImportPipeData from "./import";
 
-export default function TubeData() {
+export default function TubeData({ project }) {
   const dispatch = useDispatch();
   const pipeData = useSelector(
     (state: ProjectState) => state.project.library.pipe_data
@@ -23,7 +22,6 @@ export default function TubeData() {
   );
   const t = useTranslations("pipes");
 
-  useProjectLoader((proj) => dispatch(setProject(proj)));
   const checkbox = useRef<HTMLInputElement>(null);
   const [checked, setChecked] = useState<boolean>(false);
   const [indeterminate, setIndeterminate] = useState<boolean>(false);

@@ -7,14 +7,15 @@ import { useTranslations } from "next-intl";
 import { ProjectState } from "../redux/store";
 import { useState, useEffect } from "react";
 import { initialState } from "../redux/project-slice";
-import { TrashIcon } from "@heroicons/react/24/outline";
-import { fetchProjects } from "./fetch-proj";
+import { fetchProjects, fetchMembershipOrgs } from "./fetch-proj";
 import { createClient } from "@supabase/supabase-js";
+import ProjectTable from "./table";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
+
 
 export default function App() {
   const dispatch = useDispatch();
@@ -25,13 +26,28 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const locale = pathname.split("/")[1];
-
+  const [orgs, setOrgs] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
-    setLoading(true);
-    fetchProjects().then(data => setProjects(data));
-    setLoading(false);
-  }, []);
+    const load = async () => {
+      setLoading(true);
+  
+      const allProjects = await fetchProjects();
+      const personal = allProjects.filter(
+        (p) => p.user_id === user.id && p.org_id == null
+      );
+      setProjects(personal);
+  
+      // 🎯 Fetch orgs user is a member of
+      const userOrgs = await fetchMembershipOrgs(user.id);
+      setOrgs(userOrgs);
+  
+      setLoading(false);
+    };
+  
+    load();
+  }, [user.id]);
+  
 
   // Navigate to /details when a project is selected
   const handleSelectProject = async (uuid: string) => {
@@ -42,18 +58,55 @@ export default function App() {
         setProject({
           ...initialState,
           uuid: uuid, // Generate a new random UUID
-          user_id: user.id
+          user_id: user.id,
+          org_id: orgId,
         })
       );
     } else {
-      const selected = projects.find((p) => p.uuid === uuid);
+      const selected =
+        projects.find((p) => p.uuid === uuid);
       if (selected) {
         dispatch(setProject(selected));
       } else {
         console.error("Project not found");
       }
     }
-    router.push(`/${locale}/details?uuid=${uuid}`);
+    router.push(`/${locale}/project/${uuid}`);
+  };
+
+  const handleCreateOrganization = async () => {
+    const name = prompt("Enter the name of your new organization:");
+    if (!name) return;
+
+    const orgId = crypto.randomUUID();
+
+    // Insert org
+    const { error: orgError } = await supabase.from("orgs").insert({
+      org_id: orgId,
+      name,
+    });
+
+    if (orgError) {
+      console.error("Error creating organization:", orgError);
+      alert("Failed to create organization.");
+      return;
+    }
+
+    // Insert into organization_members
+    const { error: memberError } = await supabase.from("org_members").insert({
+      user_id: user.id,
+      org_id: orgId,
+      role: "admin",
+    });
+
+    if (memberError) {
+      console.error("Error adding to members:", memberError);
+      alert("Organization created but failed to add membership.");
+      return;
+    }
+
+    alert(`Organization "${name}" created!`);
+    location.reload(); // or re-fetch org projects/members
   };
 
   // Delete a project from Supabase
@@ -64,12 +117,12 @@ export default function App() {
       console.error("Error deleting project:", error.message);
       alert("Failed to delete project.");
     } else {
-      setProjects((prev) => prev.filter((p) => p.uuid !== uuid));
+      setProjects((prev) => (prev.filter((p) => p.uuid !== uuid)));
       alert("Project deleted successfully.");
       dispatch(setProject(initialState)); // Reset state if deleted
     }
   };
-  
+
   return (
     <main className="mx-auto max-w-4xl py-12 sm:px-6 lg:px-8">
       <div className="border-b border-gray-900/10 pb-12">
@@ -89,49 +142,57 @@ export default function App() {
         {loading ? (
           <p className="text-gray-500 mt-4">Loading projects...</p>
         ) : (
-          <table className="min-w-full mt-6 border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border border-gray-300 px-4 py-2 text-left">
-                    {t("name")}
-                </th>
-                <th className="border border-gray-300 px-2 py-2 text-center w-12">
-                    {t("actions")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects.length > 0 ? (
-                projects.map((p) => (
-                  <tr key={p.uuid} className="hover:bg-gray-50">
-                    <td
-                      className="border border-gray-300 px-4 py-2 cursor-pointer text-sky-600"
-                      onClick={() => handleSelectProject(p.uuid)}
+          <>
+            {/* Personal Projects */}
+            <h3 className="text-lg font-semibold text-gray-800 mt-8 mb-2">
+              {t("personal-projects")}
+            </h3>
+            <ProjectTable
+              projects={projects}
+              onSelect={handleSelectProject}
+              onDelete={handleDeleteProject}
+            />
+
+            {/* Organization Memberships */}
+            <h3 className="text-lg font-semibold text-gray-800 mt-10 mb-2">
+              {t("organizations")}
+            </h3>
+            <div className="mt-6 flex gap-4 justify-end">
+              {/* Make New Organization */}
+              <button
+                onClick={handleCreateOrganization}
+                className="px-4 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600"
+              >
+                + New Organization
+              </button>
+            </div>
+            {orgs.length > 0 ? (
+              <ul className="divide-y divide-gray-200 border border-gray-300 rounded-md">
+                {orgs.map((org) => (
+                  <li
+                    key={org.id}
+                    className="p-3 flex items-center justify-between"
+                  >
+                    <span className="text-gray-800">{org.name}</span>
+                    <button
+                      onClick={() =>
+                        alert(
+                          `Navigate to /organizations/${org.id} or show more info`
+                        )
+                      }
+                      className="text-sky-600 hover:underline"
                     >
-                      {p.project_name}
-                    </td>
-                    <td className="border border-gray-300 px-2 py-2 text-center w-12">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent row click from triggering navigation
-                          handleDeleteProject(p.uuid);
-                        }}
-                        className="p-1 rounded-md text-red-500 hover:text-red-700"
-                      >
-                        <TrashIcon className="h-5 w-5" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={2} className="text-center text-gray-500 py-4">
-                        {t("no-projects")}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                      View
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-gray-500">
+                You're not a member of any organizations yet.
+              </p>
+            )}
+          </>
         )}
       </div>
     </main>
