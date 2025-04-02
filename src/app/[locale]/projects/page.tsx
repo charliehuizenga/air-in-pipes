@@ -10,12 +10,12 @@ import { initialState } from "../redux/project-slice";
 import { fetchProjects, fetchMembershipOrgs } from "./fetch-proj";
 import { createClient } from "@supabase/supabase-js";
 import ProjectTable from "./table";
+import Organizations from "./organizations";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-
 
 export default function App() {
   const dispatch = useDispatch();
@@ -31,40 +31,36 @@ export default function App() {
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-  
+
       const allProjects = await fetchProjects();
       const personal = allProjects.filter(
         (p) => p.user_id === user.id && p.org_id == null
       );
       setProjects(personal);
-  
+
       // 🎯 Fetch orgs user is a member of
       const userOrgs = await fetchMembershipOrgs(user.id);
       setOrgs(userOrgs);
-  
+
       setLoading(false);
     };
-  
+
     load();
   }, [user.id]);
-  
 
-  // Navigate to /details when a project is selected
+  // Navigate to /project/[uuid] when a project is selected
   const handleSelectProject = async (uuid: string) => {
     if (uuid === "") {
-      console.log(user.id);
       uuid = crypto.randomUUID();
       dispatch(
         setProject({
           ...initialState,
           uuid: uuid, // Generate a new random UUID
           user_id: user.id,
-          org_id: orgId,
         })
       );
     } else {
-      const selected =
-        projects.find((p) => p.uuid === uuid);
+      const selected = projects.find((p) => p.uuid === uuid);
       if (selected) {
         dispatch(setProject(selected));
       } else {
@@ -117,7 +113,7 @@ export default function App() {
       console.error("Error deleting project:", error.message);
       alert("Failed to delete project.");
     } else {
-      setProjects((prev) => (prev.filter((p) => p.uuid !== uuid)));
+      setProjects((prev) => prev.filter((p) => p.uuid !== uuid));
       alert("Project deleted successfully.");
       dispatch(setProject(initialState)); // Reset state if deleted
     }
@@ -130,15 +126,6 @@ export default function App() {
           {t("dashboard")}
         </h2>
 
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={() => handleSelectProject("")}
-            className="px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600"
-          >
-            {t("create")}
-          </button>
-        </div>
-
         {loading ? (
           <p className="text-gray-500 mt-4">Loading projects...</p>
         ) : (
@@ -147,6 +134,14 @@ export default function App() {
             <h3 className="text-lg font-semibold text-gray-800 mt-8 mb-2">
               {t("personal-projects")}
             </h3>
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => handleSelectProject("")}
+                className="px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600"
+              >
+                {t("create")}
+              </button>
+            </div>
             <ProjectTable
               projects={projects}
               onSelect={handleSelectProject}
@@ -163,35 +158,10 @@ export default function App() {
                 onClick={handleCreateOrganization}
                 className="px-4 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600"
               >
-                + New Organization
+                New Organization
               </button>
             </div>
-            {orgs.length > 0 ? (
-              <ul className="divide-y divide-gray-200 border border-gray-300 rounded-md">
-                {orgs.map((org) => (
-                  <li
-                    key={org.id}
-                    className="p-3 flex items-center justify-between"
-                  >
-                    <span className="text-gray-800">{org.name}</span>
-                    <button
-                      onClick={() =>
-                        alert(
-                          `Navigate to /organizations/${org.id} or show more info`
-                        )
-                      }
-                      className="text-sky-600 hover:underline"
-                    >
-                      View
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500">
-                You're not a member of any organizations yet.
-              </p>
-            )}
+            <Organizations orgs={orgs} />
           </>
         )}
       </div>

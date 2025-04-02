@@ -80,6 +80,7 @@ export default function ProjectTabs() {
         sock_data: project.sock_data || null,
         valves: project.valves || null,
         user_id: project.user_id || user.id,
+        org_id: project.org_id || null,
       };
 
       dispatch(setProject({ ...project }));

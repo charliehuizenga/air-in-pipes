@@ -22,6 +22,8 @@ export interface Project {
   topo: Topo[];
   nSocks: number;
   valveFlags: boolean[];
+  user_id: string;
+  org_id: string;
   [key: string]: any;
 }
 
@@ -43,6 +45,8 @@ export const initialState: Project = {
     valve_cost: 380,
     pipe_data: pipeData,
   },
+  user_id: "",
+  org_id: ""
 };
 
 // Function to user JSON files

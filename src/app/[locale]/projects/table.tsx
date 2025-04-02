@@ -1,6 +1,6 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
 
-export default function ProjectTable({ projects, onSelect, onDelete, showOrgName = false }) {
+export default function ProjectTable({ projects, onSelect, onDelete }) {
     return (
       <table className="min-w-full mt-2 border-collapse border border-gray-300">
         <thead>
@@ -22,7 +22,7 @@ export default function ProjectTable({ projects, onSelect, onDelete, showOrgName
                   onClick={() => onSelect(p.uuid)}
                 >
                   {p.project_name}
-                  {showOrgName && p.organizations?.name && (
+                  {p.organizations?.name && (
                     <span className="ml-2 text-sm text-gray-500">
                       – {p.organizations.name}
                     </span>
