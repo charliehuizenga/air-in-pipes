@@ -48,14 +48,13 @@ export default function App() {
     load();
   }, [user.id]);
 
-  // Navigate to /project/[uuid] when a project is selected
   const handleSelectProject = async (uuid: string) => {
     if (uuid === "") {
       uuid = crypto.randomUUID();
       dispatch(
         setProject({
           ...initialState,
-          uuid: uuid, // Generate a new random UUID
+          uuid: uuid,
           user_id: user.id,
         })
       );
@@ -76,7 +75,6 @@ export default function App() {
 
     const orgId = crypto.randomUUID();
 
-    // Insert org
     const { error: orgError } = await supabase.from("orgs").insert({
       org_id: orgId,
       name,
@@ -88,11 +86,10 @@ export default function App() {
       return;
     }
 
-    // Insert into organization_members
     const { error: memberError } = await supabase.from("org_members").insert({
       user_id: user.id,
       org_id: orgId,
-      role: "admin",
+      role: "admin", // init creator as admin
     });
 
     if (memberError) {
@@ -102,10 +99,9 @@ export default function App() {
     }
 
     alert(`Organization "${name}" created!`);
-    location.reload(); // or re-fetch org projects/members
+    location.reload(); // re-fetch org projects/members
   };
 
-  // Delete a project from Supabase
   const handleDeleteProject = async (uuid: string) => {
     if (!confirm("Are you sure you want to delete this project?")) return;
     const { error } = await supabase.from("projects").delete().eq("uuid", uuid);
@@ -115,7 +111,7 @@ export default function App() {
     } else {
       setProjects((prev) => prev.filter((p) => p.uuid !== uuid));
       alert("Project deleted successfully.");
-      dispatch(setProject(initialState)); // Reset state if deleted
+      dispatch(setProject(initialState));
     }
   };
 

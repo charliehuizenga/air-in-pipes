@@ -20,7 +20,6 @@ export async function fetchProjects() {
 }
 
 export async function fetchMembershipOrgs(userId: string) {
-  // Step 1: Get the org_ids the user is a member of
   const { data: memberships, error: memberError } = await supabase
     .from("org_members")
     .select("org_id")
@@ -37,7 +36,6 @@ export async function fetchMembershipOrgs(userId: string) {
 
   if (orgIds.length === 0) return [];
 
-  // Step 2: Fetch the actual orgs
   const { data: orgs, error: orgError } = await supabase
     .from("orgs")
     .select("org_id, name")
@@ -47,8 +45,6 @@ export async function fetchMembershipOrgs(userId: string) {
     console.error("Error fetching orgs:", orgError);
     return [];
   }
-
-  console.log(orgs);
 
   return orgs.map((org) => ({
     id: org.org_id,

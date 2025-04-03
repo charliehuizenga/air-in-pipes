@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { ProjectState } from "../../redux/store";
-import { useDispatch } from "react-redux";
 import { setProject, initialState } from "../../redux/project-slice";
 import ProjectTable from "../../projects/table";
 
@@ -16,12 +15,12 @@ const supabase = createClient(
 
 export default function OrganizationPage() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const user = useSelector((state: ProjectState) => state.user);
-  const project = useSelector((state: ProjectState) => state.project);
   const [orgName, setOrgName] = useState("");
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const dispatch = useDispatch();
+  const [isAdmin, setIsAdmin] = useState(false); // ✅ NEW
   const pathname = usePathname().split("/");
   const locale = pathname[1];
   const org_id = pathname[3];
@@ -34,14 +33,13 @@ export default function OrganizationPage() {
         ...initialState,
         uuid,
         org_id: org_id,
-        user_id: user.id, // in case you want to save creator info
+        user_id: user.id,
       })
     );
 
-    router.push(`/${locale}/project/${uuid}`); // or `/details?uuid=${uuid}`
+    router.push(`/${locale}/project/${uuid}`);
   };
 
-  // Navigate to /project/[uuid] when a project is selected
   const handleSelectProject = async (uuid: string) => {
     const selected = projects.find((p) => p.uuid === uuid);
     if (selected) {
@@ -53,7 +51,13 @@ export default function OrganizationPage() {
   };
 
   const handleDeleteProject = async (uuid: string) => {
+    if (!isAdmin) {
+      alert("You must be an admin to delete projects in this organization.");
+      return;
+    }
+
     if (!confirm("Are you sure you want to delete this project?")) return;
+
     const { error } = await supabase.from("projects").delete().eq("uuid", uuid);
     if (error) {
       console.error("Error deleting project:", error.message);
@@ -61,7 +65,7 @@ export default function OrganizationPage() {
     } else {
       setProjects((prev) => prev.filter((p) => p.uuid !== uuid));
       alert("Project deleted successfully.");
-      dispatch(setProject(initialState)); // Reset state if deleted
+      dispatch(setProject(initialState));
     }
   };
 
@@ -69,7 +73,6 @@ export default function OrganizationPage() {
     const loadOrgData = async () => {
       if (!org_id || !user.id) return;
 
-      // 1. Check membership
       const { data: membership, error: membershipError } = await supabase
         .from("org_members")
         .select("*")
@@ -79,11 +82,12 @@ export default function OrganizationPage() {
 
       if (!membership || membershipError) {
         alert("You are not a member of this organization.");
-        router.push("/"); // or 404
+        router.push("/");
         return;
       }
 
-      // 2. Get org name
+      setIsAdmin(membership.role === "admin"); // ✅ Check if user is admin
+
       const { data: orgData } = await supabase
         .from("orgs")
         .select("name")
@@ -92,7 +96,6 @@ export default function OrganizationPage() {
 
       setOrgName(orgData?.name ?? "Unknown Org");
 
-      // 3. Get projects
       const { data: orgProjects } = await supabase
         .from("projects")
         .select("uuid, project_name")
@@ -106,9 +109,42 @@ export default function OrganizationPage() {
   }, [org_id, user.id]);
 
   const handleShare = async () => {
-    const shareURL = `${window.location.origin}/join/${org_id}`;
-    await navigator.clipboard.writeText(shareURL);
-    alert(`Invite link copied to clipboard:\n${shareURL}`);
+    // 1. Try to find existing invite for this org
+    const { data: existingInvite, error: fetchError } = await supabase
+      .from("org_invites")
+      .select("token")
+      .eq("org_id", org_id)
+      .maybeSingle();
+
+    if (fetchError) {
+      console.error("Error fetching existing invite:", fetchError);
+      alert("Failed to retrieve invite.");
+      return;
+    }
+
+    let token = existingInvite?.token;
+
+    // 2. If no existing invite, create one
+    if (!token) {
+      token = crypto.randomUUID(); // or nanoid()
+
+      const { error: insertError } = await supabase.from("org_invites").insert({
+        token,
+        org_id,
+        invite_id: crypto.randomUUID(),
+      });
+
+      if (insertError) {
+        console.error("Error creating new invite:", insertError);
+        alert("Failed to create invite.");
+        return;
+      }
+    }
+
+    // 3. Copy the invite link to clipboard
+    const inviteURL = `${window.location.origin}/${locale}/join/${token}`;
+    await navigator.clipboard.writeText(inviteURL);
+    alert(`Invite link copied to clipboard:\n${inviteURL}`);
   };
 
   return (
