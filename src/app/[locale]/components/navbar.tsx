@@ -5,12 +5,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ProjectState, AppDispatch } from "../redux/store";
 import { useDispatch, useSelector } from "react-redux";
-import { getDesign } from "../api/fetch-design";
-import { setData } from "../redux/report-slice";
-import Alert from "./alert";
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
-import { setProject, uploadFile } from "../redux/project-slice";
+import { useCallback, useRef } from "react";
+import { uploadFile } from "../redux/project-slice";
 import { clearUser } from "../redux/auth-slice"; // ✅ logout action
 import { createClient } from "@supabase/supabase-js"; // ✅ supabase
 import example0 from "../../../../examples/Example0.json";
@@ -104,7 +101,7 @@ export default function NavBar({ locale }: NavBarProps) {
       const { error } = await supabase.auth.signOut();
       dispatch(clearUser());
     }
-    router.push("/");
+    router.push(`/${locale}/login`);
   };
 
   return (
@@ -126,9 +123,12 @@ export default function NavBar({ locale }: NavBarProps) {
                   </Disclosure.Button>
                 </div>
                 <div className="flex flex-shrink-0 items-center"></div>
-                <div className="flex flex-shrink-0 font-semibold text-xl tracking-wide text-sky-400 px-1 items-center ">
-                  Agua Para La Vida
-                </div>
+                <Link
+                  href="/"
+                  className="flex flex-shrink-0 font-semibold text-xl tracking-wide text-sky-400 px-1 items-center"
+                >
+                  <span>Agua Para La Vida</span>
+                </Link>
               </div>
               <div className="flex items-center space-x-4">
                 <input
@@ -172,16 +172,18 @@ export default function NavBar({ locale }: NavBarProps) {
                   {t("save")}
                 </button>
 
-                <button
-                  onClick={handleAuthButtonClick}
-                  className={`relative inline-flex items-center gap-x-1.5 rounded-md ${
-                    user?.id
-                      ? "bg-red-500 hover:bg-red-600"
-                      : "bg-sky-600 hover:bg-sky-700"
-                  } px-3 py-2 text-sm font-medium text-white shadow-sm`}
-                >
-                  {user?.id ? "Logout" : "Login"}
-                </button>
+                {!(pathname.includes("/login") && !user?.id) && (
+                  <button
+                    onClick={handleAuthButtonClick}
+                    className={`relative inline-flex items-center gap-x-1.5 rounded-md ${
+                      user?.id
+                        ? "bg-red-500 hover:bg-red-600"
+                        : "bg-sky-600 hover:bg-sky-700"
+                    } px-3 py-2 text-sm font-medium text-white shadow-sm`}
+                  >
+                    {user?.id ? "Logout" : "Login"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
