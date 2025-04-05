@@ -14,7 +14,7 @@ export default function Organizations({
   if (!orgs || orgs.length === 0) {
     return (
       <p className="text-gray-500">
-        You're not a member of any organizations yet.
+        You&apos;re not a member of any organizations yet.
       </p>
     );
   }

@@ -8,7 +8,6 @@ const supabase = createClient(
 export async function fetchProjects() {
   const { data, error } = await supabase.from("projects").select(`
         *
-        orgs(name)  -- FK on org_id
       `);
 
   if (error) {
