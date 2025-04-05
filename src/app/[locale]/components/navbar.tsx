@@ -100,7 +100,10 @@ export default function NavBar({ locale }: NavBarProps) {
     if (user?.id) {
       const { error } = await supabase.auth.signOut();
       dispatch(clearUser());
+      router.push(`/${locale}`);
+      return;
     }
+    
     router.push(`/${locale}/login`);
   };
 
