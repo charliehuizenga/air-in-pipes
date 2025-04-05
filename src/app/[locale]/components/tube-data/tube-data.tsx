@@ -12,7 +12,7 @@ import { PipeData } from "./tube_list";
 import { fetchProjects } from "../../projects/fetch-proj";
 import ImportPipeData from "./import";
 
-export default function TubeData({ project }) {
+export default function TubeData() {
   const dispatch = useDispatch();
   const pipeData = useSelector(
     (state: ProjectState) => state.project.library.pipe_data

@@ -52,8 +52,9 @@ export default function NavBar({ locale }: NavBarProps) {
 
   const t = useTranslations("nav-bar");
   const navigation = [
-    { name: t("projects"), href: `/${locale}/projects` },
-    { name: t("about"), href: `/${locale}/about` },
+    { name: t("projects"), href: `/${locale}/projects`, protected: true },
+    { name: t("demo"), href: `/${locale}/demo`, protected: false },
+    { name: t("about"), href: `/${locale}/about`, protected: false },
   ];
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -103,7 +104,7 @@ export default function NavBar({ locale }: NavBarProps) {
       router.push(`/${locale}`);
       return;
     }
-    
+
     router.push(`/${locale}/login`);
   };
 
@@ -141,23 +142,27 @@ export default function NavBar({ locale }: NavBarProps) {
                   onChange={handleFileChange}
                 />
                 <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
-                  {navigation.map((item) => (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={classNames(
-                        isActiveRoute(item.href)
-                          ? " bg-gray-900 text-white"
-                          : " text-gray-300 hover:bg-gray-700 hover:text-white",
-                        "rounded-md px-2 py-2 text-sm font-medium"
-                      )}
-                      aria-current={
-                        isActiveRoute(item.href) ? "page" : undefined
-                      }
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+                  {navigation.map((item) => {
+                    if (!item.protected || user.id) {
+                      return (
+                        <Link
+                          key={item.name}
+                          href={item.href}
+                          className={classNames(
+                            isActiveRoute(item.href)
+                              ? " bg-gray-900 text-white"
+                              : " text-gray-300 hover:bg-gray-700 hover:text-white",
+                            "rounded-md px-2 py-2 text-sm font-medium"
+                          )}
+                          aria-current={
+                            isActiveRoute(item.href) ? "page" : undefined
+                          }
+                        >
+                          {item.name}
+                        </Link>
+                      );
+                    }
+                  })}
                 </div>
 
                 <button

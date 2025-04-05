@@ -6,9 +6,7 @@ const supabase = createClient(
 );
 
 export async function fetchProjects() {
-  const { data, error } = await supabase.from("projects").select(`
-        *
-      `);
+  const { data, error } = await supabase.from("projects").select("*");
 
   if (error) {
     console.error("Error fetching projects:", error);
