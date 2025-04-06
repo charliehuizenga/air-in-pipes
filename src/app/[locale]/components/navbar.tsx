@@ -7,7 +7,6 @@ import { ProjectState, AppDispatch } from "../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 import { useCallback, useRef } from "react";
-import { fileToState } from "../redux/project-slice";
 import { clearUser } from "../redux/auth-slice"; // ✅ logout action
 import { createClient } from "@supabase/supabase-js"; // ✅ supabase
 
@@ -32,10 +31,10 @@ export default function NavBar({ locale }: NavBarProps) {
   );
 
   const isActiveRoute = (href: string) => pathname === href;
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const t = useTranslations("nav-bar");
   const navigation = [
+    { name: t("home"), href: `/${locale}`, protected: false },
     { name: t("projects"), href: `/${locale}/projects`, protected: true },
     { name: t("demo"), href: `/${locale}/demo`, protected: false },
     { name: t("about"), href: `/${locale}/about`, protected: false },
