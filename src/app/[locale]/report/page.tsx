@@ -60,6 +60,35 @@ export default function Report(props) {
     pdf.save("report.pdf");
   }
 
+  const downloadFile = (
+    content: string,
+    fileName: string,
+    contentType: string
+  ) => {
+    const a = document.createElement("a");
+    const file = new Blob([content], { type: contentType });
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+
+  const promptForFileNameAndDownload = (
+    content: string,
+    defaultFileName: string,
+    contentType: string
+  ) => {
+    const userFileName = prompt("Enter file name", defaultFileName);
+    if (userFileName) {
+      downloadFile(content, `${userFileName}.json`, contentType);
+    }
+  };
+
+  const handleExportProject = () => {
+    const jsonStr = JSON.stringify(project, null, 2);
+    promptForFileNameAndDownload(jsonStr, "project-data", "text/json");
+  };
+
   return (
     <div className="p-4 flex flex-col items-center justify-start min-h-screen w-full">
       <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-6xl">
@@ -111,7 +140,14 @@ export default function Report(props) {
           </div>
         </div>
 
-        <div style={{ position: "absolute", top: "-9999px", left: "-9999px", width: "1000px" }}>
+        <div
+          style={{
+            position: "absolute",
+            top: "-9999px",
+            left: "-9999px",
+            width: "1000px",
+          }}
+        >
           <div ref={firstPageRef}>
             <h1 className="text-xl font-bold mb-2">Report</h1>
             <h2 className="text-m font-bold mb-2">Summary</h2>
@@ -138,12 +174,21 @@ export default function Report(props) {
           >
             Re-Calculate
           </button>
+
           <button
             type="button"
             className="px-5 py-3 bg-green-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
             onClick={exportReportToPDF}
           >
             Export to PDF
+          </button>
+
+          <button
+            type="button"
+            className="px-5 py-3 bg-blue-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            onClick={handleExportProject}
+          >
+            Export to JSON
           </button>
         </div>
       </div>
