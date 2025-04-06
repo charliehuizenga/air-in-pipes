@@ -19,8 +19,11 @@ export default function OrganizationPage() {
   const user = useSelector((state: ProjectState) => state.user);
   const [orgName, setOrgName] = useState("");
   const [projects, setProjects] = useState([]);
+  const [members, setMembers] = useState<
+    { user_id: string; email: string; role: string }[]
+  >([]);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false); // ✅ NEW
+  const [isAdmin, setIsAdmin] = useState(false);
   const pathname = usePathname().split("/");
   const locale = pathname[1];
   const org_id = pathname[3];
@@ -69,10 +72,75 @@ export default function OrganizationPage() {
     }
   };
 
+  const handleRemoveMember = async (userIdToRemove: string) => {
+    if (!isAdmin) {
+      alert("Only admins can remove members.");
+      return;
+    }
+
+    if (
+      !confirm(
+        "Are you sure you want to remove this member from the organization?"
+      )
+    )
+      return;
+
+    const { error } = await supabase
+      .from("org_members")
+      .delete()
+      .eq("org_id", org_id)
+      .eq("user_id", userIdToRemove);
+
+    if (error) {
+      console.error("Failed to remove member:", error.message);
+      alert("Error removing member.");
+    } else {
+      setMembers((prev) => prev.filter((m) => m.user_id !== userIdToRemove));
+      alert("Member removed successfully.");
+    }
+  };
+
+  const handleShare = async () => {
+    const { data: existingInvite, error: fetchError } = await supabase
+      .from("org_invites")
+      .select("token")
+      .eq("org_id", org_id)
+      .maybeSingle();
+
+    if (fetchError) {
+      console.error("Error fetching existing invite:", fetchError);
+      alert("Failed to retrieve invite.");
+      return;
+    }
+
+    let token = existingInvite?.token;
+
+    if (!token) {
+      token = crypto.randomUUID();
+
+      const { error: insertError } = await supabase.from("org_invites").insert({
+        token,
+        org_id,
+        invite_id: crypto.randomUUID(),
+      });
+
+      if (insertError) {
+        console.error("Error creating new invite:", insertError);
+        alert("Failed to create invite.");
+        return;
+      }
+    }
+
+    const inviteURL = `${window.location.origin}/${locale}/join/${token}`;
+    await navigator.clipboard.writeText(inviteURL);
+    alert(`Invite link copied to clipboard:\n${inviteURL}`);
+  };
+
   useEffect(() => {
     const loadOrgData = async () => {
       if (!org_id || !user.id) return;
 
+      // Check if user is a member of this org
       const { data: membership, error: membershipError } = await supabase
         .from("org_members")
         .select("*")
@@ -86,7 +154,7 @@ export default function OrganizationPage() {
         return;
       }
 
-      setIsAdmin(membership.role === "admin"); // ✅ Check if user is admin
+      setIsAdmin(membership.role === "admin");
 
       const { data: orgData } = await supabase
         .from("orgs")
@@ -102,50 +170,32 @@ export default function OrganizationPage() {
         .eq("org_id", org_id);
 
       setProjects(orgProjects || []);
+
+      const { data, error } = await supabase.functions.invoke(
+        "list-org-members",
+        {
+          body: { org_id },
+        }
+      );
+
+      if (error) {
+        console.error("Error loading members:", error.message);
+        setMembers([]);
+        return;
+      }
+
+      if (data?.members) {
+        setMembers(data.members); // { user_id, role, email }
+      } else {
+        console.error("No members found in response.");
+        setMembers([]);
+      }
+
       setLoading(false);
     };
 
     loadOrgData();
   }, [org_id, user.id]);
-
-  const handleShare = async () => {
-    // 1. Try to find existing invite for this org
-    const { data: existingInvite, error: fetchError } = await supabase
-      .from("org_invites")
-      .select("token")
-      .eq("org_id", org_id)
-      .maybeSingle();
-
-    if (fetchError) {
-      console.error("Error fetching existing invite:", fetchError);
-      alert("Failed to retrieve invite.");
-      return;
-    }
-
-    let token = existingInvite?.token;
-
-    // 2. If no existing invite, create one
-    if (!token) {
-      token = crypto.randomUUID(); // or nanoid()
-
-      const { error: insertError } = await supabase.from("org_invites").insert({
-        token,
-        org_id,
-        invite_id: crypto.randomUUID(),
-      });
-
-      if (insertError) {
-        console.error("Error creating new invite:", insertError);
-        alert("Failed to create invite.");
-        return;
-      }
-    }
-
-    // 3. Copy the invite link to clipboard
-    const inviteURL = `${window.location.origin}/${locale}/join/${token}`;
-    await navigator.clipboard.writeText(inviteURL);
-    alert(`Invite link copied to clipboard:\n${inviteURL}`);
-  };
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -153,7 +203,34 @@ export default function OrganizationPage() {
         <h1 className="text-2xl font-bold text-gray-900">{orgName}</h1>
       </div>
 
-      <div className="flex gap-4">
+      <div className="mb-10">
+        <h2 className="text-xl font-semibold mb-4">Organization Members</h2>
+        <ul className="space-y-2">
+          {members.map((member) => (
+            <li
+              key={member.user_id}
+              className="flex justify-between items-center bg-gray-100 px-4 py-2 rounded"
+            >
+              <div>
+                <p className="font-medium">{member.email}</p>
+                <p className="text-sm text-gray-600 capitalize">
+                  {member.role}
+                </p>
+              </div>
+              {isAdmin && member.user_id !== user.id && (
+                <button
+                  onClick={() => handleRemoveMember(member.user_id)}
+                  className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                >
+                  Remove
+                </button>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="flex gap-4 mb-6">
         <button
           onClick={handleCreateProject}
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
