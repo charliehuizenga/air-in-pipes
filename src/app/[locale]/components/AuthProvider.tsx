@@ -13,9 +13,10 @@ const supabase = createClient(
 );
 
 const PUBLIC_ROUTES: RegExp[] = [
-  /^\/[a-z]{2}(\/)?$/,   
-  /^\/about$/,
-  /^\/login$/,
+  /^\/[a-z]{2}(\/)?$/,
+  /^\/[a-z]{2}\/about$/,
+  /^\/[a-z]{2}\/login$/,
+  /^\/[a-z]{2}\/demo$/,
 ];
 
 const SUPPORTED_LOCALES = ["en", "es", "fr"];
@@ -30,7 +31,11 @@ function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some((pattern) => pattern.test(pathname));
 }
 
-export default function AuthProvider({ children }: { children: React.ReactNode }) {
+export default function AuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const dispatch = useDispatch();
   const router = useRouter();
   const pathname = usePathname();
