@@ -6,6 +6,7 @@ import { GlobeAltIcon } from "@heroicons/react/24/outline";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next-intl/client";
 import { usePathname } from "next-intl/client";
+import { useLocale } from "next-intl";
 
 const classNames = (...classes: (false | null | undefined | string)[]) => {
   return classes.filter(Boolean).join(" ");
@@ -13,6 +14,7 @@ const classNames = (...classes: (false | null | undefined | string)[]) => {
 
 export default function LanguageSelector() {
   const t = useTranslations("language-selector");
+  const locale = useLocale();
 
   const router = useRouter();
 
@@ -34,7 +36,8 @@ export default function LanguageSelector() {
     router.replace(pathname, { locale: language.id });
   };
 
-  const [selected, setSelected] = useState<Language>(languages[0]);
+  const current = languages.find((lang) => lang.id === locale) ?? languages[0];
+  const [selected, setSelected] = useState<Language>(current);
 
   return (
     <Listbox
