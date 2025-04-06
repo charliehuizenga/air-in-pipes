@@ -27,12 +27,20 @@ export default function HomePage() {
           Go to Projects
         </Link>
       ) : (
-        <Link
-          href={`/${locale}/login`}
-          className="px-6 py-3 bg-sky-600 text-white rounded-md text-lg shadow hover:bg-sky-700"
-        >
-          Log In
-        </Link>
+        <div className="flex gap-4 justify-center">
+          <Link
+            href={`/${locale}/login`}
+            className="px-6 py-3 bg-green-600 text-white rounded-md text-lg shadow hover:bg-green-700"
+          >
+            Log In
+          </Link>
+          <Link
+            href={`/${locale}/demo`}
+            className="px-6 py-3 bg-sky-600 text-white rounded-md text-lg shadow hover:bg-sky-700"
+          >
+            Try Demo
+          </Link>
+        </div>
       )}
     </main>
   );
