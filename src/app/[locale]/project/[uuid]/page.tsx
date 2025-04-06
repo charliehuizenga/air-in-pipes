@@ -23,7 +23,7 @@ export default function ProjectTabs() {
   const [activeTab, setActiveTab] = useState("details");
   const dispatch = useDispatch();
   const project = useSelector((state: ProjectState) => state.project);
-  const user =  useSelector((state: ProjectState) => state.user);
+  const user = useSelector((state: ProjectState) => state.user);
   const [showReport, toggleReport] = useState(false);
   const t = useTranslations("report");
   const tnav = useTranslations("nav-bar");
@@ -137,23 +137,29 @@ export default function ProjectTabs() {
           </button>
         </div>
         <div className="p-4 w-full">
-          {activeTab === "details" && <Details/>}
-          {activeTab === "input_data" && <InputData/>}
+          {activeTab === "details" && <Details />}
+          {activeTab === "input_data" && <InputData />}
           {activeTab === "tube_data" && <TubeData />}
         </div>
       </div>
       {showReport ? (
-        <Report calculate={calculate} saveProject={saveProject}/>
+        <Report calculate={calculate} saveProject={saveProject} />
       ) : (
-        <button
-          className="mt-3 px-5 py-3 bg-sky-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 max-w-sm"
-          onClick={async () => {
-            await saveProject();
-            await calculate();
-          }}
-        >
-            {tnav("calculate")}
-        </button>
+        <div className="mt-3 flex flex-col sm:flex-row gap-3 max-w-sm">
+          <button
+            className="px-5 py-3 bg-green-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 w-full"
+            onClick={saveProject}
+          >
+            {t("save")}
+          </button>
+
+          <button
+            className="px-5 py-3 bg-sky-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 w-full"
+            onClick={() => { saveProject(); calculate();}}
+          >
+            {t("calculate")}
+          </button>
+        </div>
       )}
     </div>
   );
