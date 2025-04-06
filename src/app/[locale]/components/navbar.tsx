@@ -40,35 +40,6 @@ export default function NavBar({ locale }: NavBarProps) {
     { name: t("about"), href: `/${locale}/about`, protected: false },
   ];
 
-  const downloadFile = (
-    content: string,
-    fileName: string,
-    contentType: string
-  ) => {
-    const a = document.createElement("a");
-    const file = new Blob([content], { type: contentType });
-    a.href = URL.createObjectURL(file);
-    a.download = fileName;
-    a.click();
-    URL.revokeObjectURL(a.href);
-  };
-
-  const promptForFileNameAndDownload = (
-    content: string,
-    defaultFileName: string,
-    contentType: string
-  ) => {
-    const userFileName = prompt("Enter file name", defaultFileName);
-    if (userFileName) {
-      downloadFile(content, `${userFileName}.json`, contentType);
-    }
-  };
-
-  const handleSave = useCallback(() => {
-    const jsonStr = JSON.stringify(project, null, 2);
-    promptForFileNameAndDownload(jsonStr, "project-data.json", "text/json");
-  }, [project]);
-
   const handleAuthButtonClick = async () => {
     if (user?.id) {
       const { error } = await supabase.auth.signOut();
@@ -130,13 +101,6 @@ export default function NavBar({ locale }: NavBarProps) {
                     }
                   })}
                 </div>
-                <button
-                  onClick={handleSave}
-                  className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400"
-                >
-                  {t("save")}
-                </button>
-
                 {!(pathname.includes("/login") && !user?.id) && (
                   <button
                     onClick={handleAuthButtonClick}
