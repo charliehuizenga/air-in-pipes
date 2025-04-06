@@ -25,6 +25,7 @@
     "tube-data": "Pipe Data",
     "valve-details": "Valve Details",
     "projects": "My projects",
+    "demo": "Demo",
     "load": "Import",
     "save": "Export",
     "about": "About"
@@ -71,7 +72,7 @@
     "input-data": "Input Data"
   },
   "projects": {
-    "dashboard": "Project Dashboard",
+    "dashboard": "Dashboard",
     "name": "Project Name",
     "actions": "Actions",
     "no-projects": "No projects found",

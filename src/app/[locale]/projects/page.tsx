@@ -1,11 +1,11 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation"; // Import Next.js router
-import { setProject } from "../redux/project-slice";
+import { useRouter, usePathname } from "next/navigation";
+import { setProject, fileToState } from "../redux/project-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
-import { ProjectState } from "../redux/store";
-import { useState, useEffect } from "react";
+import { AppDispatch, ProjectState } from "../redux/store";
+import { useState, useEffect, useRef } from "react";
 import { initialState } from "../redux/project-slice";
 import { fetchProjects, fetchMembershipOrgs } from "./fetch-proj";
 import { createClient } from "@supabase/supabase-js";
@@ -18,38 +18,36 @@ const supabase = createClient(
 );
 
 export default function App() {
-  const dispatch = useDispatch();
-  const router = useRouter(); // Initialize router
+  const dispatch: AppDispatch = useDispatch();
+  const router = useRouter();
   const t = useTranslations("projects");
   const user = useSelector((state: ProjectState) => state.user);
+  const project = useSelector((state: ProjectState) => state.project);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const locale = pathname.split("/")[1];
   const [orgs, setOrgs] = useState<{ id: string; name: string }[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-
       const allProjects = await fetchProjects();
       const personal = allProjects.filter(
         (p) => p.user_id === user.id && p.org_id == null
       );
       setProjects(personal);
 
-      // 🎯 Fetch orgs user is a member of
       const userOrgs = await fetchMembershipOrgs(user.id);
       setOrgs(userOrgs);
-
       setLoading(false);
     };
-
     load();
   }, [user.id]);
 
   const handleSelectProject = async (uuid: string) => {
-    if (uuid === "") {
+    if (uuid === "create") {
       uuid = crypto.randomUUID();
       dispatch(
         setProject({
@@ -72,7 +70,6 @@ export default function App() {
   const handleCreateOrganization = async () => {
     const name = prompt("Enter the name of your new organization:");
     if (!name) return;
-
     const orgId = crypto.randomUUID();
 
     const { error: orgError } = await supabase.from("orgs").insert({
@@ -89,7 +86,7 @@ export default function App() {
     const { error: memberError } = await supabase.from("org_members").insert({
       user_id: user.id,
       org_id: orgId,
-      role: "admin", // init creator as admin
+      role: "admin",
     });
 
     if (memberError) {
@@ -99,7 +96,7 @@ export default function App() {
     }
 
     alert(`Organization "${name}" created!`);
-    location.reload(); // re-fetch org projects/members
+    location.reload();
   };
 
   const handleDeleteProject = async (uuid: string) => {
@@ -115,6 +112,36 @@ export default function App() {
     }
   };
 
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const resultAction = await dispatch(fileToState(file));
+
+      if (fileToState.fulfilled.match(resultAction)) {
+        const importedProject = resultAction.payload;
+
+        const uuid = crypto.randomUUID();
+
+        const updatedProject = {
+          ...importedProject,
+          uuid,
+          user_id: user.id,
+        };
+
+        dispatch(setProject(updatedProject));
+
+        const path = `/${locale}/project/${uuid}`;
+        router.push(path);
+      } else {
+        alert("Failed to import project file.");
+      }
+    } else {
+      console.warn("[handleFileChange] No file selected.");
+    }
+  };
+
   return (
     <main className="mx-auto max-w-4xl py-12 sm:px-6 lg:px-8">
       <div className="border-b border-gray-900/10 pb-12">
@@ -126,16 +153,27 @@ export default function App() {
           <p className="text-gray-500 mt-4">Loading projects...</p>
         ) : (
           <>
-            {/* Personal Projects */}
             <h3 className="text-lg font-semibold text-gray-800 mt-8 mb-2">
               {t("personal-projects")}
             </h3>
-            <div className="mt-6 flex justify-end">
+            <div className="mt-6 flex justify-end gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                onChange={handleFileChange}
+              />
               <button
-                onClick={() => handleSelectProject("")}
+                onClick={() => handleSelectProject("create")}
                 className="px-4 py-2 bg-green-500 text-white rounded-md shadow-sm hover:bg-green-600"
               >
                 {t("create")}
+              </button>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="px-4 py-2 bg-sky-500 text-white rounded-md shadow-sm hover:bg-sky-600"
+              >
+                {t("import")}
               </button>
             </div>
             <ProjectTable
@@ -144,12 +182,10 @@ export default function App() {
               onDelete={handleDeleteProject}
             />
 
-            {/* Organization Memberships */}
             <h3 className="text-lg font-semibold text-gray-800 mt-10 mb-2">
               {t("organizations")}
             </h3>
             <div className="mt-6 flex gap-4 justify-end">
-              {/* Make New Organization */}
               <button
                 onClick={handleCreateOrganization}
                 className="px-4 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600"

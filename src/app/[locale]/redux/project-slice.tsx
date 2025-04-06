@@ -24,6 +24,7 @@ export interface Project {
   valveFlags: boolean[];
   user_id: string;
   org_id: string;
+  library: any;
   [key: string]: any;
 }
 
@@ -49,34 +50,38 @@ export const initialState: Project = {
   org_id: ""
 };
 
-// Function to user JSON files
-export const uploadFile = createAsyncThunk(
-    'project/uploadFile',
-    async (file: File, thunkAPI) => {
-      try {
+export const fileToState = createAsyncThunk(
+  "project/fileToState",
+  async (file: File, thunkAPI) => {
+    try {
+      const jsonData = await new Promise<any>((resolve, reject) => {
         const reader = new FileReader();
 
         reader.onload = () => {
           try {
-            const jsonData = JSON.parse(reader.result as string);
-            thunkAPI.dispatch(setProject(jsonData));
-          } catch (error) {
-            console.error("Error parsing JSON:", error);
-            thunkAPI.rejectWithValue(error);
+            const parsed = JSON.parse(reader.result as string);
+            resolve(parsed);
+          } catch (err) {
+            reject(err);
           }
         };
 
-        reader.onerror = (error) => {
-          console.error("Error reading file:", error);
-          thunkAPI.rejectWithValue(error);
+        reader.onerror = () => {
+          reject(reader.error);
         };
 
         reader.readAsText(file);
+      });
 
-      } catch (error) {
-        return thunkAPI.rejectWithValue(error);
-      }
+      // Optional: if you want to update project state right away
+      // thunkAPI.dispatch(setProject(jsonData));
+
+      return jsonData; // Pass to calling component
+    } catch (error) {
+      console.error("uploadFile error:", error);
+      return thunkAPI.rejectWithValue(error);
     }
+  }
 );
 
 const projectSlice = createSlice({

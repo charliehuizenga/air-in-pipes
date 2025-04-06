@@ -7,24 +7,9 @@ import { ProjectState, AppDispatch } from "../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 import { useCallback, useRef } from "react";
-import { uploadFile } from "../redux/project-slice";
+import { fileToState } from "../redux/project-slice";
 import { clearUser } from "../redux/auth-slice"; // ✅ logout action
 import { createClient } from "@supabase/supabase-js"; // ✅ supabase
-import example0 from "../../../../examples/Example0.json";
-import example1 from "../../../../examples/Example1.json";
-import example2 from "../../../../examples/Example2.json";
-import example3 from "../../../../examples/Example3.json";
-import example6 from "../../../../examples/Example6.json";
-import example7 from "../../../../examples/Example7.json";
-
-const manualExampleFiles = [
-  { name: "Example 0", content: example0 },
-  { name: "Example 1", content: example1 },
-  { name: "Example 2", content: example2 },
-  { name: "Example 3", content: example3 },
-  { name: "Example 6", content: example6 },
-  { name: "Example 7", content: example7 },
-];
 
 function classNames(...classes: (string | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
@@ -36,13 +21,12 @@ export interface NavBarProps {
 
 export default function NavBar({ locale }: NavBarProps) {
   const pathname = usePathname();
-  const router = useRouter(); // ✅ router for logout
+  const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
   const user = useSelector((state: ProjectState) => state.user);
-  const reportData = useSelector((state: ProjectState) => state.report);
+  const project = useSelector((state: ProjectState) => state.project);
 
   const supabase = createClient(
-    // ✅ supabase client
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
@@ -56,17 +40,6 @@ export default function NavBar({ locale }: NavBarProps) {
     { name: t("demo"), href: `/${locale}/demo`, protected: false },
     { name: t("about"), href: `/${locale}/about`, protected: false },
   ];
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files ? event.target.files[0] : null;
-    if (file) {
-      dispatch(uploadFile(file));
-    }
-  };
-
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
 
   const downloadFile = (
     content: string,
@@ -93,9 +66,9 @@ export default function NavBar({ locale }: NavBarProps) {
   };
 
   const handleSave = useCallback(() => {
-    const jsonStr = JSON.stringify(reportData, null, 2);
+    const jsonStr = JSON.stringify(project, null, 2);
     promptForFileNameAndDownload(jsonStr, "project-data.json", "text/json");
-  }, [reportData]);
+  }, [project]);
 
   const handleAuthButtonClick = async () => {
     if (user?.id) {
@@ -135,12 +108,6 @@ export default function NavBar({ locale }: NavBarProps) {
                 </Link>
               </div>
               <div className="flex items-center space-x-4">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
                 <div className="hidden md:ml-6 md:flex md:items-center md:space-x-4">
                   {navigation.map((item) => {
                     if (!item.protected || user.id) {
@@ -164,15 +131,6 @@ export default function NavBar({ locale }: NavBarProps) {
                     }
                   })}
                 </div>
-
-                <button
-                  type="button"
-                  onClick={handleUploadClick}
-                  className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400"
-                >
-                  {t("load")}
-                </button>
-
                 <button
                   onClick={handleSave}
                   className="relative inline-flex items-center gap-x-1.5 rounded-md bg-sky-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-sky-400"
