@@ -100,6 +100,93 @@ export default function OrganizationPage() {
     }
   };
 
+  const handlePromoteToAdmin = async (userId: string) => {
+    const confirmed = confirm("Promote this member to admin?");
+    if (!confirmed) return;
+
+    const { error } = await supabase
+      .from("org_members")
+      .update({ role: "admin" })
+      .eq("org_id", org_id)
+      .eq("user_id", userId);
+
+    if (error) {
+      alert("Failed to promote member.");
+    } else {
+      alert("Member promoted.");
+      setMembers((prev) =>
+        prev.map((m) => (m.user_id === userId ? { ...m, role: "admin" } : m))
+      );
+    }
+  };
+
+  const handleLeaveOrganization = async () => {
+    const confirmed = confirm(
+      "Are you sure you want to leave this organization?"
+    );
+    if (!confirmed) return;
+
+    const isLastMember = members.length === 1 && members[0].user_id === user.id;
+
+    if (isLastMember) {
+      const confirmed = confirm(
+        "You are the last member of the organization. Organization will be deleted. Continue?"
+      );
+      if (!confirmed) return;
+
+      // User is the last one — delete the org entirely
+      const { error: deleteError } = await supabase
+        .from("orgs")
+        .delete()
+        .eq("org_id", org_id);
+
+      if (deleteError) {
+        alert("Failed to delete organization.");
+        console.error("Delete error:", deleteError);
+        return;
+      }
+
+      alert("Organization has been deleted.");
+      router.push(`/${locale}/projects`);
+    } else {
+      // Just remove the user
+      const { error } = await supabase
+        .from("org_members")
+        .delete()
+        .eq("org_id", org_id)
+        .eq("user_id", user.id);
+
+      if (error) {
+        alert("Error leaving organization.");
+      } else {
+        alert("You have left the organization.");
+        router.push(`/${locale}/projects`);
+      }
+    }
+  };
+
+  const handleDeleteOrganization = async () => {
+    const confirmed = confirm(
+      "Are you sure you want to delete this organization? This cannot be undone."
+    );
+    if (!confirmed) return;
+
+    // Optional: manually delete dependent rows if not ON DELETE CASCADE
+    await supabase.from("org_members").delete().eq("org_id", org_id);
+    await supabase.from("projects").delete().eq("org_id", org_id);
+    await supabase.from("org_invites").delete().eq("org_id", org_id);
+
+    const { error } = await supabase.from("orgs").delete().eq("org_id", org_id);
+
+    if (error) {
+      alert("Failed to delete organization.");
+      console.error("Org delete error:", error);
+    } else {
+      alert("Organization deleted.");
+      router.push(`/${locale}/projects`);
+    }
+  };
+
   const handleShare = async () => {
     const { data: existingInvite, error: fetchError } = await supabase
       .from("org_invites")
@@ -140,7 +227,6 @@ export default function OrganizationPage() {
     const loadOrgData = async () => {
       if (!org_id || !user.id) return;
 
-      // Check if user is a member of this org
       const { data: membership, error: membershipError } = await supabase
         .from("org_members")
         .select("*")
@@ -217,34 +303,62 @@ export default function OrganizationPage() {
                   {member.role}
                 </p>
               </div>
-              {isAdmin && member.user_id !== user.id && (
-                <button
-                  onClick={() => handleRemoveMember(member.user_id)}
-                  className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
-                >
-                  Remove
-                </button>
-              )}
+              <div className="flex gap-2">
+                {isAdmin && member.user_id !== user.id && (
+                  <>
+                    {member.role !== "admin" && (
+                      <button
+                        onClick={() => handlePromoteToAdmin(member.user_id)}
+                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
+                      >
+                        Make Admin
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleRemoveMember(member.user_id)}
+                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                    >
+                      Remove
+                    </button>
+                  </>
+                )}
+              </div>
             </li>
           ))}
         </ul>
+
+        {/* Leave Organization */}
+        <div className="mt-6 mb-6 flex flex-wrap gap-4">
+          <button
+            onClick={handleCreateProject}
+            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          >
+            Create New Project
+          </button>
+          <button
+            onClick={handleShare}
+            className="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600"
+          >
+            Share Invite Link
+          </button>
+          <button
+            onClick={handleLeaveOrganization}
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          >
+            Leave Organization
+          </button>
+          {isAdmin && (
+            <button
+              onClick={handleDeleteOrganization}
+              className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800"
+            >
+              Delete Organization
+            </button>
+          )}
+        </div>
       </div>
 
-      <div className="flex gap-4 mb-6">
-        <button
-          onClick={handleCreateProject}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-        >
-          Create New Project
-        </button>
-        <button
-          onClick={handleShare}
-          className="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600"
-        >
-          Share Invite
-        </button>
-      </div>
-
+      {/* Projects Table */}
       {loading ? (
         <p className="text-gray-500">Loading projects...</p>
       ) : projects.length > 0 ? (

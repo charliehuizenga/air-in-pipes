@@ -96,7 +96,7 @@ export default function App() {
     }
 
     alert(`Organization "${name}" created!`);
-    location.reload();
+    router.push(`/${locale}/org/${orgId}`);
   };
 
   const handleDeleteProject = async (uuid: string) => {
