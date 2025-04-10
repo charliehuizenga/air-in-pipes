@@ -2,8 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useTranslations } from "next-intl";
-import { useSelector, useDispatch } from "react-redux";
-import { setProject } from "../redux/project-slice";
+import { useSelector } from "react-redux";
 import { ProjectState } from "../redux/store";
 import Summary from "./summary";
 import Graph from "./graph";
@@ -78,7 +77,7 @@ export default function Report(props) {
     defaultFileName: string,
     contentType: string
   ) => {
-    const userFileName = prompt("Enter file name", defaultFileName);
+    const userFileName = prompt(t("enter-filename"), defaultFileName);
     if (userFileName) {
       downloadFile(content, `${userFileName}.json`, contentType);
     }
@@ -92,7 +91,7 @@ export default function Report(props) {
   return (
     <div className="p-4 flex flex-col items-center justify-start min-h-screen w-full">
       <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-6xl">
-        <h1 className="text-center text-2xl font-bold mb-4">Report</h1>
+        <h1 className="text-center text-2xl font-bold mb-4">{t("title")}</h1>
 
         {/* Tabs */}
         <div className="flex justify-around border-b w-full">
@@ -149,16 +148,16 @@ export default function Report(props) {
           }}
         >
           <div ref={firstPageRef}>
-            <h1 className="text-xl font-bold mb-2">Report</h1>
-            <h2 className="text-m font-bold mb-2">Summary</h2>
+            <h1 className="text-xl font-bold mb-2">{t("title")}</h1>
+            <h2 className="text-m font-bold mb-2">{t("summary")}</h2>
             <Summary report={report} project={project} />
 
-            <h2 className="text-m font-bold mt-5 mb-2">Graph</h2>
+            <h2 className="text-m font-bold mt-5 mb-2">{t("graph")}</h2>
             <Graph report={report} project={project} />
           </div>
 
           <div ref={secondPageRef}>
-            <h2 className="text-m font-bold mt-5 mb-2">Detail</h2>
+            <h2 className="text-m font-bold mt-5 mb-2">{t("detail")}</h2>
             <Detail report={report} project={project} />
           </div>
         </div>
@@ -172,7 +171,7 @@ export default function Report(props) {
               saveProject();
             }}
           >
-            Re-Calculate
+            {t("recalculate")}
           </button>
 
           <button
@@ -180,7 +179,7 @@ export default function Report(props) {
             className="px-5 py-3 bg-green-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
             onClick={exportReportToPDF}
           >
-            Export to PDF
+            {t("export-pdf")}
           </button>
 
           <button
@@ -188,7 +187,7 @@ export default function Report(props) {
             className="px-5 py-3 bg-blue-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             onClick={handleExportProject}
           >
-            Export to JSON
+            {t("export-json")}
           </button>
         </div>
       </div>

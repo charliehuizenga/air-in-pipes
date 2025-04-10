@@ -24,11 +24,45 @@
     "report": "Report",
     "tube-data": "Pipe Data",
     "valve-details": "Valve Details",
-    "projects": "My projects",
+    "projects": "Projects",
     "demo": "Demo",
     "load": "Import",
     "save": "Export",
-    "about": "About"
+    "about": "About",
+    "home": "Home",
+    "logout": "Log out",
+    "login": "Login"
+  },
+  "organization": {
+    "back": "← Back",
+    "members-heading": "Organization Members",
+    "make-admin": "Make Admin",
+    "remove": "Remove",
+    "create-project": "Create New Project",
+    "share-invite": "Share Invite Link",
+    "leave-org": "Leave Organization",
+    "delete-org": "Delete Organization",
+    "loading-projects": "Loading projects...",
+    "no-projects": "This organization has no projects yet.",
+    "not-admin": "You must be an admin to perform this action.",
+    "confirm-delete-project": "Are you sure you want to delete this project?",
+    "project-deleted": "Project deleted successfully.",
+    "delete-failed": "Failed to delete project.",
+    "remove-member-confirm": "Are you sure you want to remove this member?",
+    "remove-member-success": "Member removed successfully.",
+    "promote-confirm": "Promote this member to admin?",
+    "promote-success": "Member promoted.",
+    "leave-org-confirm": "Are you sure you want to leave this organization?",
+    "leave-org-final": "You are the last member. Organization will be deleted. Continue?",
+    "leave-org-success": "You have left the organization.",
+    "org-deleted": "Organization has been deleted.",
+    "delete-org-confirm": "Delete this organization? This cannot be undone.",
+    "invite-error": "Failed to retrieve invite.",
+    "invite-create-failed": "Failed to create invite.",
+    "invite-copied": "Invite link copied to clipboard:",
+    "invite-copy-manual": "Here is the invite link (copy manually):",
+    "not-member": "You are not a member of this organization.",
+    "unknown-org": "Unknown Org"
   },
   "input-data": {
     "profile-data": "Profile Data",
@@ -69,14 +103,34 @@
     "summary": "Summary",
     "total-cost": "Total Cost",
     "valve-cost": "Valve Cost",
-    "input-data": "Input Data"
+    "input-data": "Input Data",
+    "back": "← Back",
+    "save": "Save",
+    "calculate": "Calculate",
+    "missing-name": "Please enter a project name before saving.",
+    "creation-error": "Error in creating project",
+    "unexpected-error": "An unexpected error occurred.",
+    "title": "Report",
+    "recalculate": "Re-Calculate",
+    "export-pdf": "Export to PDF",
+    "export-json": "Export to JSON",
+    "enter-filename": "Enter file name"
   },
   "projects": {
     "dashboard": "Dashboard",
+    "personal-projects": "Personal Projects",
+    "organizations": "Organizations",
     "name": "Project Name",
-    "actions": "Actions",
     "no-projects": "No projects found",
-    "create": "Create New Project"
+    "create": "Create New Project",
+    "import": "Import JSON as New Project",
+    "new-organization": "New Organization",
+    "not-a-member": "You&apos;re not a member of any organizations yet.",
+    "view": "View",
+    "project-name": "Project Name",
+    "actions": "Actions",
+    "delete": "Delete",
+    "no-projects-found": "No projects found."
   },
   "pipes": {
     "pipe-data": "Pipe Data",
@@ -102,4 +156,4 @@
     "about-air-text-p3": "This online tool allows the user to specify the topography of terrain between the spring and the tank and specify the minumum and maximum desired flow rate. The tool will then caluclate the diameters of pipe required to construct the system. In some cases, air valves may be required and the location and type of these valves will also be specified. ",
     "about-download-manual": "Links to English and Spanish versions of the complete design manual are here:"
   }
-} 
+}

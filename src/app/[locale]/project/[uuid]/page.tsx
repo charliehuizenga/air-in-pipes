@@ -13,8 +13,7 @@ import Details from "../../components/details";
 import InputData from "../../components/input-data/input-data";
 import TubeData from "../../components/tube-data/tube-data";
 import Report from "../../report/page";
-import { usePathname, useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -56,15 +55,16 @@ export default function ProjectTabs() {
   const saveProject = async () => {
     if (!project.project_name) {
       console.error("Project name is required");
-      alert("Please enter a project name before saving.");
+      alert(t("missing-name"));
       return;
     }
 
     if (!project.uuid) {
       console.error("Project creation error");
-      alert("Error in creating project");
+      alert(t("creation-error"));
       return;
     }
+
     const uuid = project.uuid;
     try {
       const newProject = {
@@ -104,7 +104,7 @@ export default function ProjectTabs() {
       }
     } catch (err) {
       console.error("Unexpected error:", err);
-      alert("An unexpected error occurred.");
+      alert(t("unexpected-error"));
     }
   };
 
@@ -115,7 +115,7 @@ export default function ProjectTabs() {
           className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm font-medium"
           onClick={() => router.push(backHref)}
         >
-          ← Back
+          {t("back")}
         </button>
       </div>
       <h1 className="text-2xl font-bold mb-4">{project.project_name}</h1>

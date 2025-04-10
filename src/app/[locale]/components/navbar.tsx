@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 import { ProjectState, AppDispatch } from "../redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
-import { useCallback, useRef } from "react";
 import { clearUser } from "../redux/auth-slice"; // ✅ logout action
 import { createClient } from "@supabase/supabase-js"; // ✅ supabase
 
@@ -110,7 +109,7 @@ export default function NavBar({ locale }: NavBarProps) {
                         : "bg-sky-600 hover:bg-sky-700"
                     } px-3 py-2 text-sm font-medium text-white shadow-sm`}
                   >
-                    {user?.id ? "Logout" : "Login"}
+                    {user?.id ? t("logout") : t("login") }
                   </button>
                 )}
               </div>

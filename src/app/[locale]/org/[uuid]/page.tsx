@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { ProjectState } from "../../redux/store";
 import { setProject, initialState } from "../../redux/project-slice";
 import ProjectTable from "../../projects/table";
+import { useTranslations } from "next-intl";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,6 +28,7 @@ export default function OrganizationPage() {
   const pathname = usePathname().split("/");
   const locale = pathname[1];
   const org_id = pathname[3];
+  const t = useTranslations("organization");
 
   const handleCreateProject = () => {
     const uuid = crypto.randomUUID();
@@ -53,27 +55,27 @@ export default function OrganizationPage() {
 
   const handleDeleteProject = async (uuid: string) => {
     if (!isAdmin) {
-      alert("You must be an admin to delete projects in this organization.");
+      alert(t("not-admin"));
       return;
     }
-    if (!confirm("Are you sure you want to delete this project?")) return;
+    if (!confirm(t("confirm-delete-project"))) return;
     const { error } = await supabase.from("projects").delete().eq("uuid", uuid);
     if (error) {
       console.error("Error deleting project:", error.message);
-      alert("Failed to delete project.");
+      alert(t("delete-failed"));
     } else {
       setProjects((prev) => prev.filter((p) => p.uuid !== uuid));
-      alert("Project deleted successfully.");
+      alert(t("project-deleted"));
       dispatch(setProject(initialState));
     }
   };
 
   const handleRemoveMember = async (userIdToRemove: string) => {
     if (!isAdmin) {
-      alert("Only admins can remove members.");
+      alert(t("not-admin"));
       return;
     }
-    if (!confirm("Are you sure you want to remove this member?")) return;
+    if (!confirm(t("remove-member-confirm"))) return;
     const { error } = await supabase
       .from("org_members")
       .delete()
@@ -81,15 +83,15 @@ export default function OrganizationPage() {
       .eq("user_id", userIdToRemove);
     if (error) {
       console.error("Error removing member:", error.message);
-      alert("Failed to remove member.");
+      alert(t("delete-failed"));
     } else {
       setMembers((prev) => prev.filter((m) => m.user_id !== userIdToRemove));
-      alert("Member removed successfully.");
+      alert(t("remove-member-success"));
     }
   };
 
   const handlePromoteToAdmin = async (userId: string) => {
-    const confirmed = confirm("Promote this member to admin?");
+    const confirmed = confirm(t("promote-confirm"));
     if (!confirmed) return;
     const { error } = await supabase
       .from("org_members")
@@ -97,9 +99,9 @@ export default function OrganizationPage() {
       .eq("org_id", org_id)
       .eq("user_id", userId);
     if (error) {
-      alert("Failed to promote member.");
+      alert(t("delete-failed"));
     } else {
-      alert("Member promoted.");
+      alert(t("promote-success"));
       setMembers((prev) =>
         prev.map((m) => (m.user_id === userId ? { ...m, role: "admin" } : m))
       );
@@ -107,15 +109,13 @@ export default function OrganizationPage() {
   };
 
   const handleLeaveOrganization = async () => {
-    const confirmed = confirm("Are you sure you want to leave this organization?");
+    const confirmed = confirm(t("leave-org-confirm"));
     if (!confirmed) return;
 
     const isLastMember = members.length === 1 && members[0].user_id === user.id;
 
     if (isLastMember) {
-      const confirmed = confirm(
-        "You are the last member. Organization will be deleted. Continue?"
-      );
+      const confirmed = confirm(t("leave-org-final"));
       if (!confirmed) return;
 
       const { error: deleteError } = await supabase
@@ -123,11 +123,11 @@ export default function OrganizationPage() {
         .delete()
         .eq("org_id", org_id);
       if (deleteError) {
-        alert("Failed to delete organization.");
+        alert(t("delete-failed"));
         return;
       }
 
-      alert("Organization has been deleted.");
+      alert(t("org-deleted"));
       router.push(`/${locale}/projects`);
     } else {
       const { error } = await supabase
@@ -136,16 +136,16 @@ export default function OrganizationPage() {
         .eq("org_id", org_id)
         .eq("user_id", user.id);
       if (error) {
-        alert("Error leaving organization.");
+        alert(t("delete-failed"));
       } else {
-        alert("You have left the organization.");
+        alert(t("leave-org-success"));
         router.push(`/${locale}/projects`);
       }
     }
   };
 
   const handleDeleteOrganization = async () => {
-    const confirmed = confirm("Delete this organization? This cannot be undone.");
+    const confirmed = confirm(t("delete-org-confirm"));
     if (!confirmed) return;
 
     await supabase.from("org_members").delete().eq("org_id", org_id);
@@ -154,10 +154,10 @@ export default function OrganizationPage() {
 
     const { error } = await supabase.from("orgs").delete().eq("org_id", org_id);
     if (error) {
-      alert("Failed to delete organization.");
+      alert(t("delete-failed"));
       console.error("Org delete error:", error);
     } else {
-      alert("Organization deleted.");
+      alert(t("org-deleted"));
       router.push(`/${locale}/projects`);
     }
   };
@@ -168,8 +168,9 @@ export default function OrganizationPage() {
       .select("token")
       .eq("org_id", org_id)
       .maybeSingle();
+
     if (fetchError) {
-      alert("Failed to retrieve invite.");
+      alert(t("invite-error"));
       return;
     }
 
@@ -181,15 +182,37 @@ export default function OrganizationPage() {
         org_id,
         invite_id: crypto.randomUUID(),
       });
+
       if (insertError) {
-        alert("Failed to create invite.");
+        alert(t("invite-create-failed"));
         return;
       }
     }
 
     const inviteURL = `${window.location.origin}/${locale}/join/${token}`;
-    await navigator.clipboard.writeText(inviteURL);
-    alert(`Invite link copied:\n${inviteURL}`);
+
+    try {
+      if (
+        navigator.clipboard &&
+        typeof navigator.clipboard.writeText === "function"
+      ) {
+        await navigator.clipboard.writeText(inviteURL);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = inviteURL;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "absolute";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      alert(`${t("invite-copied")}\n${inviteURL}`);
+    } catch (err) {
+      alert(`${t("invite-copy-manual")}\n${inviteURL}`);
+    }
   };
 
   useEffect(() => {
@@ -204,7 +227,7 @@ export default function OrganizationPage() {
         .single();
 
       if (!membership || membershipError) {
-        alert("You are not a member of this organization.");
+        alert(t("not-member"));
         router.push("/");
         return;
       }
@@ -216,7 +239,7 @@ export default function OrganizationPage() {
         .select("name")
         .eq("org_id", org_id)
         .single();
-      setOrgName(orgData?.name ?? "Unknown Org");
+      setOrgName(orgData?.name ?? t("unknown-org"));
 
       const { data: orgProjects } = await supabase
         .from("projects")
@@ -244,13 +267,12 @@ export default function OrganizationPage() {
   return (
     <div className="w-full flex justify-center px-4 sm:px-6 lg:px-8 pt-10 pb-12 min-h-screen">
       <div className="w-full max-w-5xl">
-        {/* Back Button */}
         <div className="mb-4">
           <button
             className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm font-medium"
             onClick={() => router.push(`/${locale}/projects`)}
           >
-            ← Back
+            {t("back")}
           </button>
         </div>
 
@@ -259,7 +281,7 @@ export default function OrganizationPage() {
         </div>
 
         <div className="mb-10">
-          <h2 className="text-xl font-semibold mb-4">Organization Members</h2>
+          <h2 className="text-xl font-semibold mb-4">{t("members-heading")}</h2>
           <ul className="space-y-2">
             {members.map((member) => (
               <li
@@ -268,7 +290,9 @@ export default function OrganizationPage() {
               >
                 <div>
                   <p className="font-medium">{member.email}</p>
-                  <p className="text-sm text-gray-600 capitalize">{member.role}</p>
+                  <p className="text-sm text-gray-600 capitalize">
+                    {member.role}
+                  </p>
                 </div>
                 <div className="flex gap-2">
                   {isAdmin && member.user_id !== user.id && (
@@ -278,14 +302,14 @@ export default function OrganizationPage() {
                           onClick={() => handlePromoteToAdmin(member.user_id)}
                           className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
                         >
-                          Make Admin
+                          {t("make-admin")}
                         </button>
                       )}
                       <button
                         onClick={() => handleRemoveMember(member.user_id)}
                         className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
                       >
-                        Remove
+                        {t("remove")}
                       </button>
                     </>
                   )}
@@ -299,33 +323,33 @@ export default function OrganizationPage() {
               onClick={handleCreateProject}
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
             >
-              Create New Project
+              {t("create-project")}
             </button>
             <button
               onClick={handleShare}
               className="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600"
             >
-              Share Invite Link
+              {t("share-invite")}
             </button>
             <button
               onClick={handleLeaveOrganization}
               className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
             >
-              Leave Organization
+              {t("leave-org")}
             </button>
             {isAdmin && (
               <button
                 onClick={handleDeleteOrganization}
                 className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800"
               >
-                Delete Organization
+                {t("delete-org")}
               </button>
             )}
           </div>
         </div>
 
         {loading ? (
-          <p className="text-gray-500">Loading projects...</p>
+          <p className="text-gray-500">{t("loading-projects")}</p>
         ) : projects.length > 0 ? (
           <ProjectTable
             projects={projects}
@@ -333,7 +357,7 @@ export default function OrganizationPage() {
             onDelete={handleDeleteProject}
           />
         ) : (
-          <p className="text-gray-500">This organization has no projects yet.</p>
+          <p className="text-gray-500">{t("no-projects")}</p>
         )}
       </div>
     </div>

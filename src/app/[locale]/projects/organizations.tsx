@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export default function Organizations({
   orgs,
@@ -10,11 +11,12 @@ export default function Organizations({
   const router = useRouter();
   const pathname = usePathname();
   const locale = pathname.split("/")[1];
+  const t = useTranslations("projects");
 
   if (!orgs || orgs.length === 0) {
     return (
       <p className="text-gray-500">
-        You&apos;re not a member of any organizations yet.
+        {t("not-a-member")}
       </p>
     );
   }
@@ -28,7 +30,7 @@ export default function Organizations({
           className="p-4 cursor-pointer hover:bg-gray-50 flex items-center justify-between transition-colors"
         >
           <span className="text-gray-900 font-medium">{org.name}</span>
-          <span className="text-sm text-sky-600 hover:underline">View →</span>
+          <span className="text-sm text-sky-600 hover:underline">{t("view")} →</span>
         </li>
       ))}
     </ul>
