@@ -4,11 +4,8 @@ import { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
-import { setProject } from "../redux/project-slice";
 import { setData } from "../redux/report-slice";
 import { getDesign } from "../api/fetch-design";
-import { useProjectLoader } from "../reload_fetch";
 import { ProjectState } from "../redux/store";
 import Details from "../components/details";
 import InputData from "../components/input-data/input-data";
@@ -24,12 +21,9 @@ export default function ProjectTabs() {
   const [activeTab, setActiveTab] = useState("details");
   const dispatch = useDispatch();
   const project = useSelector((state: ProjectState) => state.project);
-  const user =  useSelector((state: ProjectState) => state.user);
   const [showReport, toggleReport] = useState(false);
   const t = useTranslations("report");
   const tnav = useTranslations("nav-bar");
-
-  useProjectLoader((proj) => dispatch(setProject(proj)));
 
   async function calculate() {
     try {
@@ -45,60 +39,6 @@ export default function ProjectTabs() {
       console.error("Error fetching data:", error);
     }
   }
-
-  const saveProject = async () => {
-    if (!project.project_name) {
-      console.error("Project name is required");
-      alert("Please enter a project name before saving.");
-      return;
-    }
-
-    if (!project.uuid) {
-      console.error("Project creation error");
-      alert("Error in creating project");
-      return;
-    }
-    const uuid = project.uuid;
-    try {
-      const newProject = {
-        uuid,
-        project_name: project.project_name,
-        template: project.template || null,
-        designer: project.designer || null,
-        description: project.description || null,
-        qmin: project.qmin ?? null,
-        qmax: project.qmax ?? null,
-        airvalve_selection: project.airvalve_selection || null,
-        notes: project.notes || null,
-        created_at: project.created_at || new Date().toISOString(),
-        topo: project.topo || null,
-        nSocks: project.nSocks || 0,
-        valveFlags: project.valveFlags || null,
-        design: project.design || null,
-        design_summary: project.design_summary || null,
-        library: project.library || null,
-        pipe_design: project.pipe_design || null,
-        sock_data: project.sock_data || null,
-        valves: project.valves || null,
-        user_id: project.user_id || user.id,
-      };
-
-      dispatch(setProject({ ...project }));
-
-      const { data, error } = await supabase
-        .from("projects")
-        .upsert([{ ...newProject, uuid }], { onConflict: "uuid" });
-
-      if (error) {
-        console.error("Error inserting project:", error.message);
-      } else {
-        console.log("Project saved successfully:", project.uuid);
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      alert("An unexpected error occurred.");
-    }
-  };
 
   return (
     <div className="p-4 flex flex-col items-center justify-start min-h-screen pt-10 w-full">
@@ -143,16 +83,15 @@ export default function ProjectTabs() {
         </div>
       </div>
       {showReport ? (
-        <Report calculate={calculate} saveProject={saveProject}/>
+        <Report calculate={calculate} />
       ) : (
         <button
           className="mt-3 px-5 py-3 bg-sky-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 max-w-sm"
           onClick={async () => {
-            await saveProject();
             await calculate();
           }}
         >
-            {tnav("calculate")}
+          {tnav("calculate")}
         </button>
       )}
     </div>

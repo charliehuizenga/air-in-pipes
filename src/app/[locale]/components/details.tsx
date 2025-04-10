@@ -63,8 +63,11 @@ export default function Details() {
         setProject({
           ...exampleFile.content,
           uuid: project.uuid || exampleFile.content.uuid,
+          org_id: project.org_id,
+          user_id: project.user_id,
         })
       );
+      
 
       setSelectedExampleName(newFileName);
     } else {

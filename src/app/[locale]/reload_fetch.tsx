@@ -1,19 +1,18 @@
+"use client";
+
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation"; // ✅ not useSearchParams
 import { createClient } from "@supabase/supabase-js";
 
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
-const reload = async (setProject) => {
-  const searchParams = new URLSearchParams(window.location.search);
-  const uuid = searchParams.get("uuid");
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
+// Fetch project from Supabase
+const reload = async (uuid: string, setProject: Function) => {
   if (!uuid) {
-    console.warn("No UUID found in query params.");
+    console.warn("No UUID found in path.");
     return;
   }
 
@@ -39,11 +38,15 @@ const reload = async (setProject) => {
   }
 };
 
-// Auto-fetch project on component mount
-const useProjectLoader = async (setProject) => {
+// Custom hook to load project from URL path param
+const useProjectLoader = (setProject: Function) => {
+  const params = useParams(); // ✅ gets route params like { uuid: 'abc123' }
+
   useEffect(() => {
-    reload(setProject);
-  }, []);
+    if (params?.uuid) {
+      reload(params.uuid as string, setProject);
+    }
+  }, [params?.uuid]);
 };
 
 export { reload, useProjectLoader };
