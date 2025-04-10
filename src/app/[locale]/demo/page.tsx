@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
@@ -11,7 +11,7 @@ import Details from "../components/details";
 import InputData from "../components/input-data/input-data";
 import TubeData from "../components/tube-data/tube-data";
 import Report from "../report/page";
-import { setProject } from "../redux/project-slice";
+import { initialState, setProject } from "../redux/project-slice";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,6 +25,8 @@ export default function ProjectTabs() {
   const [showReport, toggleReport] = useState(false);
   const t = useTranslations("report");
   const tnav = useTranslations("nav-bar");
+
+  useEffect(() => {dispatch(setProject(initialState));});
 
   async function calculate() {
     try {
