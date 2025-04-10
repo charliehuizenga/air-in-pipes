@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
@@ -11,6 +11,7 @@ import Details from "../components/details";
 import InputData from "../components/input-data/input-data";
 import TubeData from "../components/tube-data/tube-data";
 import Report from "../report/page";
+import { initialState, setProject } from "../redux/project-slice";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,12 +26,15 @@ export default function ProjectTabs() {
   const t = useTranslations("report");
   const tnav = useTranslations("nav-bar");
 
+  useEffect(() => {dispatch(setProject(initialState));});
+
   async function calculate() {
     try {
-      const report = await getDesign(project);
-      dispatch(setData(report));
-      if (report.design_summary !== undefined) {
+      const res = await getDesign(project);
+      dispatch(setData(res));
+      if (res.design_summary !== undefined) {
         console.log("Successfully calculated!");
+        dispatch(setProject({ ...project, report: res }));
         toggleReport(true);
       } else {
         console.log("Cannot calculate with current input data.");
@@ -77,13 +81,13 @@ export default function ProjectTabs() {
           </button>
         </div>
         <div className="p-4 w-full">
-          {activeTab === "details" && <Details />}
-          {activeTab === "input_data" && <InputData />}
-          {activeTab === "tube_data" && <TubeData />}
+          {activeTab === "details" && <Details project={project}/>}
+          {activeTab === "input_data" && <InputData project={project}/>}
+          {activeTab === "tube_data" && <TubeData project={project}/>}
         </div>
       </div>
       {showReport ? (
-        <Report calculate={calculate} />
+        <Report calculate={calculate} saveProject={() => {console.log("saved");}}/>
       ) : (
         <button
           className="mt-3 px-5 py-3 bg-sky-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 max-w-sm"

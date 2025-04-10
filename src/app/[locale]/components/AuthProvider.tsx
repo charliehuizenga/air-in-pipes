@@ -17,6 +17,7 @@ const PUBLIC_ROUTES: RegExp[] = [
   /^\/[a-z]{2}\/about$/,
   /^\/[a-z]{2}\/login$/,
   /^\/[a-z]{2}\/demo$/,
+  /^\/[a-z]{2}\/join(\/.*)?$/,
 ];
 
 const SUPPORTED_LOCALES = ["en", "es", "fr"];

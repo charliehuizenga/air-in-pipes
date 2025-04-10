@@ -1,6 +1,7 @@
 "use client";
 import {createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { PipeData, pipeData } from "../components/tube-data/tube_list";
+import { Report } from "./report-slice";
 
 export interface Topo {
   name?: string;
@@ -25,6 +26,7 @@ export interface Project {
   user_id: string;
   org_id: string;
   library: any;
+  report: Report;
   [key: string]: any;
 }
 
@@ -33,8 +35,8 @@ export const initialState: Project = {
   project_name: "Example Project",
   json_format: 1,
   designer: "Example Designer",
-  description: "Test",
-  notes: "Testing for web application",
+  description: "1.0.0",
+  notes: "This is an example project!",
   qmax: 0.25,
   qmin: 0.25,
   airvalve_selection: "auto",
@@ -46,6 +48,7 @@ export const initialState: Project = {
     valve_cost: 380,
     pipe_data: pipeData,
   },
+  report: null,
   user_id: "",
   org_id: ""
 };

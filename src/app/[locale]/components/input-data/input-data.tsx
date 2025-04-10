@@ -12,7 +12,7 @@ export interface Tab {
   current: boolean;
 }
 
-export default function InputData() {
+export default function InputData({ project }) {
   const t = useTranslations("input-data");
 
   const inputTabs: Tab[] = [
@@ -37,7 +37,7 @@ export default function InputData() {
   function classNames(...classes: any[]): string {
     return classes.filter(Boolean).join(" ");
   }
-  
+
   return (
     <div>
       <div className="hidden sm:block mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">
@@ -60,7 +60,9 @@ export default function InputData() {
         </nav>
       </div>
 
-      {activeTab === t("profile-data") && <ProfileData></ProfileData>}
+      {activeTab === t("profile-data") && (
+        <ProfileData project={project}></ProfileData>
+      )}
 
       {activeTab === t("topo-data") && (
         <div>
