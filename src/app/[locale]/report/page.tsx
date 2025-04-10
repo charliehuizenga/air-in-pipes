@@ -22,6 +22,7 @@ export default function Report(props) {
   const secondPageRef = useRef(null);
 
   async function exportReportToPDF() {
+    calculate();
     const pdf = new jsPDF("p", "mm", "a4");
     const marginX = 10;
     const marginY = 10;
@@ -84,6 +85,7 @@ export default function Report(props) {
   };
 
   const handleExportProject = () => {
+    calculate();
     const jsonStr = JSON.stringify(project, null, 2);
     promptForFileNameAndDownload(jsonStr, "project-data", "text/json");
   };

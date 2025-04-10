@@ -24,6 +24,7 @@ export default function ProjectTabs() {
   const [activeTab, setActiveTab] = useState("details");
   const dispatch = useDispatch();
   const project = useSelector((state: ProjectState) => state.project);
+  const report = useSelector((state: ProjectState) => state.report);
   const user = useSelector((state: ProjectState) => state.user);
   const [showReport, toggleReport] = useState(false);
   const t = useTranslations("report");
@@ -35,15 +36,16 @@ export default function ProjectTabs() {
     from === "org" ? `/${locale}/org/${project.org_id}` : `/${locale}/projects`;
   const router = useRouter();
 
-  useProjectLoader((proj) => dispatch(setProject(proj)));
+  useProjectLoader((proj) => {dispatch(setProject(proj)); console.log(proj);});
 
   async function calculate() {
     try {
-      const report = await getDesign(project);
-      dispatch(setData(report));
-      if (report.design_summary !== undefined) {
+      const res = await getDesign(project);
+      dispatch(setData(res));
+      if (res.design_summary !== undefined) {
         console.log("Successfully calculated!");
         toggleReport(true);
+        dispatch(setProject({ ...project, report: res }));
       } else {
         console.log("Cannot calculate with current input data.");
       }
@@ -82,7 +84,7 @@ export default function ProjectTabs() {
         nSocks: project.nSocks || 0,
         valveFlags: project.valveFlags || null,
         design: project.design || null,
-        design_summary: project.design_summary || null,
+        report: report || null,
         library: project.library || null,
         pipe_design: project.pipe_design || null,
         sock_data: project.sock_data || null,
@@ -153,9 +155,9 @@ export default function ProjectTabs() {
           </button>
         </div>
         <div className="p-4 w-full">
-          {activeTab === "details" && <Details />}
-          {activeTab === "input_data" && <InputData />}
-          {activeTab === "tube_data" && <TubeData />}
+          {activeTab === "details" && <Details project={project}/>}
+          {activeTab === "input_data" && <InputData project={project}/>}
+          {activeTab === "tube_data" && <TubeData project={project}/>}
         </div>
       </div>
       {showReport ? (

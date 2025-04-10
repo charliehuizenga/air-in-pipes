@@ -12,14 +12,10 @@ import { PipeData } from "./tube_list";
 import { fetchProjects } from "../../projects/fetch-proj";
 import ImportPipeData from "./import";
 
-export default function TubeData() {
+export default function TubeData({project}) {
   const dispatch = useDispatch();
-  const pipeData = useSelector(
-    (state: ProjectState) => state.project.library.pipe_data
-  );
-  const cost = useSelector(
-    (state: ProjectState) => state.project.library.valve_cost
-  );
+  const pipeData = project?.library.pipe_data;
+  const cost = project?.library.valve_cost;
   const t = useTranslations("pipes");
 
   const checkbox = useRef<HTMLInputElement>(null);

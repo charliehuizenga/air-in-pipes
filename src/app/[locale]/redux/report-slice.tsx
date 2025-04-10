@@ -5,7 +5,7 @@ export interface Report {
   [key: string]: any;
 }
 
-interface DesignSummary {
+export interface DesignSummary {
   nominal_size: string;
   sdr: number;
   length: number;

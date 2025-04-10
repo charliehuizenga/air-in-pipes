@@ -1,6 +1,7 @@
 "use client";
 import {createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { PipeData, pipeData } from "../components/tube-data/tube_list";
+import { Report } from "./report-slice";
 
 export interface Topo {
   name?: string;
@@ -25,6 +26,7 @@ export interface Project {
   user_id: string;
   org_id: string;
   library: any;
+  report: Report;
   [key: string]: any;
 }
 

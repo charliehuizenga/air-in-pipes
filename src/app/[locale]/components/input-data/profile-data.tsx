@@ -17,9 +17,9 @@ type InputValues = {
   [K in keyof Topo]?: string;
 };
 
-export default function ProfileData() {
+export default function ProfileData({project}) {
   const t = useTranslations("profile-data");
-  const topo = useSelector((state: ProjectState) => state.project.topo);
+  const topo = project.topo;
   const dispatch = useDispatch();
 
   // ----- States ----- //
