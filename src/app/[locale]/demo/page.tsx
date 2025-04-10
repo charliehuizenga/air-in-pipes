@@ -79,9 +79,9 @@ export default function ProjectTabs() {
           </button>
         </div>
         <div className="p-4 w-full">
-          {activeTab === "details" && <Details />}
-          {activeTab === "input_data" && <InputData />}
-          {activeTab === "tube_data" && <TubeData />}
+          {activeTab === "details" && <Details project={project}/>}
+          {activeTab === "input_data" && <InputData project={project}/>}
+          {activeTab === "tube_data" && <TubeData project={project}/>}
         </div>
       </div>
       {showReport ? (
