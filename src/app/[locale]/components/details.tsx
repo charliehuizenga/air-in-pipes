@@ -27,18 +27,23 @@ export default function Details() {
   const project = useSelector((state: ProjectState) => state.project);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
 
-    dispatch(
-      setProject({
-        ...project,
-        [name]: name === "qmax" || name === "qmin" ? parseFloat(value) : value,
-      })
-    );
+    const isNumberField = ["qmax", "qmin"].includes(name);
+
+    if (isNumberField) {
+
+      if (isNaN(Number(value)) || value.endsWith(".") || value==="0" ) {
+        dispatch(setProject({ ...project, [name]: value }));
+      } else {
+        dispatch(setProject({ ...project, [name]: Number(value) }));
+      }
+
+    } else {
+      dispatch(setProject({ ...project, [name]: value }));
+    }
   };
 
   const [selectedExampleName, setSelectedExampleName] = useState("");
