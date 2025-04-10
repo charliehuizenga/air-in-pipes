@@ -48,6 +48,7 @@ export const initialState: Project = {
     valve_cost: 380,
     pipe_data: pipeData,
   },
+  report: null,
   user_id: "",
   org_id: ""
 };
