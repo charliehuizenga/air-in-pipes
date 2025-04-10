@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { createClient } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
@@ -15,6 +15,8 @@ const supabase = createClient(
 
 export default function SignUpLogin() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirectTo");
   const locale = pathname.split("/")[1];
   const dispatch = useDispatch();
   const router = useRouter();
@@ -62,7 +64,7 @@ export default function SignUpLogin() {
     if (isSignUp) {
       setMessage(t("confirmation-sent"));
     } else {
-      router.push(`/${locale}/projects`);
+      router.push(redirectTo ?? `/${locale}/projects`);
     }
   };
 

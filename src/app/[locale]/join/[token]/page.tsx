@@ -18,7 +18,7 @@ export default function JoinOrgPage() {
   const [status, setStatus] = useState("Joining organization...");
   const pathname = usePathname();
   const locale = pathname.split("/")[1];
-
+  
   useEffect(() => {
     const joinOrganization = async () => {
       if (!token || !user?.id) {
@@ -26,7 +26,6 @@ export default function JoinOrgPage() {
         return;
       }
 
-      // 1. Look up the invite
       const { data: invite, error: inviteError } = await supabase
         .from("org_invites")
         .select("org_id")
@@ -40,7 +39,6 @@ export default function JoinOrgPage() {
 
       const org_id = invite.org_id;
 
-      // 2. Check if the user is already a member
       const { data: existingMembership } = await supabase
         .from("org_members")
         .select("*")
@@ -48,27 +46,48 @@ export default function JoinOrgPage() {
         .eq("user_id", user.id)
         .maybeSingle();
 
-      if (!existingMembership) {
-        // 3. Add user to org_members
-        const { error: insertError } = await supabase.from("org_members").insert({
-          user_id: user.id,
-          org_id,
-          role: "member",
-        });
-
-        if (insertError) {
-          console.error("Failed to join organization:", insertError.message);
-          setStatus("Failed to join organization.");
-          return;
-        }
+      if (existingMembership) {
+        // Already a member – redirect directly
+        setStatus("You're already a member. Redirecting...");
+        router.push(`/${locale}/org/${org_id}`);
+        return;
       }
 
-      // 4. Redirect to the organization's page
+      const { error: insertError } = await supabase.from("org_members").insert({
+        user_id: user.id,
+        org_id,
+        role: "member",
+      });
+
+      if (insertError) {
+        console.error("Failed to join organization:", insertError.message);
+        setStatus("Failed to join organization.");
+        return;
+      }
+
       router.push(`/${locale}/org/${org_id}`);
     };
 
     joinOrganization();
   }, [token, user?.id]);
+
+  const handleLoginRedirect = () => {
+    router.push(`/${locale}/login?redirectTo=${encodeURIComponent(pathname)}`);
+  };
+
+  if (!user?.id) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-gray-700 text-lg space-y-4">
+        <h2>You need to log in to join this organization.</h2>
+        <button
+          onClick={handleLoginRedirect}
+          className="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600"
+        >
+          Login
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center text-gray-700 text-lg">
