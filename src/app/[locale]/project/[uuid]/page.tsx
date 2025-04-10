@@ -13,6 +13,8 @@ import Details from "../../components/details";
 import InputData from "../../components/input-data/input-data";
 import TubeData from "../../components/tube-data/tube-data";
 import Report from "../../report/page";
+import { usePathname, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,6 +29,12 @@ export default function ProjectTabs() {
   const [showReport, toggleReport] = useState(false);
   const t = useTranslations("report");
   const tnav = useTranslations("nav-bar");
+  const locale = usePathname().split("/")[1];
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
+  const backHref =
+    from === "org" ? `/${locale}/org/${project.org_id}` : `/${locale}/projects`;
+  const router = useRouter();
 
   useProjectLoader((proj) => dispatch(setProject(proj)));
 
@@ -102,6 +110,14 @@ export default function ProjectTabs() {
 
   return (
     <div className="p-4 flex flex-col items-center justify-start min-h-screen pt-10 w-full">
+      <div className="w-full max-w-5xl mb-4">
+        <button
+          className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm font-medium"
+          onClick={() => router.push(backHref)}
+        >
+          ← Back
+        </button>
+      </div>
       <h1 className="text-2xl font-bold mb-4">{project.project_name}</h1>
       <div className="w-full max-w-5xl">
         <div className="flex justify-around border-b w-full">
@@ -155,7 +171,10 @@ export default function ProjectTabs() {
 
           <button
             className="px-5 py-3 bg-sky-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 w-full"
-            onClick={() => { saveProject(); calculate();}}
+            onClick={() => {
+              saveProject();
+              calculate();
+            }}
           >
             {t("calculate")}
           </button>

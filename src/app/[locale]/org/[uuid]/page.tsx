@@ -30,17 +30,15 @@ export default function OrganizationPage() {
 
   const handleCreateProject = () => {
     const uuid = crypto.randomUUID();
-
     dispatch(
       setProject({
         ...initialState,
         uuid,
-        org_id: org_id,
+        org_id,
         user_id: user.id,
       })
     );
-
-    router.push(`/${locale}/project/${uuid}`);
+    router.push(`/${locale}/project/${uuid}?from=org`);
   };
 
   const handleSelectProject = async (uuid: string) => {
@@ -50,7 +48,7 @@ export default function OrganizationPage() {
     } else {
       console.error("Project not found");
     }
-    router.push(`/${locale}/project/${uuid}`);
+    router.push(`/${locale}/project/${uuid}?from=org`);
   };
 
   const handleDeleteProject = async (uuid: string) => {
@@ -58,9 +56,7 @@ export default function OrganizationPage() {
       alert("You must be an admin to delete projects in this organization.");
       return;
     }
-
     if (!confirm("Are you sure you want to delete this project?")) return;
-
     const { error } = await supabase.from("projects").delete().eq("uuid", uuid);
     if (error) {
       console.error("Error deleting project:", error.message);
@@ -77,23 +73,15 @@ export default function OrganizationPage() {
       alert("Only admins can remove members.");
       return;
     }
-
-    if (
-      !confirm(
-        "Are you sure you want to remove this member from the organization?"
-      )
-    )
-      return;
-
+    if (!confirm("Are you sure you want to remove this member?")) return;
     const { error } = await supabase
       .from("org_members")
       .delete()
       .eq("org_id", org_id)
       .eq("user_id", userIdToRemove);
-
     if (error) {
-      console.error("Failed to remove member:", error.message);
-      alert("Error removing member.");
+      console.error("Error removing member:", error.message);
+      alert("Failed to remove member.");
     } else {
       setMembers((prev) => prev.filter((m) => m.user_id !== userIdToRemove));
       alert("Member removed successfully.");
@@ -103,13 +91,11 @@ export default function OrganizationPage() {
   const handlePromoteToAdmin = async (userId: string) => {
     const confirmed = confirm("Promote this member to admin?");
     if (!confirmed) return;
-
     const { error } = await supabase
       .from("org_members")
       .update({ role: "admin" })
       .eq("org_id", org_id)
       .eq("user_id", userId);
-
     if (error) {
       alert("Failed to promote member.");
     } else {
@@ -121,41 +107,34 @@ export default function OrganizationPage() {
   };
 
   const handleLeaveOrganization = async () => {
-    const confirmed = confirm(
-      "Are you sure you want to leave this organization?"
-    );
+    const confirmed = confirm("Are you sure you want to leave this organization?");
     if (!confirmed) return;
 
     const isLastMember = members.length === 1 && members[0].user_id === user.id;
 
     if (isLastMember) {
       const confirmed = confirm(
-        "You are the last member of the organization. Organization will be deleted. Continue?"
+        "You are the last member. Organization will be deleted. Continue?"
       );
       if (!confirmed) return;
 
-      // User is the last one — delete the org entirely
       const { error: deleteError } = await supabase
         .from("orgs")
         .delete()
         .eq("org_id", org_id);
-
       if (deleteError) {
         alert("Failed to delete organization.");
-        console.error("Delete error:", deleteError);
         return;
       }
 
       alert("Organization has been deleted.");
       router.push(`/${locale}/projects`);
     } else {
-      // Just remove the user
       const { error } = await supabase
         .from("org_members")
         .delete()
         .eq("org_id", org_id)
         .eq("user_id", user.id);
-
       if (error) {
         alert("Error leaving organization.");
       } else {
@@ -166,18 +145,14 @@ export default function OrganizationPage() {
   };
 
   const handleDeleteOrganization = async () => {
-    const confirmed = confirm(
-      "Are you sure you want to delete this organization? This cannot be undone."
-    );
+    const confirmed = confirm("Delete this organization? This cannot be undone.");
     if (!confirmed) return;
 
-    // Optional: manually delete dependent rows if not ON DELETE CASCADE
     await supabase.from("org_members").delete().eq("org_id", org_id);
     await supabase.from("projects").delete().eq("org_id", org_id);
     await supabase.from("org_invites").delete().eq("org_id", org_id);
 
     const { error } = await supabase.from("orgs").delete().eq("org_id", org_id);
-
     if (error) {
       alert("Failed to delete organization.");
       console.error("Org delete error:", error);
@@ -193,26 +168,20 @@ export default function OrganizationPage() {
       .select("token")
       .eq("org_id", org_id)
       .maybeSingle();
-
     if (fetchError) {
-      console.error("Error fetching existing invite:", fetchError);
       alert("Failed to retrieve invite.");
       return;
     }
 
     let token = existingInvite?.token;
-
     if (!token) {
       token = crypto.randomUUID();
-
       const { error: insertError } = await supabase.from("org_invites").insert({
         token,
         org_id,
         invite_id: crypto.randomUUID(),
       });
-
       if (insertError) {
-        console.error("Error creating new invite:", insertError);
         alert("Failed to create invite.");
         return;
       }
@@ -220,7 +189,7 @@ export default function OrganizationPage() {
 
     const inviteURL = `${window.location.origin}/${locale}/join/${token}`;
     await navigator.clipboard.writeText(inviteURL);
-    alert(`Invite link copied to clipboard:\n${inviteURL}`);
+    alert(`Invite link copied:\n${inviteURL}`);
   };
 
   useEffect(() => {
@@ -247,34 +216,23 @@ export default function OrganizationPage() {
         .select("name")
         .eq("org_id", org_id)
         .single();
-
       setOrgName(orgData?.name ?? "Unknown Org");
 
       const { data: orgProjects } = await supabase
         .from("projects")
         .select("uuid, project_name")
         .eq("org_id", org_id);
-
       setProjects(orgProjects || []);
 
       const { data, error } = await supabase.functions.invoke(
         "list-org-members",
-        {
-          body: { org_id },
-        }
+        { body: { org_id } }
       );
-
       if (error) {
         console.error("Error loading members:", error.message);
         setMembers([]);
-        return;
-      }
-
-      if (data?.members) {
-        setMembers(data.members); // { user_id, role, email }
       } else {
-        console.error("No members found in response.");
-        setMembers([]);
+        setMembers(data?.members ?? []);
       }
 
       setLoading(false);
@@ -284,92 +242,100 @@ export default function OrganizationPage() {
   }, [org_id, user.id]);
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{orgName}</h1>
-      </div>
-
-      <div className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Organization Members</h2>
-        <ul className="space-y-2">
-          {members.map((member) => (
-            <li
-              key={member.user_id}
-              className="flex justify-between items-center bg-gray-100 px-4 py-2 rounded"
-            >
-              <div>
-                <p className="font-medium">{member.email}</p>
-                <p className="text-sm text-gray-600 capitalize">
-                  {member.role}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                {isAdmin && member.user_id !== user.id && (
-                  <>
-                    {member.role !== "admin" && (
-                      <button
-                        onClick={() => handlePromoteToAdmin(member.user_id)}
-                        className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
-                      >
-                        Make Admin
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleRemoveMember(member.user_id)}
-                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
-                    >
-                      Remove
-                    </button>
-                  </>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        {/* Leave Organization */}
-        <div className="mt-6 mb-6 flex flex-wrap gap-4">
+    <div className="w-full flex justify-center px-4 sm:px-6 lg:px-8 pt-10 pb-12 min-h-screen">
+      <div className="w-full max-w-5xl">
+        {/* Back Button */}
+        <div className="mb-4">
           <button
-            onClick={handleCreateProject}
-            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm font-medium"
+            onClick={() => router.push(`/${locale}/projects`)}
           >
-            Create New Project
+            ← Back
           </button>
-          <button
-            onClick={handleShare}
-            className="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600"
-          >
-            Share Invite Link
-          </button>
-          <button
-            onClick={handleLeaveOrganization}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Leave Organization
-          </button>
-          {isAdmin && (
-            <button
-              onClick={handleDeleteOrganization}
-              className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800"
-            >
-              Delete Organization
-            </button>
-          )}
         </div>
-      </div>
 
-      {/* Projects Table */}
-      {loading ? (
-        <p className="text-gray-500">Loading projects...</p>
-      ) : projects.length > 0 ? (
-        <ProjectTable
-          projects={projects}
-          onSelect={handleSelectProject}
-          onDelete={handleDeleteProject}
-        />
-      ) : (
-        <p className="text-gray-500">This organization has no projects yet.</p>
-      )}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">{orgName}</h1>
+        </div>
+
+        <div className="mb-10">
+          <h2 className="text-xl font-semibold mb-4">Organization Members</h2>
+          <ul className="space-y-2">
+            {members.map((member) => (
+              <li
+                key={member.user_id}
+                className="flex justify-between items-center bg-gray-100 px-4 py-2 rounded"
+              >
+                <div>
+                  <p className="font-medium">{member.email}</p>
+                  <p className="text-sm text-gray-600 capitalize">{member.role}</p>
+                </div>
+                <div className="flex gap-2">
+                  {isAdmin && member.user_id !== user.id && (
+                    <>
+                      {member.role !== "admin" && (
+                        <button
+                          onClick={() => handlePromoteToAdmin(member.user_id)}
+                          className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-sm"
+                        >
+                          Make Admin
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleRemoveMember(member.user_id)}
+                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                      >
+                        Remove
+                      </button>
+                    </>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-6 mb-6 flex flex-wrap gap-4">
+            <button
+              onClick={handleCreateProject}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+            >
+              Create New Project
+            </button>
+            <button
+              onClick={handleShare}
+              className="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600"
+            >
+              Share Invite Link
+            </button>
+            <button
+              onClick={handleLeaveOrganization}
+              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Leave Organization
+            </button>
+            {isAdmin && (
+              <button
+                onClick={handleDeleteOrganization}
+                className="px-4 py-2 bg-red-700 text-white rounded hover:bg-red-800"
+              >
+                Delete Organization
+              </button>
+            )}
+          </div>
+        </div>
+
+        {loading ? (
+          <p className="text-gray-500">Loading projects...</p>
+        ) : projects.length > 0 ? (
+          <ProjectTable
+            projects={projects}
+            onSelect={handleSelectProject}
+            onDelete={handleDeleteProject}
+          />
+        ) : (
+          <p className="text-gray-500">This organization has no projects yet.</p>
+        )}
+      </div>
     </div>
   );
 }

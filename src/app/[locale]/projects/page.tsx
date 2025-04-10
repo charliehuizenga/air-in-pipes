@@ -22,7 +22,6 @@ export default function App() {
   const router = useRouter();
   const t = useTranslations("projects");
   const user = useSelector((state: ProjectState) => state.user);
-  const project = useSelector((state: ProjectState) => state.project);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
@@ -52,7 +51,7 @@ export default function App() {
       dispatch(
         setProject({
           ...initialState,
-          uuid: uuid,
+          uuid,
           user_id: user.id,
         })
       );
@@ -143,20 +142,30 @@ export default function App() {
   };
 
   return (
-    <main className="mx-auto max-w-4xl py-12 sm:px-6 lg:px-8">
-      <div className="border-b border-gray-900/10 pb-12">
-        <h2 className="text-base font-semibold leading-7 text-gray-900">
+    <div className="w-full flex justify-center px-4 sm:px-6 lg:px-8 pt-10 pb-12 min-h-screen">
+      <div className="w-full max-w-5xl">
+        {/* Optional Back Button */}
+        {/* <div className="mb-4">
+          <button
+            className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 text-sm font-medium"
+            onClick={() => router.push(`/${locale}`)}
+          >
+            ← Back to Home
+          </button>
+        </div> */}
+
+        <h2 className="text-base font-semibold leading-7 text-gray-900 mb-6">
           {t("dashboard")}
         </h2>
 
         {loading ? (
-          <p className="text-gray-500 mt-4">Loading projects...</p>
+          <p className="text-gray-500">Loading projects...</p>
         ) : (
           <>
-            <h3 className="text-lg font-semibold text-gray-800 mt-8 mb-2">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
               {t("personal-projects")}
             </h3>
-            <div className="mt-6 flex justify-end gap-2">
+            <div className="mt-4 mb-6 flex justify-end gap-2">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -185,7 +194,7 @@ export default function App() {
             <h3 className="text-lg font-semibold text-gray-800 mt-10 mb-2">
               {t("organizations")}
             </h3>
-            <div className="mt-6 flex gap-4 justify-end">
+            <div className="mt-4 mb-6 flex justify-end">
               <button
                 onClick={handleCreateOrganization}
                 className="px-4 py-2 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600"
@@ -197,6 +206,6 @@ export default function App() {
           </>
         )}
       </div>
-    </main>
+    </div>
   );
 }
