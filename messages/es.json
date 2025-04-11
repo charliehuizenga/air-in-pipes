@@ -149,8 +149,9 @@
   },
   "projects": {
     "dashboard": "Salpicadero",
+    "personal-projects": "Proyecto Personales",
+    "organizations": "Organizaciónes",
     "name": "Nombre de Proyecto",
-    "actions": "Actiones",
     "no-projects": "No hay projects",
     "create": "Proyecto Nuevo",
     "import": "Importar JSON como nuevo proyecto",
@@ -161,7 +162,6 @@
     "actions": "Acciones",
     "delete": "Eliminar",
     "no-projects-found": "No se han encontrado proyectos."
-
   },
   "pipes": {
     "pipe-data": "Datos de tuberia",
