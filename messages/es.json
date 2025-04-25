@@ -10,7 +10,6 @@
     "slope": "Pendiente",
     "start": "Comenzar",
     "valve": "Válvula"
-
   },
   "language-selector": {
     "english": "Inglés",
@@ -29,13 +28,75 @@
     "demo": "Demo",
     "load": "Importar",
     "save": "Exportar",
-    "about": "Sobre"
+    "about": "Sobre",
+    "home": "Inicio",
+    "logout": "Cerrar sesión",
+    "login": "Acceso"
 
   },
+  "organization": {
+    "back": "← Volver",
+    "members-heading": "Miembros de la Organización",
+    "make-admin": "Hacer admin",
+    "remove": "Eliminar",
+    "create-project": "Crear Nuevo Proyecto",
+    "share-invite": "Compartir enlace de invitación",
+    "leave-org": "Dejar la Organización",
+    "delete-org": "Eliminar la Organización",
+    "loading-projects": "Cargando proyectos...",
+    "no-projects": "No hay proyectos en esta organización.",
+    "not-admin": "Debe ser administrador para realizar esta acción.",
+    "confirm-delete-project": "¿Está seguro de que desea eliminar este proyecto?",
+    "project-deleted": "Proyecto eliminado con éxito.",
+    "delete-failed": "Error al borrar proyecto.",
+    "remove-member-confirm": "¿Está seguro de que desea eliminar a este miembro?",
+    "remove-member-success": "Miembro eliminado con éxito.",
+    "promote-confirm": "¿Ascender a este miembro a administrador?",
+    "promote-success": "Miembro promocionado.",
+    "leave-org-confirm": "¿Estás seguro de que quieres dejar esta organización?",
+    "leave-org-final": "Eres el último miembro. La organización será eliminada. ¿Continuar?",
+    "leave-org-success": "Ha dejado de la organización.",
+    "org-deleted": "La organización ha sido eliminada..",
+    "delete-org-confirm": "¿Eliminar esta organización? Esto no se puede deshacer..",
+    "invite-error": "No se ha podido recuperar la invitación.",
+    "invite-create-failed": "Error al crear invitación.",
+    "invite-copied": "Enlace de invitación copiado en el portapapeles.",
+    "invite-copy-manual": "Aquí está el enlace de invitación (copiar manualmente):",
+    "not-member": "No eres miembro de esta organización.",
+    "unknown-org": "Organización desconocida."
+  },
+
   "input-data": {
     "profile-data": "Datos de perfil",
     "topo-data": "Datos topográficos"
   },
+
+  "auth": {
+    "sign-up": "Inscríbete",
+    "login": "Acceso",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "forgot-password": "¿Olvidaste la contraseña?",
+    "confirmation-sent": "Se ha enviado un correo electrónico de confirmación. Compruebe su correo.",
+    "signing-up": "Inscripción...",
+    "logging-in": "Inicio de sesión...",
+    "no-account": "¿No tienes cuenta?",
+    "already-have-account": "¿Ya tienes cuenta?",
+    "sign-up-here": "Inscríbete aqui",
+    "login-here": "Acceso aqui",
+    "title": "¿Olvidaste la contraseña?",
+    "placeholder": "Introduzca su dirección de correo electrónico",
+    "send": "Enviar enlace de reinicio",
+    "sent": "Se ha enviado a tu correo electrónico un enlace para restablecer la contraseña.",
+    "back": "← Volver",
+    "reset-password-title": "Restablecer contraseña",
+    "reset-password-success": "¡Contraseña restablecida con éxito! Redirigiendo...",
+    "reset-password-submit": "Actualizar contraseña",
+    "new-password": "Nueva contraseña",
+    "confirm-password": "Confirmar contraseña",
+    "password-mismatch": "Las contraseñas no coinciden"
+  },
+
   "principal": {
     "automatic-valve-design": "Localiza automáticamente las válvulas de aire necesarias (recomendado)",
     "cancel": "Cancelar",
@@ -71,15 +132,36 @@
     "summary": "Resumen",
     "total-cost": "Coste total",
     "valve-cost": "Costo de la válvula",
-    "input-data": "Datos de Entrada"
+    "input-data": "Datos de Entrada",
+    "back": "← Volver",
+    "save": "Guardar",
+    "calculate": "Calcular",
+    "missing-name": "Introduzca un nombre para el proyecto antes de guardarlo.",
+    "creation-error": "Error al crear el proyecto",
+    "unexpected-error": "Se ha producido un error inesperado.",
+    "title": "Informe",
+    "recalculate": "Calcule de nuevo",
+    "export-pdf": "Exportar a PDF",
+    "export-json": "Export a JSON",
+    "enter-filename": "Introduzca el nombre del archivo"
+
 
   },
   "projects": {
     "dashboard": "Salpicadero",
+    "personal-projects": "Proyecto Personales",
+    "organizations": "Organizaciónes",
     "name": "Nombre de Proyecto",
-    "actions": "Actiones",
     "no-projects": "No hay projects",
-    "create": "Proyecto Nuevo"
+    "create": "Proyecto Nuevo",
+    "import": "Importar JSON como nuevo proyecto",
+    "new-organization": "Nueva Organización",
+    "not-a-member": "Aún no eres miembro de ninguna organización.",
+    "view": "Ver",
+    "project-name": "Nombre del proyecto",
+    "actions": "Acciones",
+    "delete": "Eliminar",
+    "no-projects-found": "No se han encontrado proyectos."
   },
   "pipes": {
     "pipe-data": "Datos de tuberia",

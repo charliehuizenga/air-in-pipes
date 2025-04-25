@@ -59,7 +59,7 @@
     "delete-org-confirm": "Delete this organization? This cannot be undone.",
     "invite-error": "Failed to retrieve invite.",
     "invite-create-failed": "Failed to create invite.",
-    "invite-copied": "Invite link copied to clipboard:",
+    "invite-copied": "Invite link copied to clipboard.",
     "invite-copy-manual": "Here is the invite link (copy manually):",
     "not-member": "You are not a member of this organization.",
     "unknown-org": "Unknown Org"
