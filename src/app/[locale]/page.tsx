@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSelector } from "react-redux";
 import { usePathname } from "next/navigation";
 import { ProjectState } from "./redux/store";
@@ -15,7 +16,7 @@ export default function HomePage() {
       <h1 className="text-4xl font-bold text-sky-600 mb-4">
         Welcome to Agua Para La Vida&apos;s Air in Pipes Tool!
       </h1>
-      <p className="text-lg text-gray-700 max-w-xl mb-8">
+      <p className="text-lg text-gray-700 max-w-xl mb-6">
         Design, manage, and collaborate on gravity flow water systems.
       </p>
 
@@ -42,6 +43,13 @@ export default function HomePage() {
           </Link>
         </div>
       )}
+      <Image
+        src="/aplv_home.png"
+        alt="APLVC home illustration"
+        width={1000}
+        height={600}
+        className="mb-8 rounded-lg w-full max-w-4xl h-auto"
+      />
     </main>
   );
 }
