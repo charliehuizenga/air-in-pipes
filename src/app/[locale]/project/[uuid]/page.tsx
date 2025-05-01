@@ -22,11 +22,12 @@ const supabase = createClient(
 
 export default function ProjectTabs() {
   const [activeTab, setActiveTab] = useState("details");
+  const [projectVersion, setProjectVersion] = useState(0);
+  const [lastCalculatedVersion, setLastCalculatedVersion] = useState(-1);
   const dispatch = useDispatch();
   const project = useSelector((state: ProjectState) => state.project);
   const report = useSelector((state: ProjectState) => state.report);
   const user = useSelector((state: ProjectState) => state.user);
-  const [showReport, toggleReport] = useState(false);
   const t = useTranslations("report");
   const tnav = useTranslations("nav-bar");
   const locale = usePathname().split("/")[1];
@@ -36,7 +37,14 @@ export default function ProjectTabs() {
     from === "org" ? `/${locale}/org/${project.org_id}` : `/${locale}/projects`;
   const router = useRouter();
 
-  useProjectLoader((proj) => {dispatch(setProject(proj)); console.log(proj);});
+  useProjectLoader((proj) => {
+    dispatch(setProject(proj));
+    console.log(proj);
+  });
+
+  function invalidateReport() {
+    setProjectVersion((v) => v + 1);
+  }
 
   async function calculate() {
     try {
@@ -44,8 +52,8 @@ export default function ProjectTabs() {
       dispatch(setData(res));
       if (res.design_summary !== undefined) {
         console.log("Successfully calculated!");
-        toggleReport(true);
         dispatch(setProject({ ...project, report: res }));
+        setLastCalculatedVersion(projectVersion);
       } else {
         console.log("Cannot calculate with current input data.");
       }
@@ -155,18 +163,28 @@ export default function ProjectTabs() {
           </button>
         </div>
         <div className="p-4 w-full">
-          {activeTab === "details" && <Details project={project}/>}
-          {activeTab === "input_data" && <InputData project={project}/>}
-          {activeTab === "tube_data" && <TubeData project={project}/>}
+          {activeTab === "details" && (
+            <Details project={project} invalidateReport={invalidateReport} />
+          )}
+          {activeTab === "input_data" && (
+            <InputData project={project} invalidateReport={invalidateReport} />
+          )}
+          {activeTab === "tube_data" && (
+            <TubeData project={project} invalidateReport={invalidateReport} />
+          )}
         </div>
       </div>
-      {showReport ? (
+
+      {projectVersion === lastCalculatedVersion ? (
         <Report calculate={calculate} saveProject={saveProject} />
       ) : (
         <div className="mt-3 flex flex-col sm:flex-row gap-3 max-w-sm">
           <button
             className="px-5 py-3 bg-green-500 text-white text-lg font-semibold rounded-lg shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 w-full"
-            onClick={saveProject}
+            onClick={() => {
+              invalidateReport();
+              saveProject();
+            }}
           >
             {t("save")}
           </button>

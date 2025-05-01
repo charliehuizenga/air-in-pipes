@@ -4,7 +4,7 @@ import { setProject } from "../redux/project-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslations } from "next-intl";
 
-export default function Details({ project }) {
+export default function Details({ project, invalidateReport }) {
   const dispatch = useDispatch();
   const t = useTranslations("principal");
   const today = new Date().toISOString().split("T")[0];
@@ -12,7 +12,7 @@ export default function Details({ project }) {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    console.log(project);
+    invalidateReport();
     const { name, value } = e.target;
 
     const isNumberField = ["qmax", "qmin"].includes(name);

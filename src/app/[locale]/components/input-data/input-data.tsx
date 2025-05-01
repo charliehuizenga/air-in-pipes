@@ -12,7 +12,7 @@ export interface Tab {
   current: boolean;
 }
 
-export default function InputData({ project }) {
+export default function InputData({ project, invalidateReport }) {
   const t = useTranslations("input-data");
 
   const inputTabs: Tab[] = [

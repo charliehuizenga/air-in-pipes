@@ -12,7 +12,7 @@ import { PipeData } from "./tube_list";
 import { fetchProjects } from "../../projects/fetch-proj";
 import ImportPipeData from "./import";
 
-export default function TubeData({project}) {
+export default function TubeData({ project, invalidateReport }) {
   const dispatch = useDispatch();
   const pipeData = project?.library.pipe_data;
   const cost = project?.library.valve_cost;
@@ -108,12 +108,15 @@ export default function TubeData({project}) {
                 type="text"
                 value={cost}
                 onChange={(e) =>
+                {
                   dispatch(
                     setLibrary({
                       data: pipeData,
                       valveCost: Number(e.target.value),
                     })
-                  )
+                  );
+                  invalidateReport();
+                }
                 }
                 className="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
               />
