@@ -8,7 +8,7 @@ import { ProjectState } from "../redux/store";
 
 
 export default function Graph({ report, project }) {
-  const { data, options, Legend } = getGraph(project.topo, report.pipe_design);
+  const { data, options, Legend } = getGraph(report);
 
   return (
     <div className="hidden sm:block mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">

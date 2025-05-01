@@ -1,98 +1,129 @@
-import { createRef } from "react";
-import annotationPlugin from "chartjs-plugin-annotation";
 import {
-  ChartOptions,
   Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
   LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Filler,
   Title,
   Tooltip,
-  Legend as ChartLegend,
-  Filler,
-  registerables,
+  Legend,
 } from "chart.js";
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
   LineElement,
+  PointElement,
+  LinearScale,
+  CategoryScale,
+  Filler,
   Title,
   Tooltip,
-  ChartLegend,
-  Filler,
-  ...registerables,
-  annotationPlugin
+  Legend
 );
 
-export default function getGraph(topoData, pipeDesign) {
+export default function getGraph(report) {
+  const pipeDesign = report.pipe_design;
   const pipeColorPalette = [
-    "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728",
-    "#9467bd", "#8c564b", "#e377c2", "#7f7f7f",
-    "#bcbd22", "#17becf",
+    "#1f77b4",
+    "#ff7f0e",
+    "#2ca02c",
+    "#d62728",
+    "#9467bd",
+    "#8c564b",
+    "#e377c2",
+    "#7f7f7f",
+    "#bcbd22",
+    "#17becf",
   ];
 
   const pipeColorMap = new Map();
-
   const getPipeColor = (nominalSize, sdr) => {
     const key = `${nominalSize}-${sdr}`;
     if (!pipeColorMap.has(key)) {
-      const color = pipeColorPalette[pipeColorMap.size % pipeColorPalette.length];
+      const color =
+        pipeColorPalette[pipeColorMap.size % pipeColorPalette.length];
       pipeColorMap.set(key, color);
     }
     return pipeColorMap.get(key);
   };
 
-  const chartRef = createRef();
-
-  // Topography data
-  const topoPoints = topoData.map((point) => ({ x: point.l, y: point.h }));
-
-  // HGL data
-  const hglPoints = [];
-  pipeDesign.forEach((pipe) => {
-    const start = pipe.start_pos;
-    const end = pipe.start_pos + pipe.length;
-    hglPoints.push({ x: start, y: pipe.hgl });
-    hglPoints.push({ x: end, y: pipe.hgl });
+  let cumulativeL = 0;
+  const graphWithAdjustedL = report.graph.map((point) => {
+    cumulativeL += point.l ?? 0;
+    return { ...point, l: cumulativeL };
   });
 
-  // Pipe datasets by segment
-  const pipeDatasets = pipeDesign.map((pipe, i) => {
-    const color = getPipeColor(pipe.nominal_size, pipe.sdr);
-    return {
-      label: `${pipe.nominal_size} SDR: ${pipe.sdr}`,
-      data: [
-        { x: pipe.start_pos, y: null },
-        { x: pipe.start_pos + pipe.length, y: null },
-      ],
-      borderColor: color,
-      borderWidth: 3,
-      segment: {
+  const pipeSegments = graphWithAdjustedL
+    .map((point, i) => {
+      if (i === 0) return null; // skip the first point (no previous segment)
+
+      const prev = graphWithAdjustedL[i - 1];
+      const color = getPipeColor(point.nominal_size, point.sdr); // color from *current* segment info
+
+      return {
+        label: `${point.nominal_size} SDR: ${point.sdr}`,
+        data: [
+          { x: prev.l, y: prev.h },
+          { x: point.l, y: point.h },
+        ],
         borderColor: color,
+        borderWidth: 4,
+        pointRadius: 0,
+        fill: false,
+        tension: 0,
+      };
+    })
+    .filter(Boolean); // remove nulls
+
+  const pipeEndpoints = graphWithAdjustedL.flatMap((point, i) => {
+    if (i === 0) return [];
+
+    const prev = graphWithAdjustedL[i - 1];
+    const segmentLength = point.l - prev.l;
+    const label = `${prev.nominal_size} SDR: ${prev.sdr}`;
+
+    return [
+      {
+        x: point.l,
+        y: point.h,
+        meta: {
+          type: label,
+          length: segmentLength.toFixed(2),
+          height: point.h,
+        },
       },
-      showLine: true,
-      fill: false,
-      pointRadius: 0,
-    };
+    ];
   });
 
+  const hollowDotsDataset = {
+    label: "Pipe Endpoints",
+    data: pipeEndpoints,
+    pointRadius: 5,
+    pointStyle: "circle",
+    borderWidth: 2,
+    borderColor: "black",
+    backgroundColor: "transparent",
+    showLine: false,
+  };
+  
+  const hglPoints = [];
+  if (pipeDesign.length > 0 && graphWithAdjustedL.length > 0) {
+    let cumulativeX = 0;
+    const initialH = graphWithAdjustedL[0].h;
+  
+    // First point: start of the system
+    hglPoints.push({ x: 0, y: initialH });
+  
+    for (const pipe of pipeDesign) {
+      cumulativeX += pipe.length;
+      const hglY = pipe.hgl;
+  
+      hglPoints.push({ x: cumulativeX, y: hglY });
+    }
+  }
+  
   const data = {
     datasets: [
-      // Topography
-      {
-        label: "Topography",
-        data: topoPoints,
-        borderColor: "grey",
-        backgroundColor: "rgba(100, 100, 100, 0.1)", // shaded fill
-        borderWidth: 1.5,
-        pointRadius: 4,
-        fill: true,
-        tension: 0.2,
-      },      
-      // HGL
       {
         label: "HGL",
         data: hglPoints,
@@ -103,45 +134,22 @@ export default function getGraph(topoData, pipeDesign) {
         pointRadius: 0,
         tension: 0,
       },
-      // All pipe segments
-      ...pipeDesign.map((pipe) => {
-        const color = getPipeColor(pipe.nominal_size, pipe.sdr);
-        const start = pipe.start_pos;
-        const end = pipe.start_pos + pipe.length;
-
-        // Interpolate height at start and end from topoData
-        const getHeight = (x) => {
-          for (let i = 0; i < topoData.length - 1; i++) {
-            const p0 = topoData[i];
-            const p1 = topoData[i + 1];
-            if (x >= p0.l && x <= p1.l) {
-              const ratio = (x - p0.l) / (p1.l - p0.l);
-              return p0.h + ratio * (p1.h - p0.h);
-            }
-          }
-          return null;
-        };
-
-        return {
-          label: `${pipe.nominal_size} SDR: ${pipe.sdr}`,
-          data: [
-            { x: start, y: getHeight(start) },
-            { x: end, y: getHeight(end) },
-          ],
-          borderColor: color,
-          borderWidth: 4,
-          pointRadius: 0,
-          fill: false,
-          tension: 0,
-        };
-      }),
+      hollowDotsDataset,
+      ...pipeSegments,
     ],
   };
 
-  const options: ChartOptions<"line"> = {
+  const options = {
     responsive: true,
     maintainAspectRatio: true,
     aspectRatio: 2,
+    elements: {
+      point: {
+        radius: 5,            // controls visible point size (optional)
+        hitRadius: 12,        // expands clickable/hoverable area
+        hoverRadius: 8,       // how big the point gets on hover
+      }
+    },
     scales: {
       x: {
         type: "linear",
@@ -170,12 +178,24 @@ export default function getGraph(topoData, pipeDesign) {
         },
       },
       tooltip: {
-        titleFont: { size: 16 },
-        bodyFont: { size: 14 },
+        callbacks: {
+          label: function (context) {
+            const point = context.raw;
+            if (point.meta) {
+              return [
+                `Point: (${point.x}, ${point.y})`,
+                `Pipe: ${point.meta.type}`,
+                `Length: ${point.meta.length}m`,
+                `Height: ${point.meta.height}m`,
+              ];
+            }
+            return `(${context.raw.x}, ${context.raw.y})`; // fallback
+          },
+        },
       },
       title: {
         display: true,
-        text: "Topography, Pipe Segments, and HGL",
+        text: "Pipes",
         font: { size: 20 },
       },
     },
@@ -185,15 +205,14 @@ export default function getGraph(topoData, pipeDesign) {
     <div className="mt-4 space-y-2">
       {Array.from(pipeColorMap.entries()).map(([key, color]) => (
         <div key={key} className="flex items-center space-x-2">
-          <div
-            className="w-5 h-5 rounded"
-            style={{ backgroundColor: color }}
-          />
-          <span className="text-sm">{key.replace("-", ' SDR: ')}</span>
+          <div className="w-5 h-5 rounded" style={{ backgroundColor: color }} />
+          <span className="text-sm">{key.replace("-", " SDR: ")}</span>
         </div>
       ))}
     </div>
   );
 
-  return { data, options, chartRef, Legend };
+  console.log(report.graph, report.pipe_design, graphWithAdjustedL, hglPoints);
+
+  return { data, options, Legend };
 }
