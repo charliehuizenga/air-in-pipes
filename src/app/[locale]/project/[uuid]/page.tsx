@@ -39,7 +39,6 @@ export default function ProjectTabs() {
 
   useProjectLoader((proj) => {
     dispatch(setProject(proj));
-    console.log(proj);
   });
 
   function invalidateReport() {
@@ -48,7 +47,18 @@ export default function ProjectTabs() {
 
   async function calculate() {
     try {
-      const res = await getDesign(project);
+
+      console.log(project);
+      const remappedPipes = project.library.pipe_data.filter(pipe => pipe.available);
+
+      const res = await getDesign({
+        ...project,
+        library: {
+          ...project.library,
+          pipe_data: remappedPipes,
+        },
+      });
+
       dispatch(setData(res));
       if (res.design_summary !== undefined) {
         console.log("Successfully calculated!");

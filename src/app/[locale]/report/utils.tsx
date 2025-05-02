@@ -47,17 +47,11 @@ export default function getGraph(report) {
     return pipeColorMap.get(key);
   };
 
-  let cumulativeL = 0;
-  const graphWithAdjustedL = report.graph.map((point) => {
-    cumulativeL += point.l ?? 0;
-    return { ...point, l: cumulativeL };
-  });
-
-  const pipeSegments = graphWithAdjustedL
+  const pipeSegments = report.graph
     .map((point, i) => {
       if (i === 0) return null; // skip the first point (no previous segment)
 
-      const prev = graphWithAdjustedL[i - 1];
+      const prev = report.graph[i - 1];
       const color = getPipeColor(point.nominal_size, point.sdr); // color from *current* segment info
 
       return {
@@ -75,10 +69,10 @@ export default function getGraph(report) {
     })
     .filter(Boolean); // remove nulls
 
-  const pipeEndpoints = graphWithAdjustedL.flatMap((point, i) => {
+  const pipeEndpoints = report.graph.flatMap((point, i) => {
     if (i === 0) return [];
 
-    const prev = graphWithAdjustedL[i - 1];
+    const prev = report.graph[i - 1];
     const segmentLength = point.l - prev.l;
     const label = `${prev.nominal_size} SDR: ${prev.sdr}`;
 
@@ -107,9 +101,9 @@ export default function getGraph(report) {
   };
   
   const hglPoints = [];
-  if (pipeDesign.length > 0 && graphWithAdjustedL.length > 0) {
+  if (pipeDesign.length > 0 && report.graph.length > 0) {
     let cumulativeX = 0;
-    const initialH = graphWithAdjustedL[0].h;
+    const initialH = report.graph[0].h;
   
     // First point: start of the system
     hglPoints.push({ x: 0, y: initialH });
@@ -212,7 +206,7 @@ export default function getGraph(report) {
     </div>
   );
 
-  console.log(report.graph, report.pipe_design, graphWithAdjustedL, hglPoints);
+  console.log(report.graph, report.pipe_design, hglPoints);
 
   return { data, options, Legend };
 }

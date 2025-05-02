@@ -30,7 +30,16 @@ export default function ProjectTabs() {
 
   async function calculate() {
     try {
-      const res = await getDesign(project);
+      const remappedPipes = project.library.pipe_data.filter(pipe => pipe.available);
+
+      const res = await getDesign({
+        ...project,
+        library: {
+          ...project.library,
+          pipe_data: remappedPipes,
+        },
+      });
+      
       dispatch(setData(res));
       if (res.design_summary !== undefined) {
         console.log("Successfully calculated!");
