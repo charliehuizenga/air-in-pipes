@@ -3,7 +3,7 @@ import { fetchProjects } from "../../projects/fetch-proj";
 import { useDispatch } from "react-redux";
 import { setLibrary } from "../../redux/project-slice";
 
-export default function ImportPipeData({ isOpen, setIsOpen }) {
+export default function ImportPipeData({ isOpen, setIsOpen, invalidateReport }) {
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const dispatch = useDispatch();
@@ -34,6 +34,7 @@ export default function ImportPipeData({ isOpen, setIsOpen }) {
       console.log(selectedProject.library);
       setIsOpen(false);
     }
+    invalidateReport();
   };
 
   return (

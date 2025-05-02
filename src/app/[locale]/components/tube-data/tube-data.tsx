@@ -22,16 +22,10 @@ export default function TubeData({ project, invalidateReport }) {
   const [checked, setChecked] = useState<boolean>(false);
   const [indeterminate, setIndeterminate] = useState<boolean>(false);
   const [isPopupOpen, setIsPopupOpen] = useState<boolean>(false);
-  const [projects, setProjects] = useState([]);
-  const [selectedProject, setSelectedProject] = useState(null);
   const [newPipeId, setNewPipeId] = useState("");
   const [newPipeSize, setNewPipeSize] = useState("");
   const [newPipeSdr, setNewPipeSdr] = useState("");
   const [newPipeCost, setNewPipeCost] = useState("");
-
-  useEffect(() => {
-    fetchProjects().then((data) => setProjects(data));
-  }, []);
 
   useEffect(() => {
     const allAvailable = pipeData?.every((pipe: PipeData) => pipe.available);
@@ -75,18 +69,6 @@ export default function TubeData({ project, invalidateReport }) {
     setNewPipeCost("");
   }
 
-  function handleSelectChange(event) {
-    const project = projects.find((p) => p.uuid === event.target.value);
-    setSelectedProject(project || null);
-  }
-
-  function importData() {
-    if (selectedProject) {
-      dispatch(setProject(selectedProject));
-      setIsPopupOpen(false);
-    }
-  }
-
   return (
     <div className="mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -99,7 +81,7 @@ export default function TubeData({ project, invalidateReport }) {
           </div>
 
           <div className="flex flex-row items-center gap-7">
-            <ImportPipeData isOpen={isPopupOpen} setIsOpen={setIsPopupOpen} />
+            <ImportPipeData isOpen={isPopupOpen} setIsOpen={setIsPopupOpen} invalidateReport={invalidateReport}/>
             <label className="block text-sm font-medium text-gray-700">
               {t("valve-cost")}
             </label>
@@ -107,8 +89,7 @@ export default function TubeData({ project, invalidateReport }) {
               <input
                 type="text"
                 value={cost}
-                onChange={(e) =>
-                {
+                onChange={(e) => {
                   dispatch(
                     setLibrary({
                       data: pipeData,
@@ -116,8 +97,7 @@ export default function TubeData({ project, invalidateReport }) {
                     })
                   );
                   invalidateReport();
-                }
-                }
+                }}
                 className="block w-32 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-500 sm:text-sm sm:leading-6"
               />
             </div>
@@ -129,32 +109,32 @@ export default function TubeData({ project, invalidateReport }) {
             type="text"
             placeholder={t("nominal-size")}
             value={newPipeSize}
-            onChange={(e) => setNewPipeSize(e.target.value)}
+            onChange={(e) => { setNewPipeSize(e.target.value); invalidateReport();}}
             className="border rounded-md p-2"
           />
           <input
             type="text"
             placeholder={t("sdr")}
             value={newPipeSdr}
-            onChange={(e) => setNewPipeSdr(e.target.value)}
+            onChange={(e) => { setNewPipeSdr(e.target.value); invalidateReport();}}
             className="border rounded-md p-2"
           />
           <input
             type="number"
             placeholder={t("id")}
             value={newPipeId}
-            onChange={(e) => setNewPipeId(e.target.value)}
+            onChange={(e) => { setNewPipeId(e.target.value); invalidateReport();}}
             className="border rounded-md p-2"
           />
           <input
             type="number"
             placeholder={t("cost")}
             value={newPipeCost}
-            onChange={(e) => setNewPipeCost(e.target.value)}
+            onChange={(e) => { setNewPipeCost(e.target.value); invalidateReport();}}
             className="border rounded-md p-2"
           />
           <button
-            onClick={handleAddPipe}
+            onClick={() => {handleAddPipe(); invalidateReport();}}
             className="bg-sky-500 text-white px-3 py-1 rounded-md"
           >
             {t("add")}
@@ -175,7 +155,7 @@ export default function TubeData({ project, invalidateReport }) {
                             className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500"
                             ref={checkbox}
                             checked={checked}
-                            onChange={toggleAll}
+                            onChange={() => { toggleAll(); invalidateReport();}}
                           />
                           <span className="px-4 text-sm font-semibold text-gray-900">
                             {t("available")}
@@ -216,14 +196,15 @@ export default function TubeData({ project, invalidateReport }) {
                             type="checkbox"
                             className="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500"
                             checked={pipe.available}
-                            onChange={(e) =>
+                            onChange={(e) => {
                               dispatch(
                                 togglePipeAvailability({
                                   pipeId: pipe.id,
                                   isChecked: e.target.checked,
                                 })
-                              )
-                            }
+                              );
+                              invalidateReport();
+                            }}
                           />
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">

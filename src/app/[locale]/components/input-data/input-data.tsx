@@ -61,7 +61,7 @@ export default function InputData({ project, invalidateReport }) {
       </div>
 
       {activeTab === t("profile-data") && (
-        <ProfileData project={project}></ProfileData>
+        <ProfileData project={project} invalidateReport={invalidateReport}></ProfileData>
       )}
 
       {activeTab === t("topo-data") && (

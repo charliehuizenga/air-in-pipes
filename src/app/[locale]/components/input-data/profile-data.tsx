@@ -17,7 +17,7 @@ type InputValues = {
   [K in keyof Topo]?: string;
 };
 
-export default function ProfileData({project}) {
+export default function ProfileData({project, invalidateReport}) {
   const t = useTranslations("profile-data");
   const topo = project.topo;
   const dispatch = useDispatch();
@@ -54,6 +54,7 @@ export default function ProfileData({project}) {
     dispatch(removeTopo(index));
     setCheckedItems((prev) => prev.filter((_, i) => i !== index));
     setInputValues((prev) => prev.filter((_, i) => i !== index));
+    invalidateReport();
   };
 
   // Function to add a new point
@@ -74,6 +75,7 @@ export default function ProfileData({project}) {
 
     setInputValues((prev) => [...prev, { name: "", l: "", h: "" }]);
     dispatch(setTopo({ topoData: newTopo, valveCount: checkedCount }));
+    invalidateReport();
   };
 
   // Function to handle checkbox clicks
@@ -83,6 +85,7 @@ export default function ProfileData({project}) {
       newState[index] = !newState[index];
       return newState;
     });
+    invalidateReport();
   };
 
   // Function to handle input changes
@@ -105,6 +108,8 @@ export default function ProfileData({project}) {
     }
 
     dispatch(setTopo({ topoData: newTopo, valveCount: checkedCount }));
+
+    invalidateReport();
   };
 
   const checkedCount = checkedItems.reduce(
