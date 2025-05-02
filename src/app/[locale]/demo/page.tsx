@@ -20,6 +20,8 @@ const supabase = createClient(
 
 export default function ProjectTabs() {
   const [activeTab, setActiveTab] = useState("details");
+  const [projectVersion, setProjectVersion] = useState(0);
+  const [lastCalculatedVersion, setLastCalculatedVersion] = useState(-1);
   const dispatch = useDispatch();
   const project = useSelector((state: ProjectState) => state.project);
   const [showReport, toggleReport] = useState(false);
@@ -27,6 +29,11 @@ export default function ProjectTabs() {
   const tnav = useTranslations("nav-bar");
 
   useEffect(() => {dispatch(setProject(initialState));});
+
+  function invalidateReport() {
+    setProjectVersion((v) => v + 1);
+  }
+
 
   async function calculate() {
     try {
@@ -39,7 +46,7 @@ export default function ProjectTabs() {
           pipe_data: remappedPipes,
         },
       });
-      
+
       dispatch(setData(res));
       if (res.design_summary !== undefined) {
         console.log("Successfully calculated!");
@@ -90,9 +97,9 @@ export default function ProjectTabs() {
           </button>
         </div>
         <div className="p-4 w-full">
-          {activeTab === "details" && <Details project={project}/>}
-          {activeTab === "input_data" && <InputData project={project}/>}
-          {activeTab === "tube_data" && <TubeData project={project}/>}
+          {activeTab === "details" && <Details project={project} invalidateReport={invalidateReport}/>}
+          {activeTab === "input_data" && <InputData project={project} invalidateReport={invalidateReport}/>}
+          {activeTab === "tube_data" && <TubeData project={project} invalidateReport={invalidateReport}/>}
         </div>
       </div>
       {showReport ? (
