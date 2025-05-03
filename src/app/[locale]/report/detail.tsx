@@ -67,7 +67,7 @@ export default function Detail({ report, project }: SummaryProps) {
                 </td>
                 <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                   {index < valveLocations.length
-                    ? valveLocations[index].position.toFixed(1)
+                    ? valveLocations[index].l.toFixed(1)
                     : ""}
                 </td>
               </tr>
