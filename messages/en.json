@@ -155,7 +155,8 @@
     "project-name": "Project Name",
     "actions": "Actions",
     "delete": "Delete",
-    "no-projects-found": "No projects found."
+    "no-projects-found": "No projects found.",
+    "example-projects": "Examples"
   },
   "pipes": {
     "pipe-data": "Pipe Data",
