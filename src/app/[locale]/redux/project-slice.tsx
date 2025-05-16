@@ -97,7 +97,7 @@ const projectSlice = createSlice({
     setTopo: (state, action) => {
       state.topo = action.payload.topoData;
       state.nSocks = action.payload.valveCount;
-      state.valveFlags = Array(action.payload.valveFlags).fill(false);
+      state.valveFlags = action.payload.valveFlags;
     },
     removeTopo: (state, action) => {
       state.topo.splice(action.payload, 1);

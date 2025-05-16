@@ -6,10 +6,12 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { isHighPoint, calculateSlope, calculateStart } from "./utils";
-import { useSelector, useDispatch } from "react-redux";
-import { setTopo, Topo, removeTopo, setProject } from "../../redux/project-slice";
-import { ProjectState } from "../../redux/store";
-import { createClient } from "@supabase/supabase-js";
+import { useDispatch } from "react-redux";
+import {
+  setTopo,
+  Topo,
+  removeTopo,
+} from "../../redux/project-slice";
 
 // ----- Types ----- //
 
@@ -17,20 +19,15 @@ type InputValues = {
   [K in keyof Topo]?: string;
 };
 
-export default function ProfileData({project, invalidateReport}) {
+export default function ProfileData({ project, invalidateReport }) {
   const t = useTranslations("profile-data");
   const topo = project.topo;
   const dispatch = useDispatch();
 
-  // ----- States ----- //
-
-  // State to hold the points of the profile-data table
   const [inputValues, setInputValues] = useState<InputValues[]>([]);
   const [checkedItems, setCheckedItems] = useState<boolean[]>([]); // State to track high points (need valves)
 
-  //----- useEffects ----- //
   useEffect(() => {
-    // Initialize input values and checkboxes when topo changes
     const newInputValues = topo.map((point) => ({
       name: point.name ?? "",
       l: point.l?.toString() ?? "",
@@ -47,9 +44,6 @@ export default function ProfileData({project, invalidateReport}) {
     );
   }, [topo]);
 
-  // ----- Handle functions ----- //
-
-  // Function to remove a table point
   const handleRemove = (index: number) => {
     dispatch(removeTopo(index));
     setCheckedItems((prev) => prev.filter((_, i) => i !== index));
@@ -107,8 +101,14 @@ export default function ProfileData({project, invalidateReport}) {
       newTopo[index] = { ...newTopo[index], [key]: value };
     }
 
-    dispatch(setTopo({ topoData: newTopo, valveCount: checkedCount }));
-
+    dispatch(
+      setTopo({
+        topoData: newTopo,
+        valveCount: checkedCount,
+        valveFlags: checkedItems,
+      })
+    );
+    console.log(project);
     invalidateReport();
   };
 
@@ -243,7 +243,12 @@ export default function ProfileData({project, invalidateReport}) {
                             type="checkbox"
                             checked={checkedItems[index] ?? false}
                             onChange={() => handleCheckboxClick(index)}
-                            className="h-4 w-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500"
+                            disabled={project.airvalve_selection === "auto"}
+                            className={`h-4 w-4 rounded border-gray-300 text-sky-500 focus:ring-sky-500 ${
+                              project.airvalve_selection === "auto"
+                                ? "cursor-not-allowed opacity-50"
+                                : ""
+                            }`}
                           />
                         </td>
                         <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
