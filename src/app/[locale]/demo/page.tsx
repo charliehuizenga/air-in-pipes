@@ -31,6 +31,7 @@ export default function Demo({ initial = initialState }) {
   }
 
   async function calculate() {
+    console.log(project);
     try {
       const remappedPipes = project.library.pipe_data.filter(pipe => pipe.available);
 

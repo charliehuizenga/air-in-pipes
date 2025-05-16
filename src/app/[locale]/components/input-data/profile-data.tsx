@@ -7,11 +7,7 @@ import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { isHighPoint, calculateSlope, calculateStart } from "./utils";
 import { useDispatch } from "react-redux";
-import {
-  setTopo,
-  Topo,
-  removeTopo,
-} from "../../redux/project-slice";
+import { setTopo, Topo, removeTopo } from "../../redux/project-slice";
 
 // ----- Types ----- //
 
@@ -28,21 +24,39 @@ export default function ProfileData({ project, invalidateReport }) {
   const [checkedItems, setCheckedItems] = useState<boolean[]>([]); // State to track high points (need valves)
 
   useEffect(() => {
+    if (!topo || topo.length === 0) return;
+  
     const newInputValues = topo.map((point) => ({
       name: point.name ?? "",
       l: point.l?.toString() ?? "",
       h: point.h?.toString() ?? "",
     }));
-
+  
+    const newCheckedItems = topo.map((point, idx) => {
+      const prev = idx > 0 ? topo[idx - 1].h : point.h;
+      const next = idx < topo.length - 1 ? topo[idx + 1].h : point.h;
+      return isHighPoint(prev, point.h, next);
+    });
+  
+    const valveCount = newCheckedItems.reduce(
+      (total, isChecked) => total + (isChecked ? 1 : 0),
+      0
+    );
+  
     setInputValues(newInputValues);
-    setCheckedItems(
-      topo.map((point, idx) => {
-        const prevHeight = idx > 0 ? topo[idx - 1].h : point.h;
-        const nextHeight = idx < topo.length - 1 ? topo[idx + 1].h : point.h;
-        return isHighPoint(prevHeight, point.h, nextHeight);
+    setCheckedItems(newCheckedItems);
+  
+    dispatch(
+      setTopo({
+        topoData: topo,
+        valveCount,
+        valveFlags: newCheckedItems,
       })
     );
-  }, [topo]);
+  
+    invalidateReport();
+  }, [topo, dispatch]);
+  
 
   const handleRemove = (index: number) => {
     dispatch(removeTopo(index));
@@ -72,14 +86,27 @@ export default function ProfileData({ project, invalidateReport }) {
     invalidateReport();
   };
 
-  // Function to handle checkbox clicks
   const handleCheckboxClick = (index: number) => {
-    setCheckedItems((prevState) => {
-      const newState = [...prevState];
-      newState[index] = !newState[index];
-      return newState;
+    setCheckedItems((prev) => {
+      const updated = [...prev];
+      updated[index] = !updated[index];
+
+      const valveCount = updated.reduce(
+        (total, isChecked) => total + (isChecked ? 1 : 0),
+        0
+      );
+
+      dispatch(
+        setTopo({
+          topoData: topo,
+          valveCount,
+          valveFlags: updated,
+        })
+      );
+
+      invalidateReport();
+      return updated;
     });
-    invalidateReport();
   };
 
   // Function to handle input changes
