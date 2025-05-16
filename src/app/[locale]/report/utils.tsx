@@ -68,38 +68,35 @@ export default function getGraph(report) {
     })
     .filter(Boolean);
 
-  const pipeEndpoints = report.graph.flatMap((point, i) => {
-    if (i === 0) return [];
+  const hglPoints = report.hgl?.map(({ l, hgl }) => ({ x: l, y: hgl })) ?? [];
 
-    const prev = report.graph[i - 1];
-    const segmentLength = point.l - prev.l;
-    const label = `${prev.nominal_size} SDR: ${prev.sdr}`;
+  const valvePoints = report.valves ?? [];
 
-    return [
-      {
-        x: point.l,
-        y: point.h,
-        meta: {
-          type: label,
-          length: segmentLength.toFixed(2),
-          height: point.h,
-        },
-      },
-    ];
-  });
-
-  const hollowDotsDataset = {
-    label: "Pipe Endpoints",
-    data: pipeEndpoints,
-    pointRadius: 5,
+  const manualValves = {
+    label: "Manual Valves",
+    data: valvePoints
+      .filter((v) => v.type === "manual")
+      .map((v) => ({ x: v.l, y: v.h })),
+    pointRadius: 6,
     pointStyle: "circle",
-    borderWidth: 2,
     borderColor: "black",
-    backgroundColor: "transparent",
+    backgroundColor: "black",
+    borderWidth: 1,
     showLine: false,
   };
 
-  const hglPoints = report.hgl?.map(({ l, hgl }) => ({ x: l, y: hgl })) ?? [];
+  const automaticValves = {
+    label: "Automatic Valves",
+    data: valvePoints
+      .filter((v) => v.type === "automatic")
+      .map((v) => ({ x: v.l, y: v.h })),
+    pointRadius: 6,
+    pointStyle: "circle",
+    borderColor: "black",
+    backgroundColor: "white",
+    borderWidth: 2,
+    showLine: false,
+  };
 
   const data = {
     datasets: [
@@ -113,7 +110,8 @@ export default function getGraph(report) {
         pointRadius: 0,
         tension: 0,
       },
-      hollowDotsDataset,
+      manualValves,
+      automaticValves,
       ...pipeSegments,
     ],
   };
@@ -156,7 +154,11 @@ export default function getGraph(report) {
           usePointStyle: true,
           filter: function (legendItem, data) {
             const label = legendItem.text;
-            return label === "HGL" || label === "Pipe Endpoints";
+            return (
+              label === "HGL" ||
+              label === "Manual Valves" ||
+              label === "Automatic Valves"
+            );
           },
         },
       },

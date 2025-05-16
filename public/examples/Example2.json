@@ -10,7 +10,7 @@
   "qmax": 0.28,
   "airvalve_selection": "auto",
   "nSocks": 2,
-  "valveFlags": [false, false],
+  "valveFlags": [false, false, true, false, true, false, false],
   "topo": [
     {
       "name": "spring",
