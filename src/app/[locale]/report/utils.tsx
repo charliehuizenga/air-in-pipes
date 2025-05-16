@@ -49,10 +49,9 @@ export default function getGraph(report) {
 
   const pipeSegments = report.graph
     .map((point, i) => {
-      if (i === 0) return null; // skip the first point (no previous segment)
-
+      if (i === 0) return null;
       const prev = report.graph[i - 1];
-      const color = getPipeColor(point.nominal_size, point.sdr); // color from *current* segment info
+      const color = getPipeColor(point.nominal_size, point.sdr);
 
       return {
         label: `${point.nominal_size} SDR: ${point.sdr}`,
@@ -67,7 +66,7 @@ export default function getGraph(report) {
         tension: 0,
       };
     })
-    .filter(Boolean); // remove nulls
+    .filter(Boolean);
 
   const pipeEndpoints = report.graph.flatMap((point, i) => {
     if (i === 0) return [];
@@ -99,23 +98,9 @@ export default function getGraph(report) {
     backgroundColor: "transparent",
     showLine: false,
   };
-  
-  const hglPoints = [];
-  if (pipeDesign.length > 0 && report.graph.length > 0) {
-    let cumulativeX = 0;
-    const initialH = report.graph[0].h;
-  
-    // First point: start of the system
-    hglPoints.push({ x: 0, y: initialH });
-  
-    for (const pipe of pipeDesign) {
-      cumulativeX += pipe.length;
-      const hglY = pipe.hgl;
-  
-      hglPoints.push({ x: cumulativeX, y: hglY });
-    }
-  }
-  
+
+  const hglPoints = report.hgl?.map(({ l, hgl }) => ({ x: l, y: hgl })) ?? [];
+
   const data = {
     datasets: [
       {
@@ -139,14 +124,14 @@ export default function getGraph(report) {
     aspectRatio: 2,
     elements: {
       point: {
-        radius: 5,            // controls visible point size (optional)
-        hitRadius: 12,        // expands clickable/hoverable area
-        hoverRadius: 8,       // how big the point gets on hover
-      }
+        radius: 5, // controls visible point size (optional)
+        hitRadius: 12, // expands clickable/hoverable area
+        hoverRadius: 8, // how big the point gets on hover
+      },
     },
     scales: {
       x: {
-        type: "linear",
+        type: "linear" as const,
         title: {
           display: true,
           text: "Length (m)",
@@ -169,6 +154,10 @@ export default function getGraph(report) {
         labels: {
           font: { size: 14 },
           usePointStyle: true,
+          filter: function (legendItem, data) {
+            const label = legendItem.text;
+            return label === "HGL" || label === "Pipe Endpoints";
+          },
         },
       },
       tooltip: {
@@ -206,7 +195,7 @@ export default function getGraph(report) {
     </div>
   );
 
-  console.log(report.graph, report.pipe_design, hglPoints);
+  console.log(pipeSegments, hglPoints);
 
   return { data, options, Legend };
 }

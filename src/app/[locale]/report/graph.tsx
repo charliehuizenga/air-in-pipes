@@ -8,7 +8,7 @@ export default function Graph({ report, project }) {
 
   return (
     <div className="hidden sm:block mx-auto max-w-5xl py-12 sm:px-6 lg:px-8">
-      <Line data={data} />
+      <Line data={data} options={options}/>
       <div style={{ width: "25%" }}>
         <Legend />
       </div>
