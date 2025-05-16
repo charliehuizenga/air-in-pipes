@@ -3,7 +3,12 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { useTranslations } from "next-intl";
 
-export default function ProjectTable({ projects, onSelect, onDelete }) {
+export default function ProjectTable({
+  projects,
+  onSelect,
+  onDelete,
+  toggleDelete = true,
+}) {
   const t = useTranslations("projects");
 
   return (
@@ -13,9 +18,11 @@ export default function ProjectTable({ projects, onSelect, onDelete }) {
           <th className="border border-gray-300 px-4 py-2 text-left">
             {t("project-name")}
           </th>
-          <th className="border border-gray-300 px-2 py-2 text-center w-12">
-            {t("actions")}
-          </th>
+          {toggleDelete && (
+            <th className="border border-gray-300 px-2 py-2 text-center w-12">
+              {t("actions")}
+            </th>
+          )}
         </tr>
       </thead>
       <tbody>
@@ -33,18 +40,20 @@ export default function ProjectTable({ projects, onSelect, onDelete }) {
                   </span>
                 )}
               </td>
-              <td className="border border-gray-300 px-2 py-2 text-center w-12">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDelete(p.uuid);
-                  }}
-                  className="p-1 rounded-md text-red-500 hover:text-red-700"
-                  title={t("delete")}
-                >
-                  <TrashIcon className="h-5 w-5" />
-                </button>
-              </td>
+              {toggleDelete && (
+                <td className="border border-gray-300 px-2 py-2 text-center w-12">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDelete(p.uuid);
+                    }}
+                    className="p-1 rounded-md text-red-500 hover:text-red-700"
+                    title={t("delete")}
+                  >
+                    <TrashIcon className="h-5 w-5" />
+                  </button>
+                </td>
+              )}
             </tr>
           ))
         ) : (

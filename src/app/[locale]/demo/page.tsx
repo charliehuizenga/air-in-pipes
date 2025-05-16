@@ -13,27 +13,22 @@ import TubeData from "../components/tube-data/tube-data";
 import Report from "../report/page";
 import { initialState, setProject } from "../redux/project-slice";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-export default function ProjectTabs() {
+export default function Demo({ initial = initialState }) {
   const [activeTab, setActiveTab] = useState("details");
   const [projectVersion, setProjectVersion] = useState(0);
   const [lastCalculatedVersion, setLastCalculatedVersion] = useState(-1);
   const dispatch = useDispatch();
   const project = useSelector((state: ProjectState) => state.project);
-  const [showReport, toggleReport] = useState(false);
   const t = useTranslations("report");
   const tnav = useTranslations("nav-bar");
 
-  useEffect(() => {dispatch(setProject(initialState));});
+  useEffect(() => {
+    dispatch(setProject(initial));
+  }, [dispatch, initial]);
 
   function invalidateReport() {
     setProjectVersion((v) => v + 1);
   }
-
 
   async function calculate() {
     try {
@@ -51,7 +46,7 @@ export default function ProjectTabs() {
       if (res.design_summary !== undefined) {
         console.log("Successfully calculated!");
         dispatch(setProject({ ...project, report: res }));
-        toggleReport(true);
+        setLastCalculatedVersion(projectVersion);
       } else {
         console.log("Cannot calculate with current input data.");
       }
@@ -102,7 +97,7 @@ export default function ProjectTabs() {
           {activeTab === "tube_data" && <TubeData project={project} invalidateReport={invalidateReport}/>}
         </div>
       </div>
-      {showReport ? (
+      {projectVersion === lastCalculatedVersion ? (
         <Report calculate={calculate} saveProject={() => {console.log("saved");}}/>
       ) : (
         <button

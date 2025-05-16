@@ -11,6 +11,7 @@ import { fetchProjects, fetchMembershipOrgs } from "./fetch-proj";
 import { createClient } from "@supabase/supabase-js";
 import ProjectTable from "./table";
 import Organizations from "./organizations";
+import ExampleTable from "./examples";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -203,6 +204,7 @@ export default function App() {
               </button>
             </div>
             <Organizations orgs={orgs} />
+            <ExampleTable />
           </>
         )}
       </div>
