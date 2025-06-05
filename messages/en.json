@@ -181,5 +181,12 @@
     "about-air-text-p2": "Now the general belief is that if you have air in the pipes you need to get rid of it so that the pipes will run full. This is because the presence of air often increases the head required for a given flow. In fact, it is not at all rare that this air acts as a block so that no water at all comes out at the end of the pipe. On the other hand, it turns out that very frequently, in systems with springs of small, uncertain or variable output, there is a big advantage in operating with air in the pipes. The advantage is that you can design such a system so that it will operate like a canal, instead of a pipeline: within limits, which you can easily calculate, it will deliver to the end of the line whatever flow rate is provided by the spring and this without having to adjust a valve or operate any controls",
     "about-air-text-p3": "This online tool allows the user to specify the topography of terrain between the spring and the tank and specify the minumum and maximum desired flow rate. The tool will then caluclate the diameters of pipe required to construct the system. In some cases, air valves may be required and the location and type of these valves will also be specified. ",
     "about-download-manual": "Links to English and Spanish versions of the complete design manual are here:"
+  },
+  "welcome": {
+    "welcome-message": "Welcome to Agua Para La Vida's Air in Pipes Tool!",
+    "welcome-message2": "Design, manage, and collaborate on gravity flow water systems.",
+    "login": "Log in",
+    "demo": "Try demo",
+    "projects": "Go to projects"
   }
 }

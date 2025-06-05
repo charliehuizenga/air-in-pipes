@@ -69,5 +69,12 @@
     "actions": "Actions",
     "no-projects": "No projects found",
     "create": "Create New Project"
+  },
+  "welcome": {
+    "welcome-message": "Welcome to Agua Para La Vida's Air in Pipes Tool!",
+    "welcome-message2": "Design, manage, and collaborate on gravity flow water systems.",
+    "login": "Log in",
+    "demo": "Try demo",
+    "projects": "Go to projects"
   }
 }

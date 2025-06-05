@@ -187,6 +187,13 @@
     "about-air-text-p3": "Esta herramienta en línea permite al usuario especificar la topografía del terreno entre el manantial y el depósito y especificar el caudal mínimo y máximo deseado. A continuación, la herramienta calculará los diámetros de tubería necesarios para construir el sistema. En algunos casos, pueden ser necesarias válvulas de aire, cuya ubicación y tipo también se especifican.",
     "about-download-manual": "Aquí encontrará enlaces a las versiones en inglés y español del manual de diseño completo:"
 
+  },
+  "welcome": {
+    "welcome-message": "¡Bienvenido a la herramienta Aire en tuberías de Agua Para La Vida!",
+    "welcome-message2": "Diseñar, gestionar y colaborar en sistemas de agua por gravedad.",
+    "login": "Log in",
+    "demo": "Prueba la demo",
+    "projects": "Ir a los proyectos"
   }
 
 }
