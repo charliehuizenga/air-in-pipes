@@ -136,6 +136,15 @@ export default function ProfileData({ project, invalidateReport }) {
     }
   };
 
+  // Function to deal with clicking a highpoint checkbox
+  const handleCheckboxClick = (index: number) => {
+    setCheckedItems((prevState) => {
+      const newState = [...prevState];
+      newState[index] = !newState[index];
+      return newState;
+    });
+  };
+
   // Function to handle input changes
   const handleChange = (index: number, key: keyof Topo, value: string) => {
     setInputValues((prev) => {
