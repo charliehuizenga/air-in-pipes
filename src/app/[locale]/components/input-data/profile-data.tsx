@@ -65,6 +65,16 @@ export default function ProfileData({ project, invalidateReport }) {
     invalidateReport();
   };
 
+  const handleClear = () => {
+    const blankPoint = { name: "", l: 0, h: 0 };
+    const blankInput = { name: "", l: "", h: "" };
+
+    setInputValues([blankInput]);
+    setCheckedItems([false]);
+    dispatch(setTopo({ topoData: [blankPoint], valveCount: 0 }));
+    invalidateReport();
+  };
+
   // Function to add a new point
   const handleAddPoint = () => {
     const newPoint = { name: "", l: 0, h: 0 }; // Ensuring valid initial values
@@ -74,10 +84,10 @@ export default function ProfileData({ project, invalidateReport }) {
       ...prevCheckedItems,
       newTopo.length > 2
         ? isHighPoint(
-            newTopo[newTopo.length - 3].h,
-            newTopo[newTopo.length - 2].h,
-            newTopo[newTopo.length - 1].h
-          )
+          newTopo[newTopo.length - 3].h,
+          newTopo[newTopo.length - 2].h,
+          newTopo[newTopo.length - 1].h
+        )
         : false,
     ]);
 
@@ -86,27 +96,44 @@ export default function ProfileData({ project, invalidateReport }) {
     invalidateReport();
   };
 
-  const handleCheckboxClick = (index: number) => {
-    setCheckedItems((prev) => {
-      const updated = [...prev];
-      updated[index] = !updated[index];
+  // Function to paste data from spreadshet
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      const lines = text.trim().split("\n");
 
-      const valveCount = updated.reduce(
-        (total, isChecked) => total + (isChecked ? 1 : 0),
-        0
-      );
+      const newPoints = lines.map((line) => {
+        const [name, l, h] = line.split("\t");
+        return {
+          name: name?.trim() ?? "",
+          l: parseFloat(l),
+          h: parseFloat(h),
+        };
+      });
 
-      dispatch(
-        setTopo({
-          topoData: topo,
-          valveCount,
-          valveFlags: updated,
-        })
-      );
+      const newInputValues = newPoints.map((p) => ({
+        name: p.name,
+        l: p.l.toString(),
+        h: p.h.toString(),
+      }));
 
+      const newCheckedItems = newPoints.map((_, index) => {
+        if (index < 2) return false;
+        const a = newPoints[index - 2].h;
+        const b = newPoints[index - 1].h;
+        const c = newPoints[index].h;
+        return isHighPoint(a, b, c);
+      });
+
+      // Replace all existing data
+      setInputValues(newInputValues);
+      setCheckedItems(newCheckedItems);
+      dispatch(setTopo({ topoData: newPoints, valveCount: checkedCount }));
       invalidateReport();
-      return updated;
-    });
+
+    } catch (err) {
+      console.error("Failed to read clipboard:", err);
+    }
   };
 
   // Function to handle input changes
@@ -156,12 +183,32 @@ export default function ProfileData({ project, invalidateReport }) {
           <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
             <button
               type="button"
+              onClick={handlePaste}
+              className="block rounded-md bg-sky-500 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            >
+              {t("paste-topo")}
+            </button>
+          </div>
+          <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+            <button
+              type="button"
               onClick={handleAddPoint}
               className="block rounded-md bg-sky-500 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
             >
               {t("add-point")}
             </button>
           </div>
+          <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
+            <button
+              type="button"
+              onClick={handleClear}
+              className="block rounded-md bg-sky-500 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            >
+              {t("clear-topo")}
+            </button>
+          </div>
+
+
         </div>
         <div className="mt-8 flow-root">
           <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">

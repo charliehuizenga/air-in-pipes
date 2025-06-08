@@ -1,6 +1,8 @@
 {
   "profile-data": {
     "add-point": "Add Point",
+    "paste-topo": "Paste data",
+    "clear-topo": "Clear",
     "cancel": "Cancel",
     "height": "Height",
     "label": "Label",
