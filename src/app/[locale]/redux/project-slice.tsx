@@ -41,9 +41,9 @@ export const initialState: Project = {
   qmin: 0.25,
   airvalve_selection: "auto",
   template: "",
-  topo: [{ name: "1", l: 0, h: 0 }],
-  nSocks: 0,
-  valveFlags: [],
+  topo: [{ name: "Spring", l: 0, h: 31 }, { name: "", l: 250, h: 18 }, { name: "", l: 480, h: 20 }, { name: "", l: 1000, h: 0 }, { name: "Tank", l: 1700, h: 6 }],
+  nSocks: 1,
+  valveFlags: [false],
   library: {
     valve_cost: 380,
     pipe_data: pipeData,
